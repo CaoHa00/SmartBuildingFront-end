@@ -10,8 +10,8 @@ export default function Login() {
           <Image
             src="/logo-15yrs.svg"
             alt="EIU Logo"
-            width={60}
-            height={60}
+            width={120}
+            height={120}
           />
         </div>
         <LoginForm/>
