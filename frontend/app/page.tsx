@@ -9,8 +9,8 @@ const Navbar = () => (
           <Image
             src="/logo-15yrs.svg"
             alt="EIU Logo"
-            width={100}
-            height={100}
+            width={120}
+            height={120}
           />
         </Link>
         <div className="hidden md:flex items-center gap-8">
