@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Table,
   TableBody,
@@ -20,11 +21,71 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const api = axios.create({
+  baseURL: "http://localhost:9090/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+interface Block {
+  block_id: number;
+  blockName: string;
+  floors: any[];
+}
+
 export function BlockManagement() {
-  const [blocks, setBlocks] = useState([
-    { id: 1, name: "Block A", description: "Main Building" },
-    { id: 2, name: "Block B", description: "Secondary Building" },
-  ]);
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [formData, setFormData] = useState<Partial<Block>>({
+    blockName: "",
+  });
+
+  useEffect(() => {
+    fetchBlocks();
+  }, []);
+
+  const fetchBlocks = async () => {
+    try {
+      const { data } = await api.get("/block");
+      setBlocks(data);
+    } catch (error) {
+      console.error("Failed to fetch blocks:", error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (isEdit) {
+        await api.put(`/block/${formData.block_id}`, formData);
+      } else {
+        await api.post("/block", formData);
+      }
+      fetchBlocks();
+      setIsOpen(false);
+      setFormData({ blockName: "" });
+      setIsEdit(false);
+    } catch (error) {
+      console.error("Failed to save block:", error);
+    }
+  };
+
+  const handleDelete = async (blockId: number) => {
+    try {
+      await api.delete(`/block/${blockId}`);
+      fetchBlocks();
+    } catch (error) {
+      console.error("Failed to delete block:", error);
+    }
+  };
+
+  const handleEdit = (block: Block) => {
+    setFormData(block);
+    setIsEdit(true);
+    setIsOpen(true);
+  };
 
   return (
     <div className="space-y-4">
@@ -32,28 +93,32 @@ export function BlockManagement() {
         <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
           Block Management
         </h2>
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]">
+            <Button 
+              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+              onClick={() => { setIsEdit(false); setFormData({ blockName: "" }); }}
+            >
               Add New Block
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                Add New Block
+                {isEdit ? "Edit Block" : "Add New Block"}
               </DialogTitle>
             </DialogHeader>
-            <form className="space-y-4 text-xl text-neutral-700">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xl text-neutral-700">
               <div>
-                <Label htmlFor="name">Block Name</Label>
-                <Input id="name" />
+                <Label htmlFor="blockName">Block Name</Label>
+                <Input 
+                  id="blockName"
+                  value={formData.blockName}
+                  onChange={(e) => setFormData({ ...formData, blockName: e.target.value })}
+                  required
+                />
               </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Input id="description" />
-              </div>
-              <Button type="submit">Save</Button>
+              <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -65,27 +130,33 @@ export function BlockManagement() {
             <TableRow className="bg-[hsl(var(--tech-blue))/5]">
               <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Description</TableHead>
+              <TableHead>Floors</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {blocks.map((block) => (
               <TableRow
-                key={block.id}
+                key={block.block_id}
                 className="hover:bg-[hsl(var(--tech-blue))/5]"
               >
-                <TableCell>{block.id}</TableCell>
-                <TableCell>{block.name}</TableCell>
-                <TableCell>{block.description}</TableCell>
+                <TableCell>{block.block_id}</TableCell>
+                <TableCell>{block.blockName}</TableCell>
+                <TableCell>{block.floors.length}</TableCell>
                 <TableCell>
                   <Button
                     variant="outline"
                     className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                    onClick={() => handleEdit(block)}
                   >
                     Edit
                   </Button>
-                  <Button variant="destructive">Delete</Button>
+                  <Button 
+                    variant="destructive"
+                    onClick={() => handleDelete(block.block_id)}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
