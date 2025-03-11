@@ -1,51 +1,29 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   AudioWaveform,
-  Blocks,
-  Calendar,
+  Building2,
+  Clock,
   Command,
-  Home,
-  Inbox,
+  HouseWifi,
   MessageCircleQuestion,
   Search,
   Settings2,
-  Sparkles,
-  Trash2,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavFavorites } from "@/components/nav-favorites"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavWorkspaces } from "@/components/nav-workspaces"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavMain } from "@/components/nav-main";
+import { NavSecondary } from "@/components/nav-secondary";
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { NavUser } from "./nav-user";
 
 // This is sample data.
 const data = {
-  teams: [
-    {
-      name: "IIC 4.0 Room",
-      logo: () => <img src="icon.svg" alt="IIC 4.0 Room Logo" />,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
     {
       title: "Search",
@@ -53,43 +31,42 @@ const data = {
       icon: Search,
     },
     {
-      title: "Ask AI",
+      title: "Room",
       url: "#",
-      icon: Sparkles,
+      icon: Building2,
+      submenu: [
+        { title: "Room List", url: "#" },
+        { title: "Room Status", url: "#" },
+        { title: "Room Management", url: "#" }
+      ]
     },
     {
-      title: "Home",
+      title: "Schedule",
       url: "#",
-      icon: Home,
-      isActive: true,
+      icon: Clock,
+      submenu: [
+        { title: "Daily Schedule", url: "#" },
+        { title: "Weekly Schedule", url: "#" },
+        { title: "Calendar View", url: "#" }
+      ]
     },
     {
-      title: "Inbox",
+      title: "Active Devices",
       url: "#",
-      icon: Inbox,
+      icon: HouseWifi,
       badge: "10",
+      submenu: [
+        { title: "All Devices", url: "#" },
+        { title: "Connected Devices", url: "#" },
+        { title: "Device Status", url: "#" }
+      ]
     },
   ],
   navSecondary: [
     {
-      title: "Calendar",
-      url: "#",
-      icon: Calendar,
-    },
-    {
       title: "Settings",
       url: "#",
       icon: Settings2,
-    },
-    {
-      title: "Templates",
-      url: "#",
-      icon: Blocks,
-    },
-    {
-      title: "Trash",
-      url: "#",
-      icon: Trash2,
     },
     {
       title: "Help",
@@ -97,19 +74,26 @@ const data = {
       icon: MessageCircleQuestion,
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <img src="logo.svg" className="w-40" alt="Sidebar Logo" />
         <NavMain items={data.navMain} />
       </SidebarHeader>
       <SidebarContent>
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
+      <NavUser
+        user={{
+          name: "Duck Hwee",
+          email: "huyme666@gmail.com",
+          avatar: "",
+        }}
+      />
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
