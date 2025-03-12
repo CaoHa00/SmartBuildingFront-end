@@ -69,7 +69,7 @@ export default function AdminLayout({
                   "bg-[hsl(var(--tech-dark-blue))] text-white"
               )}
             >
-              <item.icon size={16} />
+              <item.icon/>
               {item.title}
             </Link>
           ))}

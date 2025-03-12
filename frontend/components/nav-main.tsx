@@ -21,11 +21,11 @@ export function NavMain({
   return (
     <SidebarMenu>
       {items.map((item) => (
-        <SidebarMenuItem key={item.title}>
+        <SidebarMenuItem key={item.title} className="w-full h-[40px]">
           <SidebarMenuButton asChild isActive={item.isActive}>
-            <a href={item.url}>
-              <item.icon />
-              <span>{item.title}</span>
+            <a href={item.url} className="flex items-center gap-2">
+              <item.icon className="text-blue-800" size={25} />
+              <span className="font-semibold text-sm text-blue-800 uppercase">{item.title}</span>
             </a>
           </SidebarMenuButton>
         </SidebarMenuItem>
