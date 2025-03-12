@@ -39,7 +39,7 @@ interface Room {
   room_id: number;
   roomName: string;
   floor_id: number;
-  equipmet: any[];
+  equipment: any[];
 }
 
 interface Floor {
@@ -95,7 +95,7 @@ export function RoomManagement() {
         room_id: 0,
         roomName: "",
         floor_id: 0,
-        // equipment: [],
+        equipment: [],
       });
       setIsEdit(false);
     } catch (e) {

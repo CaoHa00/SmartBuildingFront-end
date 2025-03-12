@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 
 const api = axios.create({
-  baseURL: "http://localhost:9090/api",
+  baseURL: "http://localhost:9090/api", //will import back to .env file
   headers: {
     "Content-Type": "application/json",
   },
@@ -94,7 +94,7 @@ export function FloorManagement() {
         floor_id: 0,
         floorName: "",
         block_id: 0,
-        // rooms: [],
+        rooms: [],
       });
       setIsEdit(false);
     } catch (e) {
