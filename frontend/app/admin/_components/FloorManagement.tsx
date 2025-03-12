@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 
 const api = axios.create({
-  baseURL: "http://localhost:9090",
+  baseURL: "http://localhost:9090/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,13 +39,13 @@ interface Floor {
   floor_id: number;
   floorName: string;
   block_id: number;
-  // rooms: any[];
+  rooms: any[];
 }
 
 interface Block {
   block_id: number;
   blockName: string;
-  // floors: any[];
+  floors: any[];
 }
 
 export function FloorManagement() {

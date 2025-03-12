@@ -29,7 +29,7 @@ import {
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:9090",
+  baseURL: "http://localhost:9090/api", //will import back to .env file
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,14 +39,14 @@ interface Room {
   room_id: number;
   roomName: string;
   floor_id: number;
-  // equipmet: any[];
+  equipmet: any[];
 }
 
 interface Floor {
   floor_id: number;
   floorName: string;
   block_id: number;
-  // rooms: any[];
+  rooms: any[];
 }
 
 export function RoomManagement() {
