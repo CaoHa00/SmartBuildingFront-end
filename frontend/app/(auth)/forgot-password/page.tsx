@@ -7,7 +7,7 @@ export default function ForgotPassword() {
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <div className="flex justify-center mb-8">
           <Image
-            src="/logo-15yrs.svg"
+            src="/icon/logo-15yrs.svg"
             alt="EIU Logo"
             width={120}
             height={120}
