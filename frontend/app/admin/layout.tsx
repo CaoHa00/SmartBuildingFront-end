@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
 import {
   LayoutGrid,
   Building2,
@@ -10,7 +10,7 @@ import {
   DoorClosed,
   Cpu,
   UserCircle2,
-} from "lucide-react";
+} from "lucide-react"
 
 const sidebarItems = [
   {
@@ -43,22 +43,20 @@ const sidebarItems = [
     href: "/admin/users",
     icon: UserCircle2,
   },
-];
+]
 
 export default function AdminLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   return (
     <div className="flex min-h-screen bg-background">
       <aside className="w-64 border-r border-sidebar-border bg-sidebar-background">
         <div className="p-6 border-b border-sidebar-border">
-          <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
-            Smart Building
-          </h2>
+          <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">Smart Building</h2>
         </div>
         <nav className="flex flex-col gap-2 p-4">
           {sidebarItems.map((item) => (
@@ -79,5 +77,5 @@ export default function AdminLayout({
       </aside>
       <main className="flex-1 bg-background">{children}</main>
     </div>
-  );
+  )
 }

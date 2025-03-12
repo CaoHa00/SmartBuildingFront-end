@@ -31,7 +31,7 @@ const api = axios.create({
 interface Block {
   block_id: number;
   blockName: string;
-  // floors: any[];
+  floors: any[];
 }
 
 export function BlockManagement() {
@@ -95,12 +95,9 @@ export function BlockManagement() {
         </h2>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button
+            <Button 
               className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-              onClick={() => {
-                setIsEdit(false);
-                setFormData({ blockName: "" });
-              }}
+              onClick={() => { setIsEdit(false); setFormData({ blockName: "" }); }}
             >
               Add New Block
             </Button>
@@ -111,18 +108,13 @@ export function BlockManagement() {
                 {isEdit ? "Edit Block" : "Add New Block"}
               </DialogTitle>
             </DialogHeader>
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-4 text-xl text-neutral-700"
-            >
+            <form onSubmit={handleSubmit} className="space-y-4 text-xl text-neutral-700">
               <div>
                 <Label htmlFor="blockName">Block Name</Label>
-                <Input
+                <Input 
                   id="blockName"
                   value={formData.blockName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, blockName: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, blockName: e.target.value })}
                   required
                 />
               </div>
@@ -150,7 +142,7 @@ export function BlockManagement() {
               >
                 <TableCell>{block.block_id}</TableCell>
                 <TableCell>{block.blockName}</TableCell>
-                {/* <TableCell>{block.floors.length}</TableCell> */}
+                <TableCell>{block.floors.length}</TableCell>
                 <TableCell>
                   <Button
                     variant="outline"
@@ -159,7 +151,7 @@ export function BlockManagement() {
                   >
                     Edit
                   </Button>
-                  <Button
+                  <Button 
                     variant="destructive"
                     onClick={() => handleDelete(block.block_id)}
                   >
