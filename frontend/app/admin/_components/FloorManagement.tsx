@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 
 const api = axios.create({
-  baseURL: "http://localhost:9090/api",
+  baseURL: "http://localhost:9090",
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,13 +39,13 @@ interface Floor {
   floor_id: number;
   floorName: string;
   block_id: number;
-  rooms: any[];
+  // rooms: any[];
 }
 
 interface Block {
   block_id: number;
   blockName: string;
-  floors: any[];
+  // floors: any[];
 }
 
 export function FloorManagement() {
@@ -59,6 +59,7 @@ export function FloorManagement() {
 
   useEffect(() => {
     fetchFloors();
+    fetchBlocks();
   }, []);
 
   const fetchFloors = async () => {
@@ -93,7 +94,7 @@ export function FloorManagement() {
         floor_id: 0,
         floorName: "",
         block_id: 0,
-        rooms: [],
+        // rooms: [],
       });
       setIsEdit(false);
     } catch (e) {
@@ -191,7 +192,6 @@ export function FloorManagement() {
               <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Block</TableHead>
-              <TableHead>Level</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>

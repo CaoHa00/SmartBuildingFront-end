@@ -1,0 +1,116 @@
+{
+    "block": [
+      {
+        "block_id": "1",
+        "blockName": "B3"
+      },
+      {
+        "block_id": "2",
+        "blockName": "B5"
+      },
+      {
+        "block_id": "3",
+        "blockName": "B8"
+      },
+      {
+        "block_id": "4",
+        "blockName": "B10"
+      },
+      {
+        "block_id": "5",
+        "blockName": "B11"
+      }
+    ],
+    "floor": [
+      {
+        "floor_id": "1",
+        "floorName": "Floor 1",
+        "block_id": "1"
+      },
+      {
+        "floor_id": "2",
+        "floorName": "Floor 2",
+        "block_id": "1"
+      },
+      {
+        "floor_id": "3",
+        "floorName": "Floor 3",
+        "block_id": "1"
+      },
+      {
+        "floor_id": "4",
+        "floorName": "Floor 1",
+        "block_id": "2"
+      },
+      {
+        "floor_id": "5",
+        "floorName": "Floor 2",
+        "block_id": "2"
+      },
+      {
+        "floor_id": "6",
+        "floorName": "Floor 3",
+        "block_id": "2"
+      },
+      {
+        "floor_id": "7",
+        "floorName": "Floor 1",
+        "block_id": "3"
+      },
+      {
+        "floor_id": "8",
+        "floorName": "Floor 2",
+        "block_id": "3"
+      },
+      {
+        "floor_id": "9",
+        "floorName": "Floor 3",
+        "block_id": "3"
+      },
+      {
+        "floor_id": "10",
+        "floorName": "Floor 4",
+        "block_id": "3"
+      },
+      {
+        "floor_id": "11",
+        "floorName": "Floor 1",
+        "block_id": "4"
+      },
+      {
+        "floor_id": "12",
+        "floorName": "Floor 2",
+        "block_id": "4"
+      },
+      {
+        "floor_id": "13",
+        "floorName": "Floor 3",
+        "block_id": "4"
+      },
+      {
+        "floor_id": "14",
+        "floorName": "Floor 4",
+        "block_id": "4"
+      },
+      {
+        "floor_id": "15",
+        "floorName": "Floor 1",
+        "block_id": "5"
+      },
+      {
+        "floor_id": "16",
+        "floorName": "Floor 2",
+        "block_id": "5"
+      },
+      {
+        "floor_id": "17",
+        "floorName": "Floor 3",
+        "block_id": "5"
+      },
+      {
+        "floor_id": "18",
+        "floorName": "Floor 4",
+        "block_id": "5"
+      }
+    ]
+  }
