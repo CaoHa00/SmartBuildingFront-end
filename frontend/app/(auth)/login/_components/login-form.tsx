@@ -1,13 +1,7 @@
-"use client";
+"use client"
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,18 +11,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/components/ui/form"
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 
 const formSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
-  password: z
-    .string()
+  password: z.string()
     .min(1, "Password is required")
     .min(6, "Password must be at least 6 characters"),
-});
+})
 
 export function LoginForm({
   className,
@@ -40,14 +33,14 @@ export function LoginForm({
       email: "",
       password: "",
     },
-  });
+  })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values);
+      console.log(values)
       // Add your login logic here
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
   }
 
@@ -71,7 +64,6 @@ export function LoginForm({
                   Login with Facebook
                 </Button>
                 <Button variant="outline" className="w-full">
-
                 <img src="/img/google.png" width={25} alt="Facebook logo"></img>
                   Login with Google
                 </Button>
@@ -116,11 +108,7 @@ export function LoginForm({
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={form.formState.isSubmitting}
-                >
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting ? "Logging in..." : "Login"}
                 </Button>
               </div>
