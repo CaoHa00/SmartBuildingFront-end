@@ -62,7 +62,7 @@ export function RegisterForm({
         <CardHeader>
           <div className="flex justify-center mb-4">
             <Image
-              src="/logo-15yrs.svg"
+              src="/icon/logo-15yrs.svg"
               alt="EIU Logo"
               width={120}
               height={120}

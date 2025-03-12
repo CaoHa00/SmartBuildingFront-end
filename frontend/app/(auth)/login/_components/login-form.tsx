@@ -60,11 +60,11 @@ export function LoginForm({
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
               <div className="flex flex-col gap-4">
                 <Button variant="outline" className="w-full">
-                  <img src="/facebook.png" width={25} alt="Facebook logo"></img>
+                  <img src="/img/facebook.png" width={25} alt="Facebook logo"></img>
                   Login with Facebook
                 </Button>
                 <Button variant="outline" className="w-full">
-                <img src="/google.png" width={25} alt="Facebook logo"></img>
+                <img src="/img/google.png" width={25} alt="Facebook logo"></img>
                   Login with Google
                 </Button>
               </div>

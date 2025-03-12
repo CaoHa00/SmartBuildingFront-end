@@ -1,4 +1,5 @@
 "use client"
+
 import {
   BadgeCheck,
   Bell,
@@ -7,6 +8,7 @@ import {
   LogOut,
   Sparkles,
 } from "lucide-react"
+
 import {
   Avatar,
   AvatarFallback,
@@ -27,6 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+
 export function NavUser({
   user,
 }: {
@@ -37,6 +40,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
