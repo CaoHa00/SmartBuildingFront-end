@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Smart Building",
   description: "EIU 15th Anniversary Innovation Project",
   icons: {
-    icon: "/icon.svg",
+    icon: "/icon/iic-logo.svg",
   },
 };
 
