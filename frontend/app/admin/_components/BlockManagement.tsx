@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const api = axios.create({
-  baseURL: "http://localhost:9090/api", //will import back to .env file
+  baseURL: "http://localhost:9090/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -31,7 +31,7 @@ const api = axios.create({
 interface Block {
   block_id: number;
   blockName: string;
-  floors: any[];
+  // floors: any[];
 }
 
 export function BlockManagement() {
