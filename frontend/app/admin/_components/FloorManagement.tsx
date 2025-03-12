@@ -138,7 +138,7 @@ export function FloorManagement() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                {isEdit ? "Edit Block" : "Add New Block"}
+                {isEdit ? "Edit Floor" : "Add New Floor"}
               </DialogTitle>
             </DialogHeader>
             <form
