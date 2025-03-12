@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 
 const api = axios.create({
-  baseURL: "http://localhost:9090/api", //will import back to .env file
+  baseURL: "http://localhost:9090/api", //will import back to .env file ...
   headers: {
     "Content-Type": "application/json",
   },
