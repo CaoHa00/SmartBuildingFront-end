@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { api } from "@/lib/axios";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -21,20 +22,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const api = axios.create({
-  baseURL: "http://localhost:9090/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
 interface Block {
-  block_id: number;
+  blockId: number;
   blockName: string;
-  // floors: any[];
+  floors: any[];
+}
+
+interface NewBlockData {
+  blockName: string;
 }
 
 export function BlockManagement() {
+  const { toast } = useToast();
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -48,10 +47,16 @@ export function BlockManagement() {
 
   const fetchBlocks = async () => {
     try {
-      const { data } = await api.get("/block");
-      setBlocks(data);
+      const response = await api.get<Block[]>("/block");
+      if (response.data.length > 0) {
+        setBlocks(response.data);
+      }
     } catch (error) {
-      console.error("Failed to fetch blocks:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch blocks",
+      });
     }
   };
 
@@ -59,16 +64,27 @@ export function BlockManagement() {
     e.preventDefault();
     try {
       if (isEdit) {
-        await api.put(`/block/${formData.block_id}`, formData);
+        await api.put(`/block/${formData.blockId}`, formData);
       } else {
-        await api.post("/block", formData);
+        const newBlock: NewBlockData = {
+          blockName: formData.blockName || "",
+        };
+        await api.post("/block", newBlock);
       }
       fetchBlocks();
       setIsOpen(false);
       setFormData({ blockName: "" });
       setIsEdit(false);
+      toast({
+        title: "Success",
+        description: `Block ${isEdit ? "updated" : "created"} successfully`,
+      });
     } catch (error) {
-      console.error("Failed to save block:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to ${isEdit ? "update" : "create"} block`,
+      });
     }
   };
 
@@ -76,8 +92,16 @@ export function BlockManagement() {
     try {
       await api.delete(`/block/${blockId}`);
       fetchBlocks();
+      toast({
+        title: "Success",
+        description: "Block deleted successfully",
+      });
     } catch (error) {
-      console.error("Failed to delete block:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete block",
+      });
     }
   };
 
@@ -136,19 +160,17 @@ export function BlockManagement() {
         <Table>
           <TableHeader>
             <TableRow className="bg-[hsl(var(--tech-blue))/5]">
-              <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Floors</TableHead>
+              {/* <TableHead>Floors</TableHead> */}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {blocks.map((block) => (
               <TableRow
-                key={block.block_id}
+                key={block.blockId}
                 className="hover:bg-[hsl(var(--tech-blue))/5]"
               >
-                <TableCell>{block.block_id}</TableCell>
                 <TableCell>{block.blockName}</TableCell>
                 {/* <TableCell>{block.floors.length}</TableCell> */}
                 <TableCell>
@@ -161,7 +183,7 @@ export function BlockManagement() {
                   </Button>
                   <Button
                     variant="destructive"
-                    onClick={() => handleDelete(block.block_id)}
+                    onClick={() => handleDelete(block.blockId)}
                   >
                     Delete
                   </Button>
