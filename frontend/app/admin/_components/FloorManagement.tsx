@@ -29,21 +29,25 @@ import {
 } from "@/components/ui/select";
 
 const api = axios.create({
-  baseURL: "http://localhost:9090/api", //will import back to .env file
+  baseURL: "http://10.60.253.172:9090/api", //will import back to .env file
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 interface Floor {
-  floor_id: number;
+  floorId: number;
   floorName: string;
-  block_id: number;
+  blockId: number;
   rooms: any[];
 }
 
+interface NewFloorData {
+  floorName: string;
+}
+
 interface Block {
-  block_id: number;
+  blockId: number;
   blockName: string;
   floors: any[];
 }
@@ -64,8 +68,11 @@ export function FloorManagement() {
 
   const fetchFloors = async () => {
     try {
-      const { data } = await api.get("/floor");
-      setFloors(data);
+      const response = await api.get<Floor[]>("/floor");
+      console.log("API Response for Floors:", response.data);
+      if (response.data.length > 0) {
+        setFloors(response.data);
+      }
     } catch (e) {
       console.error("Failed to fetch floors:", e);
     }
@@ -73,8 +80,11 @@ export function FloorManagement() {
 
   const fetchBlocks = async () => {
     try {
-      const { data } = await api.get("/block");
-      setBlocks(data);
+      const response = await api.get<Block[]>("/block");
+      console.log("API Response for Blocks:", response.data);
+      if (response.data.length > 0) {
+        setBlocks(response.data);
+      }
     } catch (error) {
       console.error("Failed to fetch blocks:", error);
     }
@@ -83,17 +93,25 @@ export function FloorManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!formData.blockId) {
+        alert("Please select a block before submitting.");
+        return;
+      }
       if (isEdit) {
-        await api.put(`/floor/${formData.floor_id}`, formData);
+        await api.put(`/floor/${formData.floorId}`, formData);
       } else {
-        await api.post("/floor", formData);
+        const newFloor: NewFloorData = {
+          floorName: formData.floorName || "",
+        };
+        console.log(newFloor);
+        await api.post(`/floor/${formData.blockId}`, newFloor);
       }
       fetchFloors();
       setIsOpen(false);
       setFormData({
-        floor_id: 0,
+        floorId: 0,
         floorName: "",
-        block_id: 0,
+        blockId: 0,
         rooms: [],
       });
       setIsEdit(false);
@@ -116,7 +134,7 @@ export function FloorManagement() {
       console.error("Failed to delete floor:", e);
     }
   };
-
+  console.log("Blocks data:", blocks);
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -160,22 +178,28 @@ export function FloorManagement() {
                 <Label htmlFor="block_id">Block</Label>
                 <Select
                   onValueChange={(value) =>
-                    setFormData({ ...formData, block_id: parseInt(value, 10) })
+                    setFormData({ ...formData, blockId: parseInt(value, 10) })
                   }
-                  value={formData.block_id ? String(formData.block_id) : ""}
+                  value={
+                    formData.blockId ? String(formData.blockId) : undefined
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select block" />
                   </SelectTrigger>
                   <SelectContent>
-                    {blocks.map((block) => (
-                      <SelectItem
-                        key={block.block_id}
-                        value={String(block.block_id)}
-                      >
-                        {block.blockName}
-                      </SelectItem>
-                    ))}
+                    {blocks.length > 0 ? (
+                      blocks.map((block) => (
+                        <SelectItem
+                          key={block.blockId}
+                          value={String(block.blockId)}
+                        >
+                          {block.blockName}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div>No blocks available</div>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -189,7 +213,6 @@ export function FloorManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Block</TableHead>
               <TableHead>Actions</TableHead>
@@ -198,13 +221,12 @@ export function FloorManagement() {
           <TableBody>
             {floors.map((floor) => (
               <TableRow
-                key={floor.floor_id}
+                key={floor.floorId}
                 className="hover:bg-[hsl(var(--tech-blue))/5]"
               >
-                <TableCell>{floor.floor_id}</TableCell>
                 <TableCell>{floor.floorName}</TableCell>
                 <TableCell>
-                  {blocks.find((block) => block.block_id === floor.block_id)
+                  {blocks.find((block) => block.blockId === floor.blockId)
                     ?.blockName || "Unknown"}
                 </TableCell>
                 <TableCell>
@@ -217,7 +239,7 @@ export function FloorManagement() {
                   </Button>
                   <Button
                     variant="destructive"
-                    onClick={() => handleDelete(floor.floor_id)}
+                    onClick={() => handleDelete(floor.floorId)}
                   >
                     Delete
                   </Button>

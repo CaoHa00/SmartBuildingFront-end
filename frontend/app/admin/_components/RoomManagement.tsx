@@ -29,23 +29,27 @@ import {
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:9090/api", //will import back to .env file
+  baseURL: "http://10.60.253.172:9090/api", //will import back to .env file
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 interface Room {
-  room_id: number;
+  roomId: number;
   roomName: string;
-  floor_id: number;
+  floorId: number;
   equipment: any[];
 }
 
+interface NewRoomData {
+  roomName: string;
+}
+
 interface Floor {
-  floor_id: number;
+  floorId: number;
   floorName: string;
-  block_id: number;
+  blockId: number;
   rooms: any[];
 }
 
@@ -65,8 +69,11 @@ export function RoomManagement() {
 
   const fetchRooms = async () => {
     try {
-      const { data } = await api.get("/room");
-      setRooms(data);
+      const response = await api.get<Room[]>("/room");
+      console.log("API Response for Rooms:", response.data);
+      if (response.data.length > 0) {
+        setRooms(response.data);
+      }
     } catch (e) {
       console.error("Failed to fetch rooms:", e);
     }
@@ -74,8 +81,11 @@ export function RoomManagement() {
 
   const fetchFloors = async () => {
     try {
-      const { data } = await api.get("/floor");
-      setFloors(data);
+      const response = await api.get<Floor[]>("/floor");
+      console.log("API Response for Floors:", response.data);
+      if (response.data.length > 0) {
+        setFloors(response.data);
+      }
     } catch (e) {
       console.error("Failed to fetch floors:", e);
     }
@@ -84,17 +94,24 @@ export function RoomManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!formData.roomId) {
+        alert("Please select a room before submitting.");
+        return;
+      }
       if (isEdit) {
-        await api.put(`/room/${formData.room_id}`, formData);
+        await api.put(`/room/${formData.roomId}`, formData);
       } else {
-        await api.post("/room", formData);
+        const newRoom: NewRoomData = {
+          roomName: formData.roomName || "",
+        };
+        await api.post(`/room/${formData.floorId}`, newRoom);
       }
       fetchRooms();
       setIsOpen(false);
       setFormData({
-        room_id: 0,
+        roomId: 0,
         roomName: "",
-        floor_id: 0,
+        floorId: 0,
         equipment: [],
       });
       setIsEdit(false);
@@ -117,7 +134,8 @@ export function RoomManagement() {
       console.error("Failed to delete room:", e);
     }
   };
-
+  console.log("Rooms data:", rooms);
+  console.log("Floors data:", floors);
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -159,15 +177,22 @@ export function RoomManagement() {
               </div>
               <div>
                 <Label htmlFor="floor">Floor</Label>
-                <Select>
+                <Select
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, floorId: parseInt(value, 10) })
+                  }
+                  value={
+                    formData.floorId ? String(formData.floorId) : undefined
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select floor" />
                   </SelectTrigger>
                   <SelectContent>
                     {floors.map((floor) => (
                       <SelectItem
-                        key={floor.floor_id}
-                        value={String(floor.floor_id)}
+                        key={floor.floorId}
+                        value={String(floor.floorId)}
                       >
                         {floor.floorName}
                       </SelectItem>
@@ -198,21 +223,20 @@ export function RoomManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Floor</TableHead>
+              <TableHead>Floors</TableHead>
               {/* <TableHead>Type</TableHead> */}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rooms.map((room) => (
-              <TableRow key={room.room_id}>
-                <TableCell>{room.room_id}</TableCell>
+              <TableRow key={room.roomId}>
                 <TableCell>{room.roomName}</TableCell>
                 <TableCell>
-                  {floors.find((floor) => floor.floor_id === room.floor_id)
-                    ?.floorName || "Unknown"}
+                  {floors.find(
+                    (floor) => Number(floor.floorId) === Number(room.floorId)
+                  )?.floorName || "Unknown"}
                 </TableCell>
                 {/* <TableCell>{room.type}</TableCell> */}
                 <TableCell>
@@ -225,7 +249,7 @@ export function RoomManagement() {
                   </Button>
                   <Button
                     variant="destructive"
-                    onClick={() => handleDelete(room.room_id)}
+                    onClick={() => handleDelete(room.roomId)}
                   >
                     Delete
                   </Button>

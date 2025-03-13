@@ -26,6 +26,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://localhost:9090/api", //will import back to .env file
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+interface Equipment {
+  equipmentId: number;
+}
 
 export function DeviceManagement() {
   const [devices, setDevices] = useState([
