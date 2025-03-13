@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BlockManagement } from "../admin/_components/BlockManagement";
 import { FloorManagement } from "../admin/_components/FloorManagement";
 import { RoomManagement } from "../admin/_components/RoomManagement";
-import { DeviceManagement } from "../admin/_components/DeviceManagement";
+import { EquipmentManagement } from "../admin/_components/EquipmentManagement";
 import { UserManagement } from "../admin/_components/UserManagement";
 
 export default function AdminDashboard() {
@@ -19,7 +19,7 @@ export default function AdminDashboard() {
           <TabsTrigger value="blocks">Blocks</TabsTrigger>
           <TabsTrigger value="floors">Floors</TabsTrigger>
           <TabsTrigger value="rooms">Rooms</TabsTrigger>
-          <TabsTrigger value="devices">Devices</TabsTrigger>
+          <TabsTrigger value="equipment">Equipment</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
 
@@ -35,8 +35,8 @@ export default function AdminDashboard() {
           <RoomManagement />
         </TabsContent>
 
-        <TabsContent value="devices">
-          <DeviceManagement />
+        <TabsContent value="equipment">
+          <EquipmentManagement/>
         </TabsContent>
 
         <TabsContent value="users">

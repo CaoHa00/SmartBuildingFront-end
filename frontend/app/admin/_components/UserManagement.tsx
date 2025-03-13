@@ -15,10 +15,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+interface User {
+  user_id: number;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+}
+
 export function UserManagement() {
-  const [users, setUsers] = useState([
-    { id: 1, name: "John Doe", email: "john@example.com", role: "Admin", status: "Active" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", role: "User", status: "Active" },
+  const [users, setUsers] = useState<User[]>([
+    { user_id: 1, name: "John Doe", email: "john@example.com", role: "Admin", status: "Active" },
+    { user_id: 2, name: "Jane Smith", email: "jane@example.com", role: "User", status: "Active" },
   ])
 
   return (
@@ -80,8 +88,8 @@ export function UserManagement() {
           </TableHeader>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id} className="hover:bg-[hsl(var(--tech-blue))/5]">
-                <TableCell>{user.id}</TableCell>
+              <TableRow key={user.user_id} className="hover:bg-[hsl(var(--tech-blue))/5]">
+                <TableCell>{user.user_id}</TableCell>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.role}</TableCell>

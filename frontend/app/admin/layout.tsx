@@ -11,6 +11,7 @@ import {
   Cpu,
   UserCircle2,
 } from "lucide-react";
+import { Toaster } from "@/components/ui/toaster";
 
 const sidebarItems = [
   {
@@ -34,7 +35,7 @@ const sidebarItems = [
     icon: DoorClosed,
   },
   {
-    title: "Devices",
+    title: "Equipment",
     href: "/admin/devices",
     icon: Cpu,
   },
@@ -78,6 +79,7 @@ export default function AdminLayout({
         </nav>
       </aside>
       <main className="flex-1 bg-background">{children}</main>
+      <Toaster />
     </div>
   );
 }
