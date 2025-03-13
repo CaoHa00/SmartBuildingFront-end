@@ -38,7 +38,7 @@ const api = axios.create({
 interface Room {
   roomId: number;
   roomName: string;
-  floorId: number;
+  floor: Floor;
   equipment: any[];
 }
 
@@ -49,8 +49,14 @@ interface NewRoomData {
 interface Floor {
   floorId: number;
   floorName: string;
-  blockId: number;
+  block: Block;
   rooms: any[];
+}
+
+interface Block {
+  blockId: number;
+  blockName: string;
+  floors: any[];
 }
 
 export function RoomManagement() {
@@ -94,8 +100,8 @@ export function RoomManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (!formData.roomId) {
-        alert("Please select a room before submitting.");
+      if (!formData.floor) {
+        alert("Please select a floor before submitting.");
         return;
       }
       if (isEdit) {
@@ -104,14 +110,19 @@ export function RoomManagement() {
         const newRoom: NewRoomData = {
           roomName: formData.roomName || "",
         };
-        await api.post(`/room/${formData.floorId}`, newRoom);
+        await api.post(`/room/${formData.floor.floorId}`, newRoom);
       }
       fetchRooms();
       setIsOpen(false);
       setFormData({
         roomId: 0,
         roomName: "",
-        floorId: 0,
+        floor: {
+          floorId: 0,
+          floorName: "",
+          block: { blockId: 0, blockName: "", floors: [] },
+          rooms: [],
+        },
         equipment: [],
       });
       setIsEdit(false);
@@ -124,6 +135,21 @@ export function RoomManagement() {
     setFormData(room);
     setIsEdit(true);
     setIsOpen(true);
+  };
+
+  const handleSelectFloor = async (value: string) => {
+    let floorId = parseInt(value, 10);
+    try {
+      const response = await api.get<Floor>(`/floor/${floorId}`);
+      console.log("API Response for Floor by ID:", response.data);
+      if (response.data) {
+        setFormData({ ...formData, floor: response.data });
+      } else {
+        console.error("No floor data found for ID:", floorId);
+      }
+    } catch (e) {
+      console.error("Failed to fetch floor by ID:", e);
+    }
   };
 
   const handleDelete = async (roomId: number) => {
@@ -178,11 +204,11 @@ export function RoomManagement() {
               <div>
                 <Label htmlFor="floor">Floor</Label>
                 <Select
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, floorId: parseInt(value, 10) })
-                  }
+                  onValueChange={(value) => handleSelectFloor(value)}
                   value={
-                    formData.floorId ? String(formData.floorId) : undefined
+                    formData.floor?.floorId
+                      ? String(formData.floor.floorId)
+                      : undefined
                   }
                 >
                   <SelectTrigger>
@@ -233,11 +259,7 @@ export function RoomManagement() {
             {rooms.map((room) => (
               <TableRow key={room.roomId}>
                 <TableCell>{room.roomName}</TableCell>
-                <TableCell>
-                  {floors.find(
-                    (floor) => Number(floor.floorId) === Number(room.floorId)
-                  )?.floorName || "Unknown"}
-                </TableCell>
+                <TableCell>{room.floor.floorName}</TableCell>
                 {/* <TableCell>{room.type}</TableCell> */}
                 <TableCell>
                   <Button

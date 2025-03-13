@@ -38,7 +38,7 @@ const api = axios.create({
 interface Floor {
   floorId: number;
   floorName: string;
-  blockId: number;
+  block: Block;
   rooms: any[];
 }
 
@@ -93,7 +93,7 @@ export function FloorManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (!formData.blockId) {
+      if (!formData.block) {
         alert("Please select a block before submitting.");
         return;
       }
@@ -104,14 +104,14 @@ export function FloorManagement() {
           floorName: formData.floorName || "",
         };
         console.log(newFloor);
-        await api.post(`/floor/${formData.blockId}`, newFloor);
+        await api.post(`/floor/${formData.block.blockId}`, newFloor);
       }
       fetchFloors();
       setIsOpen(false);
       setFormData({
         floorId: 0,
         floorName: "",
-        blockId: 0,
+        block: { blockId: 0, blockName: "", floors: [] },
         rooms: [],
       });
       setIsEdit(false);
@@ -126,6 +126,21 @@ export function FloorManagement() {
     setIsOpen(true);
   };
 
+  const handleSelectBlock = async (value: string) => {
+    let blockId = parseInt(value, 10);
+    try {
+      const response = await api.get<Block>(`/block/${blockId}`);
+      console.log("API Response for Block by ID:", response.data);
+      if (response.data) {
+        setFormData({ ...formData, block: response.data });
+      } else {
+        console.error("No block data found for ID:", blockId);
+      }
+    } catch (e) {
+      console.error("Failed to fetch block by ID:", e);
+    }
+  };
+
   const handleDelete = async (floorId: number) => {
     try {
       await api.delete(`/floor/${floorId}`);
@@ -134,7 +149,6 @@ export function FloorManagement() {
       console.error("Failed to delete floor:", e);
     }
   };
-  console.log("Blocks data:", blocks);
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -177,11 +191,11 @@ export function FloorManagement() {
               <div>
                 <Label htmlFor="block_id">Block</Label>
                 <Select
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, blockId: parseInt(value, 10) })
-                  }
+                  onValueChange={(value) => handleSelectBlock(value)}
                   value={
-                    formData.blockId ? String(formData.blockId) : undefined
+                    formData.block?.blockId
+                      ? String(formData.block.blockId)
+                      : undefined
                   }
                 >
                   <SelectTrigger>
@@ -225,10 +239,7 @@ export function FloorManagement() {
                 className="hover:bg-[hsl(var(--tech-blue))/5]"
               >
                 <TableCell>{floor.floorName}</TableCell>
-                <TableCell>
-                  {blocks.find((block) => block.blockId === floor.blockId)
-                    ?.blockName || "Unknown"}
-                </TableCell>
+                <TableCell>{floor.block.blockName}</TableCell>
                 <TableCell>
                   <Button
                     variant="outline"
