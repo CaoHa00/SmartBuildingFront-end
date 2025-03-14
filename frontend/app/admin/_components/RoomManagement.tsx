@@ -26,30 +26,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: "http://localhost:9090/api", //will import back to .env file
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+import { api } from "@/lib/axios";
+import { useToast } from "@/hooks/use-toast";
 
 interface Room {
-  room_id: number;
+  roomId: number;
   roomName: string;
-  floor_id: number;
+  floor: Floor;
   equipment: any[];
 }
 
+interface NewRoomData {
+  roomName: string;
+}
+
 interface Floor {
-  floor_id: number;
+  floorId: number;
   floorName: string;
-  block_id: number;
+  block: Block;
   rooms: any[];
 }
 
+interface Block {
+  blockId: number;
+  blockName: string;
+  floors: any[];
+}
+
 export function RoomManagement() {
+  const { toast } = useToast();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [floors, setFloors] = useState<Floor[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -65,41 +70,69 @@ export function RoomManagement() {
 
   const fetchRooms = async () => {
     try {
-      const { data } = await api.get("/room");
-      setRooms(data);
-    } catch (e) {
-      console.error("Failed to fetch rooms:", e);
+      const response = await api.get<Room[]>("/room");
+      if (response.data.length > 0) {
+        setRooms(response.data);
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch rooms",
+      });
     }
   };
 
   const fetchFloors = async () => {
     try {
-      const { data } = await api.get("/floor");
-      setFloors(data);
-    } catch (e) {
-      console.error("Failed to fetch floors:", e);
+      const response = await api.get<Floor[]>("/floor");
+      if (response.data.length > 0) {
+        setFloors(response.data);
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch floors",
+      });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!formData.floor) {
+        alert("Please select a floor before submitting.");
+        return;
+      }
       if (isEdit) {
-        await api.put(`/room/${formData.room_id}`, formData);
+        await api.put(`/room/${formData.roomId}`, formData);
       } else {
-        await api.post("/room", formData);
+        const newRoom: NewRoomData = {
+          roomName: formData.roomName || "",
+        };
+        await api.post(`/room/${formData.floor.floorId}`, newRoom);
       }
       fetchRooms();
       setIsOpen(false);
       setFormData({
-        room_id: 0,
+        roomId: 0,
         roomName: "",
-        floor_id: 0,
+        floor: {
+          floorId: 0,
+          floorName: "",
+          block: { blockId: 0, blockName: "", floors: [] },
+          rooms: [],
+        },
         equipment: [],
       });
       setIsEdit(false);
-    } catch (e) {
-      console.error("Failed to save room:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save room",
+      });
     }
   };
 
@@ -109,15 +142,38 @@ export function RoomManagement() {
     setIsOpen(true);
   };
 
+  const handleSelectFloor = async (value: string) => {
+    let floorId = parseInt(value, 10);
+    try {
+      const response = await api.get<Floor>(`/floor/${floorId}`);
+      if (response.data) {
+        setFormData({ ...formData, floor: response.data });
+      } else {
+        console.error("No floor data found for ID:", floorId);
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch floor by ID",
+      });
+    }
+  };
+
   const handleDelete = async (roomId: number) => {
     try {
       await api.delete(`/room/${roomId}`);
       fetchRooms();
-    } catch (e) {
-      console.error("Failed to delete room:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete room",
+      });
     }
   };
-
+  console.log("Rooms data:", rooms);
+  console.log("Floors data:", floors);
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -159,15 +215,22 @@ export function RoomManagement() {
               </div>
               <div>
                 <Label htmlFor="floor">Floor</Label>
-                <Select>
+                <Select
+                  onValueChange={(value) => handleSelectFloor(value)}
+                  value={
+                    formData.floor?.floorId
+                      ? String(formData.floor.floorId)
+                      : undefined
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select floor" />
                   </SelectTrigger>
                   <SelectContent>
                     {floors.map((floor) => (
                       <SelectItem
-                        key={floor.floor_id}
-                        value={String(floor.floor_id)}
+                        key={floor.floorId}
+                        value={String(floor.floorId)}
                       >
                         {floor.floorName}
                       </SelectItem>
@@ -175,19 +238,6 @@ export function RoomManagement() {
                   </SelectContent>
                 </Select>
               </div>
-              {/* <div>
-                <Label htmlFor="type">Room Type</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="office">Office</SelectItem>
-                    <SelectItem value="meeting">Meeting Room</SelectItem>
-                    <SelectItem value="storage">Storage</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div> */}
               <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
             </form>
           </DialogContent>
@@ -198,23 +248,16 @@ export function RoomManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Floor</TableHead>
-              {/* <TableHead>Type</TableHead> */}
+              <TableHead>Floors</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rooms.map((room) => (
-              <TableRow key={room.room_id}>
-                <TableCell>{room.room_id}</TableCell>
+              <TableRow key={room.roomId}>
                 <TableCell>{room.roomName}</TableCell>
-                <TableCell>
-                  {floors.find((floor) => floor.floor_id === room.floor_id)
-                    ?.floorName || "Unknown"}
-                </TableCell>
-                {/* <TableCell>{room.type}</TableCell> */}
+                <TableCell>{room.floor.floorName}</TableCell>
                 <TableCell>
                   <Button
                     variant="outline"
@@ -225,7 +268,7 @@ export function RoomManagement() {
                   </Button>
                   <Button
                     variant="destructive"
-                    onClick={() => handleDelete(room.room_id)}
+                    onClick={() => handleDelete(room.roomId)}
                   >
                     Delete
                   </Button>
