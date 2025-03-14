@@ -100,6 +100,7 @@ export function RoomManagement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Before submitting, FormData:", formData);
     try {
       if (!formData.floor) {
         alert("Please select a floor before submitting.");
@@ -114,18 +115,19 @@ export function RoomManagement() {
         await api.post(`/room/${formData.floor.floorId}`, newRoom);
       }
       fetchRooms();
+      console.log("Submitting FormData:", formData);
       setIsOpen(false);
-      setFormData({
+      setFormData((prevData) => ({
         roomId: 0,
         roomName: "",
-        floor: {
+        floor: prevData.floor || {
           floorId: 0,
           floorName: "",
           block: { blockId: 0, blockName: "", floors: [] },
           rooms: [],
         },
         equipment: [],
-      });
+      }));
       setIsEdit(false);
     } catch (error) {
       toast({
