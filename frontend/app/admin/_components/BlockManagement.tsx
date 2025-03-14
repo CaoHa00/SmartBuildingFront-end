@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { api } from "@/lib/axios";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -21,13 +22,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const api = axios.create({
-  baseURL: "http://10.60.253.172:9090/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
 interface Block {
   blockId: number;
   blockName: string;
@@ -39,6 +33,7 @@ interface NewBlockData {
 }
 
 export function BlockManagement() {
+  const { toast } = useToast();
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -53,12 +48,15 @@ export function BlockManagement() {
   const fetchBlocks = async () => {
     try {
       const response = await api.get<Block[]>("/block");
-      console.log("API Response for Blocks:", response.data);
       if (response.data.length > 0) {
         setBlocks(response.data);
       }
     } catch (error) {
-      console.error("Failed to fetch blocks:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch blocks",
+      });
     }
   };
 
@@ -77,8 +75,16 @@ export function BlockManagement() {
       setIsOpen(false);
       setFormData({ blockName: "" });
       setIsEdit(false);
+      toast({
+        title: "Success",
+        description: `Block ${isEdit ? "updated" : "created"} successfully`,
+      });
     } catch (error) {
-      console.error("Failed to save block:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to ${isEdit ? "update" : "create"} block`,
+      });
     }
   };
 
@@ -86,8 +92,16 @@ export function BlockManagement() {
     try {
       await api.delete(`/block/${blockId}`);
       fetchBlocks();
+      toast({
+        title: "Success",
+        description: "Block deleted successfully",
+      });
     } catch (error) {
-      console.error("Failed to delete block:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete block",
+      });
     }
   };
 
