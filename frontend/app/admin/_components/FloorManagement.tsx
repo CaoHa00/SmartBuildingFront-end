@@ -93,6 +93,7 @@ export function FloorManagement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Before submitting, FormData:", formData);
     try {
       if (!formData.block) {
         alert("Please select a block before submitting.");
@@ -107,13 +108,14 @@ export function FloorManagement() {
         await api.post(`/floor/${formData.block.blockId}`, newFloor);
       }
       fetchFloors();
+      console.log("Submitting FormData:", formData);
       setIsOpen(false);
-      setFormData({
+      setFormData((prevData) => ({
         floorId: 0,
         floorName: "",
-        block: { blockId: 0, blockName: "", floors: [] },
+        block: prevData.block || { blockId: 0, blockName: "", floors: [] }, // Preserve selected block if needed
         rooms: [],
-      });
+      }));
       setIsEdit(false);
     } catch (error) {
       toast({
@@ -131,6 +133,7 @@ export function FloorManagement() {
   };
 
   const handleSelectBlock = async (value: string) => {
+    console.log("Selected Value:", value);
     let blockId = parseInt(value, 10);
     try {
       const response = await api.get<Block>(`/block/${blockId}`);
@@ -144,6 +147,7 @@ export function FloorManagement() {
         });
       }
     } catch (error) {
+      console.error("API error:", error);
       toast({
         variant: "destructive",
         title: "Error",
