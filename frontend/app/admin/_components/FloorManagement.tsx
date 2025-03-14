@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "@/lib/axios";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -28,13 +29,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const api = axios.create({
-  baseURL: "http://10.60.253.172:9090/api", //will import back to .env file
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
 interface Floor {
   floorId: number;
   floorName: string;
@@ -53,6 +47,7 @@ interface Block {
 }
 
 export function FloorManagement() {
+  const { toast } = useToast();
   const [floors, setFloors] = useState<Floor[]>([]);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -69,24 +64,30 @@ export function FloorManagement() {
   const fetchFloors = async () => {
     try {
       const response = await api.get<Floor[]>("/floor");
-      console.log("API Response for Floors:", response.data);
       if (response.data.length > 0) {
         setFloors(response.data);
       }
-    } catch (e) {
-      console.error("Failed to fetch floors:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch floors",
+      });
     }
   };
 
   const fetchBlocks = async () => {
     try {
       const response = await api.get<Block[]>("/block");
-      console.log("API Response for Blocks:", response.data);
       if (response.data.length > 0) {
         setBlocks(response.data);
       }
     } catch (error) {
-      console.error("Failed to fetch blocks:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch blocks",
+      });
     }
   };
 
@@ -103,7 +104,6 @@ export function FloorManagement() {
         const newFloor: NewFloorData = {
           floorName: formData.floorName || "",
         };
-        console.log(newFloor);
         await api.post(`/floor/${formData.block.blockId}`, newFloor);
       }
       fetchFloors();
@@ -115,8 +115,12 @@ export function FloorManagement() {
         rooms: [],
       });
       setIsEdit(false);
-    } catch (e) {
-      console.error("Failed to save floor:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save floor",
+      });
     }
   };
 
@@ -130,14 +134,21 @@ export function FloorManagement() {
     let blockId = parseInt(value, 10);
     try {
       const response = await api.get<Block>(`/block/${blockId}`);
-      console.log("API Response for Block by ID:", response.data);
       if (response.data) {
         setFormData({ ...formData, block: response.data });
       } else {
-        console.error("No block data found for ID:", blockId);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No block data found for the selected ID",
+        });
       }
-    } catch (e) {
-      console.error("Failed to fetch block by ID:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch block by ID",
+      });
     }
   };
 
@@ -145,10 +156,15 @@ export function FloorManagement() {
     try {
       await api.delete(`/floor/${floorId}`);
       fetchFloors();
-    } catch (e) {
-      console.error("Failed to delete floor:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete floor",
+      });
     }
   };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">

@@ -26,14 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: "http://10.60.253.172:9090/api", //will import back to .env file
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+import { api } from "@/lib/axios";
+import { useToast } from "@/hooks/use-toast";
 
 interface Room {
   roomId: number;
@@ -60,6 +54,7 @@ interface Block {
 }
 
 export function RoomManagement() {
+  const { toast } = useToast();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [floors, setFloors] = useState<Floor[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -76,24 +71,30 @@ export function RoomManagement() {
   const fetchRooms = async () => {
     try {
       const response = await api.get<Room[]>("/room");
-      console.log("API Response for Rooms:", response.data);
       if (response.data.length > 0) {
         setRooms(response.data);
       }
-    } catch (e) {
-      console.error("Failed to fetch rooms:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch rooms",
+      });
     }
   };
 
   const fetchFloors = async () => {
     try {
       const response = await api.get<Floor[]>("/floor");
-      console.log("API Response for Floors:", response.data);
       if (response.data.length > 0) {
         setFloors(response.data);
       }
-    } catch (e) {
-      console.error("Failed to fetch floors:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch floors",
+      });
     }
   };
 
@@ -126,8 +127,12 @@ export function RoomManagement() {
         equipment: [],
       });
       setIsEdit(false);
-    } catch (e) {
-      console.error("Failed to save room:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save room",
+      });
     }
   };
 
@@ -141,14 +146,17 @@ export function RoomManagement() {
     let floorId = parseInt(value, 10);
     try {
       const response = await api.get<Floor>(`/floor/${floorId}`);
-      console.log("API Response for Floor by ID:", response.data);
       if (response.data) {
         setFormData({ ...formData, floor: response.data });
       } else {
         console.error("No floor data found for ID:", floorId);
       }
-    } catch (e) {
-      console.error("Failed to fetch floor by ID:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch floor by ID",
+      });
     }
   };
 
@@ -156,8 +164,12 @@ export function RoomManagement() {
     try {
       await api.delete(`/room/${roomId}`);
       fetchRooms();
-    } catch (e) {
-      console.error("Failed to delete room:", e);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete room",
+      });
     }
   };
   console.log("Rooms data:", rooms);
@@ -226,19 +238,6 @@ export function RoomManagement() {
                   </SelectContent>
                 </Select>
               </div>
-              {/* <div>
-                <Label htmlFor="type">Room Type</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="office">Office</SelectItem>
-                    <SelectItem value="meeting">Meeting Room</SelectItem>
-                    <SelectItem value="storage">Storage</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div> */}
               <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
             </form>
           </DialogContent>
@@ -251,7 +250,6 @@ export function RoomManagement() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Floors</TableHead>
-              {/* <TableHead>Type</TableHead> */}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -260,7 +258,6 @@ export function RoomManagement() {
               <TableRow key={room.roomId}>
                 <TableCell>{room.roomName}</TableCell>
                 <TableCell>{room.floor.floorName}</TableCell>
-                {/* <TableCell>{room.type}</TableCell> */}
                 <TableCell>
                   <Button
                     variant="outline"
