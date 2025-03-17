@@ -1,21 +1,26 @@
-import { AppSidebar } from "./_components/app-sidebar"
-import { Separator } from "@/components/ui/separator"
+import { AppSidebar } from "./_components/app-sidebar";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export default function Page() {
   return (
-    <SidebarProvider >
-      <AppSidebar/>
+    <SidebarProvider>
+      <AppSidebar className="p-2 rounded-3xl" />
       <SidebarInset className="bg-sky-300">
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 font-bold text-xl text-blue-800">
           <div className="flex items-center gap-2 px-4 ">
             <SidebarTrigger className="-ml-1 w-5 h-5" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <img src="/icon/logo-15yrs.svg" alt="EIU Logo" width={120} height={120} />
+            <img
+              src="/icon/logo-15yrs.svg"
+              alt="EIU Logo"
+              width={120}
+              height={120}
+            />
             <h2 className="text-xl font-bold">Smart Building </h2>
           </div>
         </header>
@@ -29,5 +34,5 @@ export default function Page() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
