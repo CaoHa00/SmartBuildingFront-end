@@ -9,6 +9,8 @@ import {
   Map,
   PieChart,
   Clock,
+  Settings,
+  Info,
 } from "lucide-react";
 
 import { NavFacility } from "@/app/dashboard/_components/nav-facility";
@@ -23,11 +25,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import SearchBar from "@/components/search-bar";
-import { Separator } from "@radix-ui/react-select";
 import { NavScheduler } from "@/app/dashboard/_components/nav-scheduler";
-import { scheduler } from "timers/promises";
-import { title } from "process";
-
 // This is sample data.
 const data = {
   user: {
@@ -153,23 +151,6 @@ const data = {
       icon: Clock,
     },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -182,9 +163,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavFacility items={data.facility} />
         <NavScheduler scheduler={data.scheduler} />
-        <NavDevices projects={data.projects} />
+        <NavDevices devices={[]} />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="flex flex-col items-start">
         <NavUser user={data.user} />
       </SidebarFooter>
       <SidebarRail />

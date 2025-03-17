@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Cpu,
   Folder,
   Forward,
   MoreHorizontal,
@@ -24,11 +25,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { MusicPlayerCard } from "./music-player-card";
 
 export function NavDevices({
-  projects,
+  devices,
 }: {
-  projects: {
+  devices: {
     name: string;
     url: string;
     icon: LucideIcon;
@@ -38,13 +40,14 @@ export function NavDevices({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden ">
-      <SidebarGroupLabel className="text-xl font-bold text-blue-800 hover:text-blue-400">
-        Active Devices
+      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400">
+        Active Devices <Cpu/>
       </SidebarGroupLabel>
       <SidebarMenu  className="text-xl font-bold text-blue-800 hover:text-blue-400">
-        {projects.map((item) => (
+      <MusicPlayerCard />
+        {devices.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
+            {/* <SidebarMenuButton asChild>
               <a href={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
@@ -76,15 +79,15 @@ export function NavDevices({
                   <span>Delete Project</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu> */}
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
+        {/* <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
             <MoreHorizontal className="text-sidebar-foreground/70" />
             <span>More</span>
           </SidebarMenuButton>
-        </SidebarMenuItem>
+        </SidebarMenuItem> */}
       </SidebarMenu>
     </SidebarGroup>
   );
