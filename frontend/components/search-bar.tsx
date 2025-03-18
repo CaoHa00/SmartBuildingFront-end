@@ -26,7 +26,6 @@ export default function SearchBar() {
           onClick={handleSearchClick}
         />
         <Input 
-          type="text" 
           placeholder="Search" 
           className={`pl-12 pr-4 bg-sky-100 ${isCollapsed && !isSearchOpen ? 'hidden' : 'block'}`}
         />

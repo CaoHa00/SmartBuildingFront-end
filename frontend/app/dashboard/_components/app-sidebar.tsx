@@ -1,17 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  AudioWaveform,
-  LayoutDashboard,
-  Command,
-  Frame,
-  Map,
-  PieChart,
-  Clock,
-  Settings,
-  Info,
-} from "lucide-react";
+import { AudioWaveform, LayoutDashboard, Command, Clock } from "lucide-react";
 
 import { NavFacility } from "@/app/dashboard/_components/nav-facility";
 import { NavDevices } from "@/app/dashboard/_components/nav-devices";
@@ -156,7 +146,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader >
         <TeamSwitcher teams={data.teams} />
         <SearchBar />
       </SidebarHeader>

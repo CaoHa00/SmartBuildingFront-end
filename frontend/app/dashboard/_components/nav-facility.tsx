@@ -76,20 +76,20 @@ export function NavFacility({
             </SidebarMenuItem>
           </Collapsible>
         ))}
-        <div className="flex gap-2 mt-4 justify-between">
+        <div className="flex gap-2 mt-4 justify-between group-data-[collapsible=icon]:mt-0 group-data-[collapsible=icon]:flex-row group-data-[collapsible=icon]:justify-evenly">
           <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
-            <AirVent size={20} />
+            <AirVent size={18} />
           </button>
-          <button className=" rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
+          <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
             <img src="/icon/Lamp.svg" alt="Lamp Logo" width={18} height={18} />
           </button>
-          <button className=" rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
-            <AudioLines size={20} />
+          <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
+            <AudioLines size={18} />
           </button>
-          <button className=" rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
+          <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
             <img src="/icon/M Wifi.svg" alt="EIU Logo" width={18} height={18} />
           </button>
-          <button className=" rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
+          <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
             <img
               src="/icon/Lock.svg"
               alt="Lock Button"
