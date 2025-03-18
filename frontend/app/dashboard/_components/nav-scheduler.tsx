@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Calendar,
   Eye,
   Files,
   MoreHorizontal,
@@ -38,15 +39,16 @@ export function NavScheduler({
   const { isMobile } = useSidebar();
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden ">
-      <SidebarGroupLabel className="text-xl font-bold text-blue-800 hover:text-blue-400">
-        Scheduler
+    <SidebarGroup className="group-data-[collapsible=icon]:px-2">
+      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400 group-data-[collapsible=icon]:justify-center">
+        <Calendar className="group-data-[collapsible=icon]:w-5 group-data-[collapsible=icon]:h-5"/>
+        <span className="group-data-[collapsible=icon]:hidden">Scheduler</span>
       </SidebarGroupLabel>
       <SidebarMenu className="text-xl font-bold text-blue-800 hover:text-blue-400">
         {scheduler.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <div className="flex gap-2 w-full h-[30px] mb-4">
+              <div className="flex gap-2 w-full h-[40px] mb-4">
                 <item.icon />
                 <div className="flex w-full flex-col justify-center">
                   <span className="font-bold text-sm">
@@ -84,12 +86,12 @@ export function NavScheduler({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
+        {/* <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
             <MoreHorizontal className="text-sidebar-foreground/70" />
             <span>More</span>
           </SidebarMenuButton>
-        </SidebarMenuItem>
+        </SidebarMenuItem> */}
       </SidebarMenu>
     </SidebarGroup>
   );

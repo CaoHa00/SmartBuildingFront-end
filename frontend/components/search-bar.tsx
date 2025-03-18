@@ -20,7 +20,7 @@ export default function SearchBar() {
     }`}>
       <div className={`relative flex ${
         isCollapsed && !isSearchOpen ? 'w-9' : 'w-full'
-      } text-blue-800 bg-white border border-blue-200 rounded-lg`}>
+      } text-blue-800 bg-white border border-blue-300 rounded-lg`}>
         <Search 
           className={`${isCollapsed ? 'cursor-pointer' : ''} absolute left-2 top-1/2 transform -translate-y-1/2 w-5 h-5`}
           onClick={handleSearchClick}
@@ -28,7 +28,7 @@ export default function SearchBar() {
         <Input 
           type="text" 
           placeholder="Search" 
-          className={`pl-12 pr-4 ${isCollapsed && !isSearchOpen ? 'hidden' : 'block'}`}
+          className={`pl-12 pr-4 bg-sky-100 ${isCollapsed && !isSearchOpen ? 'hidden' : 'block'}`}
         />
       </div>
     </div>
