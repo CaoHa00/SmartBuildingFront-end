@@ -23,7 +23,6 @@ import { Switch } from "@/components/ui/switch";
 
 import { EnergyChart } from "./_components/energy-chart";
 
-
 export default function Page() {
   return (
     <SidebarProvider>
@@ -44,17 +43,17 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="aspect-[16/11] rounded-xl bg-muted/50">
+            <div className="aspect-[16/17] rounded-xl bg-muted/50">
               <div className="ml-3 pt-3">
-                <h2 className="font-bold tracking-wide text-base text-blue-800 leading-none">
+                <h2 className="font-boldz` tracking-wide text-base text-blue-800 leading-none">
                   Active Device
                 </h2>
                 <p className="tracking-widest text-blue-700 text-[10px] font-thin">
                   Track active devices for connectivity
                 </p>
               </div>
-              <div className="bg-blue-700 rounded-xl aspect-[32/17] m-3 p-3">
-                <div className="flex">
+              <div className="bg-blue-700 rounded-xl aspect-[16/15] m-3 p-3">
+                <div className="flex text-white">
                   <LayoutDashboard fill="white" size={28} />
                   <p className="text-xl ml-1">Room 104</p>
                 </div>
@@ -186,7 +185,7 @@ export default function Page() {
                 </div>
               </div>
               <div className="col-span-2 aspect-[8/3] rounded-xl bg-blue-700">
-                <div className="flex justify-between">
+                <div className="flex justify-between text-white">
                   <div className="ml-5 pt-3">
                     <h2 className="font-bold tracking-wide text-base text-white leading-none">
                       VOICE ASSISTANT
@@ -199,7 +198,7 @@ export default function Page() {
                 </div>
               </div>
             </div>
-            <div className="aspect-[64/39] rounded-xl bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-blue-900 to-blue-700 border border-dashed">
+            <div className="aspect-[64/39] text-white rounded-xl bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-blue-900 to-blue-700 border border-dashed">
               <CirclePlus size={32} className="mx-auto my-8 " />
               <div className="text-center tracking-widest text-2xl leading-[1.2] mb-8">
                 ADD NEW DEVICE FROM DASHBOARD
