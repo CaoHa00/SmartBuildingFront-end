@@ -1,27 +1,10 @@
 "use client";
 
-import {
-  Cpu,
-  Folder,
-  Forward,
-  MoreHorizontal,
-  Trash2,
-  type LucideIcon,
-} from "lucide-react";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Cpu, type LucideIcon } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
@@ -41,10 +24,11 @@ export function NavDevices({
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden ">
       <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400">
-        Active Devices <Cpu/>
+        <Cpu />
+        Active Devices
       </SidebarGroupLabel>
-      <SidebarMenu  className="text-xl font-bold text-blue-800 hover:text-blue-400">
-      <MusicPlayerCard />
+      <SidebarMenu className="text-xl font-bold text-blue-800 hover:text-blue-400">
+        <MusicPlayerCard />
         {devices.map((item) => (
           <SidebarMenuItem key={item.name}>
             {/* <SidebarMenuButton asChild>
