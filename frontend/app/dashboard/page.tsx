@@ -5,6 +5,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+
 import {
   AirVent,
   Bluetooth,
@@ -19,6 +20,9 @@ import {
   Wind,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+
+import { EnergyChart } from "./_components/energy-chart";
+
 
 export default function Page() {
   return (
@@ -56,8 +60,8 @@ export default function Page() {
                 </div>
               </div>
             </div>
-            <div className="col-span-2 rounded-xl bg-muted/50">
-              ////////////graph
+            <div className="col-span-2 flex-1 rounded-xl bg-muted/50 md:min-h-min bg-sky-300">
+              <EnergyChart />
             </div>
             <div className="aspect-video relative rounded-xl bg-muted/50">
               <div className="h-1/4 relative rounded-xl columns-2 bg-gradient-to-r from-blue-600 to-sky-300 mx-2 my-2">
