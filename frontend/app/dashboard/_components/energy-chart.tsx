@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { TrendingUp } from "lucide-react"
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState } from "react";
+import { TrendingUp } from "lucide-react";
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   Card,
@@ -12,13 +18,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 
 const dailyData = [
   { time: "00:00", peak: 120, offPeak: 80 },
@@ -51,8 +57,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function EnergyChart() {
-  const [timeRange, setTimeRange] = useState("day")
-  const chartData = timeRange === "day" ? dailyData : weeklyData
+  const [timeRange, setTimeRange] = useState("day");
+  const chartData = timeRange === "day" ? dailyData : weeklyData;
 
   return (
     <Card className="bg-sky-200">
@@ -92,12 +98,9 @@ export function EnergyChart() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tick={{ fill: '#1e40af' }}
+              tick={{ fill: "#1e40af" }}
             />
-            <ChartTooltip 
-              cursor={false} 
-              content={<ChartTooltipContent />} 
-            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Line
               dataKey="peak"
               type="monotone"
@@ -118,11 +121,13 @@ export function EnergyChart() {
       <CardFooter>
         <div className="flex w-full flex-col gap-2 text-sm text-blue-800">
           <div className="flex items-center gap-2 font-medium">
-            {timeRange === "day" ? "Daily" : "Weekly"} peak consumption trending up 
+            {timeRange === "day" ? "Daily" : "Weekly"} peak consumption trending
+            up
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="text-blue-700">
-            Energy consumption patterns ({timeRange === "day" ? "24 hours" : "7 days"})
+            Energy consumption patterns (
+            {timeRange === "day" ? "24 hours" : "7 days"})
           </div>
         </div>
       </CardFooter>
