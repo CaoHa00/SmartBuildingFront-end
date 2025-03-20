@@ -61,7 +61,7 @@ export function EnergyChart() {
   const chartData = timeRange === "day" ? dailyData : weeklyData;
 
   return (
-    <Card className="bg-sky-200">
+    <Card className="bg-sky-200 h-[540px]">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
@@ -84,7 +84,7 @@ export function EnergyChart() {
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
           <LineChart
             data={chartData}
             margin={{
