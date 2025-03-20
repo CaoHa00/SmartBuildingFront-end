@@ -5,6 +5,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { CirclePlus } from "lucide-react";
 
 import { EnergyChart } from "./_components/energy-chart";
 import ActiveDevice from "./_components/active-device";
