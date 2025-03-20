@@ -67,7 +67,7 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
 		screens: {
-			standee: { 'max': '751px' },
+			standee: { 'max': '800px' },
 		}
   	}
   },
