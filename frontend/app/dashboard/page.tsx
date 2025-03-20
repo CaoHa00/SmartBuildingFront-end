@@ -22,6 +22,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 import { EnergyChart } from "./_components/energy-chart";
+import { SiriWave } from "./_components/siri-wave";
+import { AirConditionerControl } from "./_components/ac-control";
+import { AirMonitor } from "./_components/air-monitor";
 
 export default function Page() {
   return (
@@ -45,7 +48,7 @@ export default function Page() {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="aspect-[16/17] rounded-xl bg-muted/50">
               <div className="ml-3 pt-3">
-                <h2 className="font-boldz` tracking-wide text-base text-blue-800 leading-none">
+                <h2 className="font-bold tracking-wide text-xl text-blue-800 leading-none">
                   Active Device
                 </h2>
                 <p className="tracking-widest text-blue-700 text-[10px] font-thin">
@@ -55,84 +58,16 @@ export default function Page() {
               <div className="bg-blue-700 rounded-xl aspect-[16/15] m-3 p-3">
                 <div className="flex text-white">
                   <LayoutDashboard fill="white" size={28} />
-                  <p className="text-xl ml-1">Room 104</p>
+                  <p className="text-xl ml-1">Room 103.B11</p>
                 </div>
               </div>
             </div>
             <div className="col-span-2 flex-1 rounded-xl bg-muted/50 md:min-h-min bg-sky-300">
               <EnergyChart />
             </div>
-            <div className="aspect-video relative rounded-xl bg-muted/50">
-              <div className="h-1/4 relative rounded-xl columns-2 bg-gradient-to-r from-blue-600 to-sky-300 mx-2 my-2">
-                <div className="italic tracking-widest text-xs font-semibold text-left text-white p-1 ml-2">
-                  Humidity
-                </div>
-                <div className="text-3xl text-center pb-1 absolute inset-x-0 text-white bottom-0 standee:text-4xl">
-                  15 - 24 %
-                </div>
-                <div className="absolute top-0 right-0 p-1 text-white">
-                  <Droplet />
-                </div>
-              </div>
-              <div className="h-1/4 relative rounded-xl columns-2 bg-gradient-to-r from-blue-600 to-sky-300 mx-2 my-2">
-                <div className="italic tracking-widest text-xs font-semibold text-left text-white p-1 ml-2">
-                  Temperature
-                </div>
-                <div className="text-3xl text-center pb-1 absolute inset-x-0 text-white bottom-0 standee:text-4xl">
-                  26°C
-                </div>
-                <div className="absolute top-0 right-0 p-1 text-white">
-                  <Waves />
-                </div>
-              </div>
-              <div className="h-1/3 relative rounded-xl bg-gradient-to-r from-blue-600 to-sky-300 mx-2 my-2">
-                <div className="text-2xl text-center inset-0 text-white standee:text-3xl standee:pt-3">
-                  700-1000 PPM
-                </div>
-                <div className="text-2xl text-center flex justify-between p-1 text-white standee:text-3xl standee:pt-6">
-                  <p className="pl-2 standee:pt-3">CO</p>
-                  <div className="text-white">
-                    <TriangleAlert
-                      size={30}
-                      className="standee:w-12 standee:h-12"
-                    />
-                  </div>
-                  <p className="pr-2 standee:pt-3">CO₂</p>
-                </div>
-              </div>
-            </div>
+            <AirMonitor />
             <div className="aspect-video relative rounded-xl bg-blue-700">
-              <div className="absolute top-0 left-0 p-2 m-3 rounded-full bg-white">
-                <AirVent color="blue" />
-              </div>
-              <div className="ml-16 pt-2">
-                <h2 className="font-bold tracking-wide text-xl text-white">
-                  AIR CONDITIONERS
-                </h2>
-                <p className="tracking-widest text-sky-100 text-xs font-thin">
-                  Auto Cooling
-                </p>
-              </div>
-              <div className="text-3xl text-center mt-8 mb-2 text-white standee:my-16 standee:py-10 standee:text-5xl">
-                26°C
-              </div>
-              <div className="columns-5 flex justify-evenly content-evenly p-3">
-                <div className="max-w-6 max-h-6 text-center mt-4 text-white">
-                  <CircleMinus />
-                </div>
-                <div className="max-w-10 max-h-10 p-2 rounded-full bg-sky-300 mt-2 text-white">
-                  <Wind />
-                </div>
-                <div className="max-w-14 p-3 rounded-full bg-blue-900 text-white">
-                  <Snowflake size={32} />
-                </div>
-                <div className="max-w-10 max-h-10 p-2 rounded-full bg-sky-300 mt-2 text-white">
-                  <Droplet />
-                </div>
-                <div className="max-w-6 max-h-6 text-center mt-4 text-white">
-                  <CirclePlus />
-                </div>
-              </div>
+              <AirConditionerControl />
             </div>
             <div className="row-span-2 rounded-xl bg-muted/50">
               <div className="text-2xl text-blue-800 p-3 font-bold">
@@ -184,7 +119,7 @@ export default function Page() {
                   </div>
                 </div>
               </div>
-              <div className="col-span-2 aspect-[8/3] rounded-xl bg-blue-700">
+              <div className="col-span-2 aspect-[8/3] rounded-xl bg-blue-700 overflow-hidden relative group">
                 <div className="flex justify-between text-white">
                   <div className="ml-5 pt-3">
                     <h2 className="font-bold tracking-wide text-base text-white leading-none">
@@ -195,6 +130,14 @@ export default function Page() {
                     </p>
                   </div>
                   <CirclePlus size={20} className="m-3" />
+                </div>
+                <div className="h-12 mx-4">
+                  <SiriWave />
+                </div>
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <span className="text-white text-xl font-medium">
+                    How can I help you?
+                  </span>
                 </div>
               </div>
             </div>

@@ -87,14 +87,6 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Info />
-                Help
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings />
-                Setting
-              </DropdownMenuItem>
-              <DropdownMenuItem>
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>

@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { AudioWaveform, LayoutDashboard, Command, Clock } from "lucide-react";
+import {
+  AudioWaveform,
+  LayoutDashboard,
+  Command,
+  Clock,
+  SettingsIcon,
+  HelpCircleIcon,
+} from "lucide-react";
 
 import { NavFacility } from "@/app/dashboard/_components/nav-facility";
 import { NavDevices } from "@/app/dashboard/_components/nav-devices";
@@ -16,6 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 import SearchBar from "@/components/search-bar";
 import { NavScheduler } from "@/app/dashboard/_components/nav-scheduler";
+import { NavHelper } from "./nav-helper";
 // This is sample data.
 const data = {
   user: {
@@ -141,12 +149,24 @@ const data = {
       icon: Clock,
     },
   ],
+  NavHelper: [
+    {
+      title: "Settings",
+      url: "#",
+      icon: SettingsIcon,
+    },
+    {
+      title: "Get Help",
+      url: "#",
+      icon: HelpCircleIcon,
+    },
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader >
+      <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
         <SearchBar />
       </SidebarHeader>
@@ -154,6 +174,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavFacility items={data.facility} />
         <NavScheduler scheduler={data.scheduler} />
         <NavDevices devices={[]} />
+        <NavHelper items={data.NavHelper} className="mt-auto font-bold text-blue-800" />
       </SidebarContent>
       <SidebarFooter className="flex flex-col items-start">
         <NavUser user={data.user} />
