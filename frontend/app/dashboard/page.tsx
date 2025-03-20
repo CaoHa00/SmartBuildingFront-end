@@ -8,13 +8,14 @@ import {
 
 import { EnergyChart } from "./_components/energy-chart";
 import ActiveDevice from "./_components/active-device";
-import HumidTempCo2 from "./_components/humid-temp-co2";
-import AirConditioners from "./_components/air-con";
 import DeviceManager from "./_components/device-manager";
 import WifiTab from "./_components/wifi-tab";
 import BluetoothTab from "./_components/bluetooth-tab";
-import VoiceAssistant from "./_components/voice-assistant";
 import AddNewDevice from "./_components/add-new-device";
+import { SiriWave } from "./_components/siri-wave";
+import { AirConditionerControl } from "./_components/ac-control";
+import { AirMonitor } from "./_components/air-monitor";
+
 
 export default function Page() {
   return (
@@ -40,20 +41,39 @@ export default function Page() {
             <div className="col-span-2 flex-1 aspect-auto rounded-xl bg-muted/50 md:min-h-min bg-sky-300 shadow-xl">
               <EnergyChart />
             </div>
-            <HumidTempCo2 />
-            <AirConditioners />
+            <AirMonitor />
+            <div className="aspect-video relative rounded-xl bg-blue-700">
+              <AirConditionerControl />
+            </div>
             <DeviceManager />
             <div className="row-span-1 grid auto-rows-min gap-4 md:grid-cols-2">
               <WifiTab />
               <BluetoothTab />
-              <VoiceAssistant />
+              <div className="col-span-2 aspect-[8/3] rounded-xl bg-blue-700 overflow-hidden relative group">
+                <div className="flex justify-between text-white">
+                  <div className="ml-5 pt-3">
+                    <h2 className="font-bold tracking-wide text-base text-white leading-none">
+                      VOICE ASSISTANT
+                    </h2>
+                    <p className="tracking-widest text-sky-100 text-[10px] font-thin">
+                      VOICE CONTROL THE SMART BUILDING
+                    </p>
+                  </div>
+                  <CirclePlus size={20} className="m-3" />
+                </div>
+                <div className="h-12 mx-4">
+                  <SiriWave />
+                </div>
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <span className="text-white text-xl font-medium">
+                    How can I help you?
+                  </span>
+                </div>
+              </div>
             </div>
             <AddNewDevice />
-            {/* <div className="row-span-1 rounded-xl bg-muted/50"></div>
-            <div></div> */}
           </div>
         </div>
-        {/* <img src="/img/UI-02.png" alt="" /> */}
       </SidebarInset>
     </SidebarProvider>
   );
