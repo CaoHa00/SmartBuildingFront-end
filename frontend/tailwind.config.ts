@@ -67,8 +67,17 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
 		screens: {
-			standee: { 'max': '800px' },
-		}
+			standee: { 'max': '650px' },
+		},
+		animation: {
+			marquee: "marquee 15s linear infinite",
+		},
+		keyframes: {
+			marquee: {
+				"0%": { transform: "translateX(100%)" },
+				"100%": { transform: "translateX(-100%)" },
+			},
+		},
   	}
   },
   plugins: [require("tailwindcss-animate")],
