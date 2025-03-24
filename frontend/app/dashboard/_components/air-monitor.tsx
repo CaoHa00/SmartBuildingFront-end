@@ -34,7 +34,7 @@ export function AirMonitor() {
   if (error) return <div>Error loading data</div>;
 
   return (
-    <div className="aspect-video relative rounded-xl bg-muted/50 h-[430px] w-[510px]">
+    <div className="aspect-auto relative rounded-xl bg-muted/50 md:h-[430px] md:w-[510px]">
       <div className="h-1/3 relative rounded-xl bg-gradient-to-r from-blue-600 to-sky-300 mx-2 my-2">
         <div className="italic tracking-widest text-xs font-bold text-center text-white p-1">
           Humidity

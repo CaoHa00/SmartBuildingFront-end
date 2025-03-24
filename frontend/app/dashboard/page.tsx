@@ -17,7 +17,6 @@ import { SiriWave } from "./_components/siri-wave";
 import { AirConditionerControl } from "./_components/ac-control";
 import { AirMonitor } from "./_components/air-monitor";
 
-
 export default function Page() {
   return (
     <SidebarProvider>
@@ -74,6 +73,7 @@ export default function Page() {
             </div>
             <AddNewDevice />
           </div>
+          {/* <img src="/img/UI-05.png" /> */}
         </div>
       </SidebarInset>
     </SidebarProvider>
