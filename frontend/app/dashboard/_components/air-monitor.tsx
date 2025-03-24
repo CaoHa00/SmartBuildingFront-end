@@ -6,7 +6,7 @@ import { AirQualityResponse } from "@/types/air-quality";
 
 async function fetchAirQuality() {
   const { data } = await axios.post<AirQualityResponse>(
-    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/query-temperature`
+    "http://10.60.253.172:9090/api/aqara/query-temperature"
   );
   return data;
 }
