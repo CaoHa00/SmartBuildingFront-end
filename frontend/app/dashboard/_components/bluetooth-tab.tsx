@@ -3,7 +3,7 @@ import { Switch } from "@/components/ui/switch";
 
 export default function BluetoothTab() {
   return (
-    <div className="aspect-auto rounded-xl bg-muted/50 max-w-40 shadow-xl">
+    <div className="flex-1 w-full rounded-xl bg-muted/50 shadow-xl">
       <div className="relative ml-3 pt-2">
         <h2 className="tracking-wide text-sm text-blue-800 leading-none">
           Bluetooth
