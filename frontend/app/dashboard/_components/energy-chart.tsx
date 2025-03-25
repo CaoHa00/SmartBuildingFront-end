@@ -61,7 +61,7 @@ export function EnergyChart() {
   const chartData = timeRange === "day" ? dailyData : weeklyData;
 
   return (
-    <Card className="bg-sky-200 h-[540px]">
+    <Card className="bg-sky-200 h-full">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>

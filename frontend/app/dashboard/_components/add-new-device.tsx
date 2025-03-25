@@ -8,7 +8,7 @@ export default function AddNewDevice() {
           <CirclePlus size={32} />
         </button>
       </div>
-      <div className="text-center tracking-widest text-2xl leading-[1.2] mb-8">
+      <div className="text-center font-bold tracking-widest text-2xl leading-[1.2] mb-8">
         ADD NEW DEVICE FROM DASHBOARD
       </div>
       <div className="text-center tracking-widest text-xl font-semibold pb-3">
