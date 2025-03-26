@@ -1,11 +1,25 @@
+"use client";
+
 import { Ear, Square } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export default function NoiseDetect() {
+  const { isEnglish } = useLanguage();
+
+  const text = isEnglish
+    ? {
+        title: "Noise Detect",
+        status: "Minimum",
+      }
+    : {
+        title: "Chỉ số tiếng ồn",
+        status: "Thấp",
+      };
   return (
     <div className="bg-muted/40 rounded-xl aspect-auto px-5 py-3 mb-2">
       <div className="flex justify-center text-2xl leading-none">
         <Ear />
-        Noise Detect
+        {text.title}
       </div>
       <div className="w-full text-center mt-3 h-24 md:h-40">Gauge</div>
       <div className="flex justify-center">
@@ -13,7 +27,9 @@ export default function NoiseDetect() {
           <div className="w-full">
             <div className="flex justify-center">
               <Ear size={12} className="h-5" />
-              <p className="text-sm md:text-base font-bold px-1">Minimum</p>
+              <p className="text-sm md:text-base font-bold px-1">
+                {text.status}
+              </p>
               <Square
                 size={10}
                 className="h-5"

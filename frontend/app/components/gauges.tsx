@@ -5,7 +5,7 @@ import UVGauge from "./uv-gauge";
 
 export default function GaugesComponents() {
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-2 gap-2 h-full">
       <UVGauge />
       <HumidityGauge />
       <TempGauge />
