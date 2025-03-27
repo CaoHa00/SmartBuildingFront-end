@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/axios";
 import {
   AudioWaveform,
   LayoutDashboard,
@@ -8,6 +10,8 @@ import {
   Clock,
   SettingsIcon,
   HelpCircleIcon,
+  Layers,
+  DoorClosed,
 } from "lucide-react";
 
 import { NavFacility } from "@/app/dashboard/_components/nav-facility";
@@ -48,93 +52,6 @@ const data = {
       plan: "Free",
     },
   ],
-  facility: [
-    {
-      title: "Block 8",
-      url: "#",
-      icon: LayoutDashboard,
-      isActive: true,
-      items: [
-        {
-          title: "103.B11",
-          url: "#",
-        },
-        {
-          title: "104.B11",
-          url: "#",
-        },
-        {
-          title: "105.B11",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Block 10",
-      url: "#",
-      icon: LayoutDashboard,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Block 11",
-      url: "#",
-      icon: LayoutDashboard,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Block 5",
-      url: "#",
-      icon: LayoutDashboard,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
   scheduler: [
     {
       title: "On/Off AC",
@@ -163,7 +80,48 @@ const data = {
   ],
 };
 
+interface Room {
+  roomId: number;  
+  roomName: string; 
+  floorId: number;
+}
+
+interface Floor {
+  floorId: number;  
+  floorName: string;
+  blockId: number;
+  rooms: Room[];
+}
+
+interface Block {
+  blockId: number;
+  blockName: string;
+  floors: Floor[];
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [blocks, setBlocks] = useState<Block[]>([]);
+
+  useEffect(() => {
+    const fetchBlocks = async () => {
+      try {
+        const response = await api.get<Block[]>("/block");
+        if (response.data.length > 0) {
+          const formattedBlocks = response.data.map(block => ({
+            blockId: block.blockId,
+            blockName: block.blockName,
+            floors: block.floors,
+          }));
+          setBlocks(formattedBlocks);
+        }
+      } catch (error) {
+        console.error("Failed to fetch blocks:", error);
+      }
+    };
+
+    fetchBlocks();
+  }, []);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -171,7 +129,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SearchBar />
       </SidebarHeader>
       <SidebarContent>
-        <NavFacility items={data.facility} />
+        <NavFacility
+          items={blocks.map(block => ({
+            key: block.blockId,
+            name: block.blockName,
+            url: `/block/${block.blockId}`,
+            icon: LayoutDashboard,
+            items: block.floors?.map(floor => ({
+              key: floor.floorId ,
+              name: floor.floorName,
+              url: `/block/${block.blockId}/floor/${floor.floorId}`,
+              icon: Layers,
+              items: floor.rooms?.map(room => ({
+                key: room.roomId ,
+                name: room.roomName,
+                url: `/block/${block.blockId}/floor/${floor.floorId}/room/${room.roomId}`,
+                icon: DoorClosed,
+              }))
+            })),
+          }))}
+        />
         <NavScheduler scheduler={data.scheduler} />
         <NavDevices devices={[]} />
         <NavHelper items={data.NavHelper} className="mt-auto font-bold text-blue-800" />
