@@ -6,8 +6,39 @@ import { AirQualityResponse } from "@/types/air-quality";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 async function fetchAirQuality() {
+  const requestBody = {
+    equipmentId: 3,
+    equipmentName: "doanhTest",
+    deviceId: "lumi.54ef441000a4894c",
+    equipmentType: {
+      equipmentTypeId: 2,
+      equipmentTypeName: "Aqara",
+      equipments: [
+        {
+          equipmentId: 3,
+          equipmentName: "lumi.54ef441000a4894c",
+          deviceId: "doanhTest",
+          logValues: []
+        }
+      ]
+    },
+    room: {
+      roomId: 2,
+      roomName: "102",
+      equipments: [
+        {
+          equipmentId: 3,
+          equipmentName: "lumi.54ef441000a4894c",
+          deviceId: "doanhTest",
+          logValues: []
+        }
+      ]
+    }
+  };
+
   const { data } = await axios.post<AirQualityResponse>(
-    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/query-temperature`
+    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/currentValue`,
+    requestBody
   );
   return data;
 }
