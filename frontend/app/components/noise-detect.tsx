@@ -33,8 +33,8 @@ export default function NoiseDetect() {
               <Square
                 size={10}
                 className="h-5"
-                fill="#02f506"
-                color="#02f506"
+                fill="#16c91a"
+                color="#16c91a"
               />
             </div>
             <p className="text-xs md:text-base font-bold text-center">

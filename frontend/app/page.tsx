@@ -8,6 +8,7 @@ import WaterUsage from "./components/water-usage";
 import EnergyComponent from "./components/energy-component";
 import { LanguageProvider } from "@/components/providers/language-provider";
 import BorderLines from "./components/border-lines";
+import GetRealWeather from "./components/get-real-weather";
 
 export default function Home() {
   return (
@@ -17,10 +18,11 @@ export default function Home() {
         <TopBar />
         <section className="relative h-full flex justify-center bg-gradient-to-b from-blue-900 via-blue-400 to-violet-700">
           <div className="container mx-auto px-6 text-white">
-            <div className="grid mt-[80px] md:mt-24 grid-cols-2 gap-2 mb-2">
+            {/* <div className="grid mt-[80px] md:mt-24 grid-cols-2 gap-2 mb-2">
               <WeatherComponent />
               <GaugesComponents />
-            </div>
+            </div> */}
+            <GetRealWeather />
             <div className="grid grid-cols-2 gap-2">
               <NoiseDetect />
               <AirQuality />
