@@ -26,7 +26,7 @@ export default function ElectricityUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[10px] pr-4 h-[20px] md:text-lg"
+                : "text-[10px] h-[20px] md:text-lg"
             }
           >
             {text.title}
@@ -52,7 +52,7 @@ export default function ElectricityUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[10px] pr-1 h-[20px] md:text-lg"
+                : "text-[9px] h-[20px] md:text-lg"
             }
           >
             {text.efficiency}
