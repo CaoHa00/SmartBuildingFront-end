@@ -1,6 +1,6 @@
 "use client";
 
-import { Droplet, MoveUp, Receipt } from "lucide-react";
+import { Droplet, MoveUp } from "lucide-react";
 import Image from "next/image";
 import { useLanguage } from "@/components/providers/language-provider";
 
