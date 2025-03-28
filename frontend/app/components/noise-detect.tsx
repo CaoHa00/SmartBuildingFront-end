@@ -16,8 +16,8 @@ export default function NoiseDetect() {
         status: "Thấp",
       };
   return (
-    <div className="bg-muted/40 rounded-xl aspect-auto px-5 py-3 mb-2">
-      <div className="flex justify-center text-2xl leading-none">
+    <div className="bg-[#5e83ba] rounded-xl aspect-auto px-5 py-3">
+      <div className="flex justify-center font-bold text-2xl leading-none">
         <Ear />
         {text.title}
       </div>

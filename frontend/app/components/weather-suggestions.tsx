@@ -29,40 +29,40 @@ export default function WeatherComponent({
 }: WeatherComponentProps) {
   const { isEnglish } = useLanguage();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [city, setCity] = useState("Loading...");
+  // const [city, setCity] = useState("Loading...");
 
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          fetchCityName(latitude, longitude);
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          setCity("Unknown Location");
-        }
-      );
-    } else {
-      setCity("Geolocation Not Supported");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if ("geolocation" in navigator) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       async (position) => {
+  //         const { latitude, longitude } = position.coords;
+  //         fetchCityName(latitude, longitude);
+  //       },
+  //       (error) => {
+  //         console.error("Error getting location:", error);
+  //         setCity("Unknown Location");
+  //       }
+  //     );
+  //   } else {
+  //     setCity("Geolocation Not Supported");
+  //   }
+  // }, []);
 
-  async function fetchCityName(lat: number, lon: number) {
-    try {
-      const apiKey = "b9cea54cd1514bebac07eb8d1c904dd8";
-      const response = await fetch(
-        `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${apiKey}`
-      );
-      const data = await response.json();
-      const cityName =
-        data.results[0]?.components.city || data.results[0]?.components.town;
-      setCity(cityName || "Unknown City");
-    } catch (error) {
-      console.error("Error fetching city name:", error);
-      setCity("Unknown City");
-    }
-  }
+  // async function fetchCityName(lat: number, lon: number) {
+  //   try {
+  //     const apiKey = "b9cea54cd1514bebac07eb8d1c904dd8";
+  //     const response = await fetch(
+  //       `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${apiKey}`
+  //     );
+  //     const data = await response.json();
+  //     const cityName =
+  //       data.results[0]?.components.city || data.results[0]?.components.town;
+  //     setCity(cityName || "Unknown City");
+  //   } catch (error) {
+  //     console.error("Error fetching city name:", error);
+  //     setCity("Unknown City");
+  //   }
+  // }
 
   const formattedDate = currentTime.toLocaleDateString(
     isEnglish ? "en-US" : "vi-VN",
@@ -185,7 +185,7 @@ export default function WeatherComponent({
   }, []);
 
   return (
-    <div className="bg-muted/40 relative rounded-xl aspect-auto pl-5 md:pl-8 pr-3 h-full md:h-[480px] overflow-hidden">
+    <div className="bg-[#5e83ba] relative rounded-xl aspect-auto pl-5 md:pl-8 pr-3 h-full md:h-[480px] overflow-hidden">
       <div className="absolute pt-3 top-0 right-0 font-bold text-2xl md:text-4xl pr-3">
         {formattedTime}
       </div>

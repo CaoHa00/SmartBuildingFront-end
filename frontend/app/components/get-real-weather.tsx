@@ -118,7 +118,7 @@ export default function GetRealWeather() {
   if (!weatherData) return <p>Loading weather data...</p>;
 
   return (
-    <div className="grid mt-[80px] md:mt-24 grid-cols-2 gap-2 mb-2">
+    <div className="grid mt-[80px] bg-[#0f4da8] p-2 rounded-xl md:mt-24 grid-cols-2 gap-2 mb-2">
       <WeatherComponent
         temperature={weatherData.temperature2m}
         weatherCode={weatherData.weatherCode}

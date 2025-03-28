@@ -17,7 +17,7 @@ export default function WaterUsageAnalytics() {
         efficiency: "Hiệu năng sử dụng",
       };
   return (
-    <div className="bg-muted/40 flex rounded-xl aspect-auto px-2 md:px-5 py-3 mb-2">
+    <div className="bg-[#5e83ba] flex rounded-xl aspect-auto px-2 md:px-5 py-3">
       <div className="w-1/2 relative flex border-r border-white">
         <Droplet fill="white" className="h-12 md:h-16 md:w-8" />
         <div className="ml-3 pt-1">
@@ -25,7 +25,7 @@ export default function WaterUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[10px] pr-4 h-[20px] md:text-lg"
+                : "text-[10px] h-[20px] md:text-lg"
             }
           >
             {text.title}
@@ -51,7 +51,7 @@ export default function WaterUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[10px] pr-1 h-[20px] md:text-lg"
+                : "text-[10px] h-[20px] md:text-lg"
             }
           >
             {text.efficiency}
