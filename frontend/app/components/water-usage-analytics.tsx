@@ -1,6 +1,6 @@
 "use client";
 
-import { Droplet, MoveUp, Receipt } from "lucide-react";
+import { Droplet, MoveUp } from "lucide-react";
 import Image from "next/image";
 import { useLanguage } from "@/components/providers/language-provider";
 
@@ -25,7 +25,7 @@ export default function WaterUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[10px] pr-4 h-[20px] md:text-lg"
+                : "text-[10px] h-[20px] md:text-lg"
             }
           >
             {text.title}
@@ -51,7 +51,7 @@ export default function WaterUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[10px] pr-1 h-[20px] md:text-lg"
+                : "text-[10px] h-[20px] md:text-lg"
             }
           >
             {text.efficiency}
