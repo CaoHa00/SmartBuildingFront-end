@@ -185,7 +185,7 @@ export default function WeatherComponent({
   }, []);
 
   return (
-    <div className="bg-muted/40 relative rounded-xl aspect-auto pl-5 md:pl-8 pr-3 h-full md:h-[480px] overflow-hidden">
+    <div className="bg-[#5e83ba] relative rounded-xl aspect-auto pl-5 md:pl-8 pr-3 h-full md:h-[480px] overflow-hidden">
       <div className="absolute pt-3 top-0 right-0 font-bold text-2xl md:text-4xl pr-3">
         {formattedTime}
       </div>

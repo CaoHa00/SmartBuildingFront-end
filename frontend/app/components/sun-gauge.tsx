@@ -1,7 +1,8 @@
 "use client";
 
 import { useLanguage } from "@/components/providers/language-provider";
-import { Sunrise, Sunset } from "lucide-react";
+// import { Sunrise, Sunset } from "lucide-react";
+import Image from "next/image";
 // import dynamic from "next/dynamic";
 // import { useState, useMemo, useEffect } from "react";
 
@@ -79,7 +80,7 @@ export default function SunGauge({ sunrise, sunset }: SunProps) {
   // );
 
   return (
-    <div className="bg-muted/40 rounded-xl aspect-auto md:p-5">
+    <div className="bg-[#5e83ba] rounded-xl aspect-auto md:p-5">
       <div className="font-bold text-base tracking-wide px-3 py-2 flex">
         <p className="my-auto">
           <span className="text-2xl not-italic">🌤️</span>
@@ -110,11 +111,25 @@ export default function SunGauge({ sunrise, sunset }: SunProps) {
             value={currentTime.getHours() * 60 + currentTime.getMinutes()}
             pointer={{ type: "blob", animationDelay: 0 }}
           /> */}
-        <Sunrise className="mx-auto mb-[8px]" size={28} />
+        {/* <Sunrise className="mx-auto mb-[8px]" size={28} /> */}
+        <Image
+          src="/icon/sunrise.png"
+          alt="sunrise"
+          className="mx-auto mb-[3px]"
+          width={30}
+          height={30}
+        />
         <p className="text-3xl font-extrabold text-white">{sunrise}</p>
         <div className="mx-auto w-1/2 border border-white"></div>
         <p className="text-3xl font-extrabold text-white">{sunset}</p>
-        <Sunset className="mx-auto mt-[5px]" size={28} />
+        {/* <Sunset className="mx-auto mt-[5px]" size={28} /> */}
+        <Image
+          src="/icon/sunset.png"
+          alt="sunset"
+          className="mx-auto mt-[3px]"
+          width={30}
+          height={30}
+        />
       </div>
     </div>
   );

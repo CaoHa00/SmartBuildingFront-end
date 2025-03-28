@@ -64,7 +64,7 @@ export default function TempGauge({ temperature }: TempProps) {
   );
 
   return (
-    <div className="bg-muted/40 rounded-xl aspect-auto md:p-5">
+    <div className="bg-[#5e83ba] rounded-xl aspect-auto md:p-5">
       <div className="text-base font-bold px-3 py-2 flex justify-between">
         <p>
           <span className="not-italic text-2xl">🌡️</span>{" "}

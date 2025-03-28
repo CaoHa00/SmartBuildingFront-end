@@ -63,7 +63,7 @@ export default function HumidityGauge({ humidity }: HumidityProps) {
   );
 
   return (
-    <div className="bg-muted/40 rounded-xl aspect-auto md:p-5">
+    <div className="bg-[#5e83ba] rounded-xl aspect-auto md:p-5">
       <div className="font-bold text-base px-3 pt-2 flex justify-between">
         <p>
           <span className="not-italic text-2xl">💧</span> {text.title}
