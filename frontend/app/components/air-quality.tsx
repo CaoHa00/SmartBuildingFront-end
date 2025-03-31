@@ -6,8 +6,8 @@ import { fetchWeatherApi } from "openmeteo";
 import { useState, useEffect } from "react";
 
 const params = {
-  latitude: 10.823,
-  longitude: 106.6296,
+  latitude: 11.0542,
+  longitude: 106.6667,
   current: [
     "pm2_5",
     "pm10",

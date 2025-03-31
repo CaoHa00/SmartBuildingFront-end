@@ -6,8 +6,8 @@ import WeatherComponent from "./weather-suggestions";
 import GaugesComponents from "./gauges";
 
 const params = {
-  latitude: 10.823,
-  longitude: 106.6296,
+  latitude: 11.0542,
+  longitude: 106.6667,
   daily: ["temperature_2m_min", "temperature_2m_max", "sunrise", "sunset"],
   current: [
     "temperature_2m",
@@ -73,32 +73,6 @@ async function fetchWeatherData(): Promise<WeatherData | null> {
     console.error("Error fetching weather data:", error);
     return null;
   }
-
-  // const formatTime = (isoString: string) => isoString.split("T")[1] ?? "N/A";
-
-  // console.log("Daily response:", daily);
-  // console.log("Sunrise:", daily.variables(2)?.valuesArray());
-  // console.log("Sunset:", daily.variables(3)?.valuesArray());
-
-  // const getDailyVariable = (index: number) => {
-  //   const variable = daily.variables(index);
-  //   return variable && variable.valuesArray()
-  //     ? variable.valuesArray()![0]
-  //     : null;
-  // };
-
-  // return {
-  //   time: new Date(Number(current.time()) * 1000),
-  //   temperature2m: current.variables(0)!.value(),
-  //   relativeHumidity2m: current.variables(1)!.value(),
-  //   apparentTemperature: current.variables(2)!.value(),
-  //   weatherCode: current.variables(3)!.value(),
-  //   uvIndex: current.variables(4)!.value(),
-  //   dailyMinTemp: getDailyVariable(0) ?? 0,
-  //   dailyMaxTemp: getDailyVariable(1) ?? 0,
-  //   sunrise: formatTime(sunrise),
-  //   sunset: formatTime(sunset),
-  // };
 }
 
 export default function GetRealWeather() {
@@ -129,8 +103,6 @@ export default function GetRealWeather() {
         temperature={weatherData.temperature2m}
         humidity={weatherData.relativeHumidity2m}
         uvIndex={weatherData.uvIndex}
-        sunrise={weatherData.sunrise}
-        sunset={weatherData.sunset}
       />
     </div>
   );

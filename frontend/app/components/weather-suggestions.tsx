@@ -10,6 +10,7 @@ import {
   MapPin,
   Calendar,
 } from "lucide-react";
+import Image from "next/image";
 import { useLanguage } from "@/components/providers/language-provider";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -218,6 +219,9 @@ function getWeatherDescription(
     61: { en: "Light Rain", vi: "Mưa nhỏ" },
     63: { en: "Moderate Rain", vi: "Mưa vừa" },
     65: { en: "Heavy Rain", vi: "Mưa lớn" },
+    80: { en: "Slight Rain Showers", vi: "Mưa rào" },
+    95: { en: "Slight to Moderate Thunderstorm", vi: "Mưa giông vừa và nhỏ" },
+    96: { en: "Heavy Thunderstorm", vi: "Mưa giông lớn" },
   };
 
   return descriptions[weatherCode]
@@ -230,34 +234,209 @@ function getWeatherDescription(
 }
 
 function getWeatherIcon(weatherCode: number) {
-  const iconSize = 150;
+  const iconSize = 100;
   const hour = new Date().getHours();
   const isDaytime = hour >= 6 && hour < 18;
   const icons: {
     [key: number]: { day: React.ReactNode; night: React.ReactNode };
   } = {
-    0: { day: <Sun size={iconSize} />, night: <Moon size={iconSize} /> },
+    0: {
+      day: (
+        <Image
+          src="/icon/Sun.svg"
+          alt="Sun"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Moon.svg"
+          alt="Moon"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+    },
     1: {
-      day: <CloudSun size={iconSize} />,
-      night: <CloudMoon size={iconSize} />,
+      day: (
+        <Image
+          src="/icon/CloudSun.svg"
+          alt="CloudSun"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/CloudMoon.svg"
+          alt="CloudMoon"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
     },
     2: {
-      day: <CloudSun size={iconSize} />,
-      night: <CloudMoon size={iconSize} />,
+      day: (
+        <Image
+          src="/icon/CloudSun.svg"
+          alt="CloudSun"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/CloudMoon.svg"
+          alt="CloudMoon"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
     },
-    3: { day: <Cloud size={iconSize} />, night: <Cloud size={iconSize} /> },
-    45: { day: <Cloud size={iconSize} />, night: <Cloud size={iconSize} /> },
+    3: {
+      day: (
+        <Image
+          src="/icon/Cloud.svg"
+          alt="Cloud"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Cloud.svg"
+          alt="Cloud"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+    },
+    45: {
+      day: (
+        <Image
+          src="/icon/Cloud.svg"
+          alt="Cloud"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Cloud.svg"
+          alt="Cloud"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+    },
     61: {
-      day: <CloudRain size={iconSize} />,
-      night: <CloudRain size={iconSize} />,
+      day: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
     },
     63: {
-      day: <CloudRain size={iconSize} />,
-      night: <CloudRain size={iconSize} />,
+      day: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
     },
     65: {
-      day: <CloudRain size={iconSize} />,
-      night: <CloudRain size={iconSize} />,
+      day: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+    },
+    80: {
+      day: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+    },
+    95: {
+      day: (
+        <Image
+          src="/icon/Storm.svg"
+          alt="Storm"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Storm.svg"
+          alt="Storm"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+    },
+    96: {
+      day: (
+        <Image
+          src="/icon/Storm.svg"
+          alt="Storm"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Storm.svg"
+          alt="Storm"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
     },
   };
 

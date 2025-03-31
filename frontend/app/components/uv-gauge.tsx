@@ -44,20 +44,17 @@ export default function UVGauge({ uvIndex }: UVProps) {
         valueLabel: {
           style: { fontSize: 50, fontWeight: "bold", textShadow: "none" },
           formatTextValue: (value: any) => value + "",
-          // hide: true,
         },
         tickLabels: {
           type: "outer" as "outer",
           defaultTickLineConfig: { hide: true },
           defaultTickValueConfig: {
-            // formatTextValue: (value: any) => value + "",
-            // style: { fontSize: 13, fill: "#ffffff" },
             hide: true,
           },
         },
       },
     }),
-    []
+    [uvIndex]
   );
   return (
     <div className="bg-[#5e83ba] rounded-xl aspect-auto md:p-5">
