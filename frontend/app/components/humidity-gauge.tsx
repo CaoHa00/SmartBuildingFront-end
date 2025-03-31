@@ -46,14 +46,11 @@ export default function HumidityGauge({ humidity }: HumidityProps) {
         valueLabel: {
           style: { fontSize: 50, fontWeight: "bold", textShadow: "none" },
           formatTextValue: (value: any) => value + "%",
-          // hide: true,
         },
         tickLabels: {
           type: "outer" as "outer",
           defaultTickLineConfig: { hide: true },
           defaultTickValueConfig: {
-            // formatTextValue: (value: any) => value + "",
-            // style: { fontSize: 13, fill: "#ffffff" },
             hide: true,
           },
         },

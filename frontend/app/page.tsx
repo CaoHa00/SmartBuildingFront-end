@@ -1,6 +1,4 @@
 import TopBar from "./components/top-bar";
-// import WeatherComponent from "./components/weather-suggestions";
-// import GaugesComponents from "./components/gauges";
 import NoiseDetect from "./components/noise-detect";
 import AirQuality from "./components/air-quality";
 import ElectricityUsage from "./components/electricity-usage";
@@ -16,12 +14,10 @@ export default function Home() {
       <div className="relative min-h-screen">
         <BorderLines />
         <TopBar />
-        <section className="relative h-full flex justify-center bg-[url(/img/BG.svg)]">
+        {/* <section className="relative h-full flex justify-center bg-[url(/img/BG.svg)]"> */}
+        {/* <section className="relative h-full flex justify-center bg-[url(/img/BGSpring.svg)]"> */}
+        <section className="relative h-full flex justify-center bg-gradient-to-b from-[#080077] via-[#65aff1] to-[#650bf7]">
           <div className="container mx-auto px-6 text-white">
-            {/* <div className="grid mt-[80px] md:mt-24 grid-cols-2 gap-2 mb-2">
-              <WeatherComponent />
-              <GaugesComponents />
-            </div> */}
             <GetRealWeather />
             <div className="grid bg-[#0f4da8] p-2 rounded-xl grid-cols-2 gap-2 mb-2">
               <NoiseDetect />
