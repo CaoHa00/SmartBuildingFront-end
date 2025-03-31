@@ -159,7 +159,7 @@ export default function WeatherComponent({
         <span className="not-italic">🥛</span>
       </p>
       <p className="text-base md:text-2xl italic w-full">
-        Don't forget to drink at least 2 liters of{" "}
+        Don&apos;t forget to drink at least 2 liters of{" "}
         <span className="not-italic">💧</span> water daily. Have you had any
         water today? <span className="not-italic">🥛</span>
       </p>

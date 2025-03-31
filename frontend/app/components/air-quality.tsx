@@ -126,10 +126,12 @@ export default function AirQuality() {
   return (
     <div className="bg-[#5e83ba] rounded-xl aspect-auto px-3 py-3">
       <div className="flex justify-center">
+
         <Leaf fill="#16c91a" color="#16c91a" />
         <h1 className="text-2xl md:text-3xl font-bold leading-none ml-2">
           {text.title}
         </h1>
+
       </div>
       <div className="w-full text-center mt-1 mb-1 h-24 md:h-40">
         <h1
