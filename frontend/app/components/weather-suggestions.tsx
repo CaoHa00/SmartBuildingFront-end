@@ -1,25 +1,20 @@
 "use client";
 
-import {
-  CloudSun,
-  CloudRain,
-  Sun,
-  Cloud,
-  Moon,
-  CloudMoon,
-  MapPin,
-  Calendar,
-} from "lucide-react";
+import { CloudSun, MapPin, Calendar } from "lucide-react";
 import Image from "next/image";
 import { useLanguage } from "@/components/providers/language-provider";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import WeatherChart from "./weather-chart";
 
 interface WeatherComponentProps {
   temperature: number;
   weatherCode: number;
   dailyMinTemp: number;
   dailyMaxTemp: number;
+  hourlyTemp2m: number[];
+  hourlyWeatherCodes: number[];
+  hourlyTime: Date[];
 }
 
 export default function WeatherComponent({
@@ -27,6 +22,9 @@ export default function WeatherComponent({
   weatherCode,
   dailyMinTemp,
   dailyMaxTemp,
+  hourlyTemp2m,
+  hourlyWeatherCodes,
+  hourlyTime,
 }: WeatherComponentProps) {
   const { isEnglish } = useLanguage();
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -87,11 +85,11 @@ export default function WeatherComponent({
     weather: getWeatherDescription(weatherCode, isEnglish),
   };
 
-  const weatherIcon = getWeatherIcon(weatherCode);
+  const weatherIcon = getWeatherIcon(weatherCode, 100);
 
   const content = [
     <div key="1">
-      <div className="flex justify-between pt-20 md:pt-16">
+      <div className="flex justify-between pt-6 md:pt-16">
         <div className="">
           <div className="flex">
             <MapPin fill="red" className="mr-1" />
@@ -104,8 +102,8 @@ export default function WeatherComponent({
           </div>
         </div>
       </div>
-      <div className="flex justify-between md:justify-around">
-        <div className="text-[130px] leading-[1.2] md:leading-[1.5] md:text-[150px]">
+      <div className="flex justify-around">
+        <div className="text-[110px] leading-[1.2] md:leading-[1.5] md:text-[150px]">
           {Math.round(temperature)}°
         </div>
         {weatherIcon}
@@ -113,13 +111,18 @@ export default function WeatherComponent({
       <div className="text-xl italic md:text-3xl pb-6">
         {Math.round(dailyMinTemp)}° - {Math.round(dailyMaxTemp)}° {text.weather}
       </div>
+      <WeatherChart
+        hourlyTemp2m={hourlyTemp2m}
+        hourlyWeatherCodes={hourlyWeatherCodes}
+        hourlyTime={hourlyTime}
+      />
     </div>,
 
     <div
       key="2"
       className="h-full flex flex-col relative justify-center item-center text-center"
     >
-      <p className="text-xl md:text-3xl italic mb-10 w-full">
+      <p className="text-xl md:text-3xl italic mb-16 w-full">
         <span className="not-italic">☀️</span> Hiện tại chỉ số tia UV đang rất
         cao. Hãy hạn chế ra ngoài và nhớ mang theo ô{" "}
         <span className="not-italic">☂️</span> hoặc áo khoác chống nắng{" "}
@@ -137,7 +140,7 @@ export default function WeatherComponent({
       key="2"
       className="h-full flex flex-col justify-center item-center text-center"
     >
-      <p className="text-xl md:text-3xl italic mb-10 w-full">
+      <p className="text-xl md:text-3xl italic mb-16 w-full">
         <span className="not-italic">🌡️</span> Nhiệt độ bên ngoài và trong phòng
         đang chênh lệch cao. Hãy điều chỉnh nhiệt độ điều hòa để tránh tình
         trạng sốc nhiệt.
@@ -153,7 +156,7 @@ export default function WeatherComponent({
       key="4"
       className="h-full flex flex-col justify-center item-center text-center"
     >
-      <p className="text-xl md:text-3xl italic mb-10 w-full">
+      <p className="text-xl md:text-3xl italic mb-16 w-full">
         Đừng quên uống đủ 2 lít <span className="not-italic">💧</span> nước mỗi
         ngày. Bạn đã uống nước hôm nay chưa?{" "}
         <span className="not-italic">🥛</span>
@@ -186,7 +189,7 @@ export default function WeatherComponent({
   }, []);
 
   return (
-    <div className="bg-[#5e83ba] relative rounded-xl aspect-auto pl-5 md:pl-8 pr-3 h-full md:h-[480px] overflow-hidden">
+    <div className="bg-[#5e83ba] relative rounded-xl aspect-auto px-3 h-[483px] md:h-[483px] overflow-hidden">
       <div className="absolute pt-3 top-0 right-0 font-bold text-2xl md:text-4xl pr-3">
         {formattedTime}
       </div>
@@ -219,7 +222,8 @@ function getWeatherDescription(
     61: { en: "Light Rain", vi: "Mưa nhỏ" },
     63: { en: "Moderate Rain", vi: "Mưa vừa" },
     65: { en: "Heavy Rain", vi: "Mưa lớn" },
-    80: { en: "Slight Rain Showers", vi: "Mưa rào" },
+    80: { en: "Slight Rain Showers", vi: "Mưa rào nhỏ" },
+    81: { en: "Moderate Rain Showers", vi: "Mưa rào" },
     95: { en: "Slight to Moderate Thunderstorm", vi: "Mưa giông vừa và nhỏ" },
     96: { en: "Heavy Thunderstorm", vi: "Mưa giông lớn" },
   };
@@ -233,8 +237,7 @@ function getWeatherDescription(
     : "Thời tiết không xác định";
 }
 
-function getWeatherIcon(weatherCode: number) {
-  const iconSize = 100;
+export function getWeatherIcon(weatherCode: number, iconSize: number) {
   const hour = new Date().getHours();
   const isDaytime = hour >= 6 && hour < 18;
   const icons: {
@@ -385,6 +388,24 @@ function getWeatherIcon(weatherCode: number) {
       ),
     },
     80: {
+      day: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+      night: (
+        <Image
+          src="/icon/Rain.svg"
+          alt="Rain"
+          width={iconSize}
+          height={iconSize}
+        />
+      ),
+    },
+    81: {
       day: (
         <Image
           src="/icon/Rain.svg"

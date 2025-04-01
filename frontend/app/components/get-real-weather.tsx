@@ -8,7 +8,7 @@ import GaugesComponents from "./gauges";
 const params = {
   latitude: 11.0542,
   longitude: 106.6667,
-  daily: ["temperature_2m_min", "temperature_2m_max", "sunrise", "sunset"],
+  daily: ["temperature_2m_min", "temperature_2m_max"],
   current: [
     "temperature_2m",
     "relative_humidity_2m",
@@ -16,9 +16,9 @@ const params = {
     "weather_code",
     "uv_index",
   ],
+  hourly: ["temperature_2m", "weather_code"],
   timezone: "Asia/Bangkok",
   forecast_days: 1,
-  cell_selection: "nearest",
 };
 
 interface WeatherData {
@@ -30,33 +30,28 @@ interface WeatherData {
   uvIndex: number;
   dailyMinTemp: number;
   dailyMaxTemp: number;
-  sunrise: string;
-  sunset: string;
+  hourlyTemp2m: number[];
+  hourlyWeatherCode: number[];
+  hourlyTime: Date[];
 }
 
 async function fetchWeatherData(): Promise<WeatherData | null> {
-  const currentUrl = "https://api.open-meteo.com/v1/forecast";
-  const dailyUrl = `https://api.open-meteo.com/v1/forecast?latitude=${params.latitude}&longitude=${params.longitude}&daily=temperature_2m_min,temperature_2m_max,sunrise,sunset&timezone=${params.timezone}&forecast_days=1`;
-  const responses = await fetchWeatherApi(currentUrl, params);
+  const url = "https://api.open-meteo.com/v1/forecast";
+  const responses = await fetchWeatherApi(url, params);
 
+  const range = (start: number, stop: number, step: number) =>
+    Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
   const response = responses[0];
   const current = response.current();
+  const daily = response.daily();
+  const hourly = response.hourly();
 
-  if (!current) {
-    console.error("Failed to fetch current weather data.");
+  if (!current || !daily || !hourly) {
+    console.error("Failed to fetch weather data.");
     return null;
   }
 
   try {
-    const response = await fetch(dailyUrl);
-    if (!response.ok) throw new Error("Failed to fetch weather data");
-
-    const data = await response.json();
-
-    console.log("API Response:", data);
-
-    const formatTime = (isoString: string) => isoString.split("T")[1] ?? "N/A";
-
     return {
       time: new Date(Number(current.time()) * 1000),
       temperature2m: current.variables(0)!.value(),
@@ -64,10 +59,15 @@ async function fetchWeatherData(): Promise<WeatherData | null> {
       apparentTemperature: current.variables(2)!.value(),
       weatherCode: current.variables(3)!.value(),
       uvIndex: current.variables(4)!.value(),
-      dailyMinTemp: data.daily.temperature_2m_min[0] ?? 0,
-      dailyMaxTemp: data.daily.temperature_2m_max[0] ?? 0,
-      sunrise: formatTime(data.daily.sunrise[0]),
-      sunset: formatTime(data.daily.sunset[0]),
+      dailyMinTemp: daily.variables(0)!.valuesArray()![0],
+      dailyMaxTemp: daily.variables(1)!.valuesArray()![0],
+      hourlyTemp2m: Array.from(hourly.variables(0)!.valuesArray()!),
+      hourlyWeatherCode: Array.from(hourly.variables(1)!.valuesArray()!),
+      hourlyTime: range(
+        Number(hourly.time()),
+        Number(hourly.timeEnd()),
+        hourly.interval()
+      ).map((t) => new Date(t * 1000)),
     };
   } catch (error) {
     console.error("Error fetching weather data:", error);
@@ -98,6 +98,9 @@ export default function GetRealWeather() {
         weatherCode={weatherData.weatherCode}
         dailyMinTemp={weatherData.dailyMinTemp}
         dailyMaxTemp={weatherData.dailyMaxTemp}
+        hourlyTemp2m={weatherData.hourlyTemp2m}
+        hourlyWeatherCodes={weatherData.hourlyWeatherCode}
+        hourlyTime={weatherData.hourlyTime}
       />
       <GaugesComponents
         temperature={weatherData.temperature2m}
