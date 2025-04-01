@@ -108,7 +108,7 @@ export default function WeatherComponent({
         </div>
         {weatherIcon}
       </div>
-      <div className="text-xl italic md:text-3xl pb-6">
+      <div className="text-base italic md:text-3xl pb-6">
         {Math.round(dailyMinTemp)}° - {Math.round(dailyMaxTemp)}° {text.weather}
       </div>
       <WeatherChart
@@ -220,11 +220,11 @@ function getWeatherDescription(
     3: { en: "Overcast", vi: "Nhiều mây" },
     45: { en: "Fog", vi: "Sương mù" },
     61: { en: "Light Rain", vi: "Mưa nhỏ" },
-    63: { en: "Moderate Rain", vi: "Mưa vừa" },
+    63: { en: "Rain", vi: "Mưa" },
     65: { en: "Heavy Rain", vi: "Mưa lớn" },
     80: { en: "Slight Rain Showers", vi: "Mưa rào nhỏ" },
-    81: { en: "Moderate Rain Showers", vi: "Mưa rào" },
-    95: { en: "Slight to Moderate Thunderstorm", vi: "Mưa giông vừa và nhỏ" },
+    81: { en: "Rain Showers", vi: "Mưa rào" },
+    95: { en: "Thunderstorm", vi: "Mưa giông" },
     96: { en: "Heavy Thunderstorm", vi: "Mưa giông lớn" },
   };
 

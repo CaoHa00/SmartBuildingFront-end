@@ -57,7 +57,7 @@ export default function EnergyUser() {
           {text.dropdown}
         </div>
       </div>
-      <div className="h-[140px] bg-muted/60 mt-3 mr-2 rounded-xl"></div>
+      <div className="h-[120px] bg-muted/60 mt-3 mr-2 rounded-xl"></div>
     </div>
   );
 }
