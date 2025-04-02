@@ -11,6 +11,7 @@ export default function TopBar() {
             alt="EIU Logo"
             width={170}
             height={180}
+            priority
           />
           <h1 className="relative text-4xl md:text-5xl text-white font-bold mx-[75px] md:mx-72">
             BLOCK B8
@@ -21,6 +22,7 @@ export default function TopBar() {
             alt="Powered by IIC Logo"
             width={150}
             height={150}
+            priority
           />
         </div>
       </div>

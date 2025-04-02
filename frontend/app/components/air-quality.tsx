@@ -2,23 +2,7 @@
 
 import { Leaf } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
-import { fetchWeatherApi } from "openmeteo";
 import { useState, useEffect } from "react";
-
-const params = {
-  latitude: 11.0542,
-  longitude: 106.6667,
-  current: [
-    "pm2_5",
-    "pm10",
-    "sulphur_dioxide",
-    "nitrogen_dioxide",
-    "ozone",
-    "carbon_monoxide",
-    "us_aqi",
-  ],
-  timezone: "Asia/Bangkok",
-};
 
 interface AirQualityData {
   time: Date;
@@ -32,27 +16,19 @@ interface AirQualityData {
 }
 
 async function fetchAirQuality(): Promise<AirQualityData | null> {
-  const url = "https://air-quality-api.open-meteo.com/v1/air-quality";
-  const responses = await fetchWeatherApi(url, params);
+  try {
+    const response = await fetch("/api/air-quality", { cache: "no-store" });
+    if (!response.ok) throw new Error("Failed to fetch air quality data");
+    const data = await response.json();
 
-  const response = responses[0];
-  const current = response.current()!;
-
-  if (!current) {
-    console.error("Failed to fetch current air quailty data.");
+    return {
+      ...data,
+      time: new Date(data.time),
+    };
+  } catch (error) {
+    console.error("Error fetching air quality data:", error);
     return null;
   }
-
-  return {
-    time: new Date(Number(current.time()) * 1000),
-    pm2_5: current.variables(0)!.value(),
-    pm10: current.variables(1)!.value(),
-    sulphur_dioxide: current.variables(2)!.value(),
-    nitrogen_dioxide: current.variables(3)!.value(),
-    ozone: current.variables(4)!.value(),
-    carbon_monoxide: current.variables(5)!.value(),
-    us_aqi: current.variables(6)!.value(),
-  };
 }
 
 function getAQIColor(aqi: number): string {
@@ -126,12 +102,10 @@ export default function AirQuality() {
   return (
     <div className="bg-[#5e83ba] rounded-xl aspect-auto px-3 py-3">
       <div className="flex justify-center">
-
         <Leaf fill="#16c91a" color="#16c91a" />
         <h1 className="text-2xl md:text-3xl font-bold leading-none ml-2">
           {text.title}
         </h1>
-
       </div>
       <div className="w-full text-center mt-1 mb-1 h-24 md:h-40">
         <h1
