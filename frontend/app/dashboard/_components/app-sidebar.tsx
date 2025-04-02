@@ -25,7 +25,6 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import SearchBar from "@/components/search-bar";
 import { NavScheduler } from "@/app/dashboard/_components/nav-scheduler";
 import { NavHelper } from "./nav-helper";
 // This is sample data.
@@ -126,7 +125,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
-        <SearchBar />
       </SidebarHeader>
       <SidebarContent>
         <NavFacility

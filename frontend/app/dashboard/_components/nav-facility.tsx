@@ -24,6 +24,8 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
+import { useFacility } from "@/app/context/facility-context";
+
 interface FacilityItem {
   key: number;
   name: string;
@@ -54,6 +56,13 @@ interface FacilityItem {
 }
 
 export function NavFacility({ items }: { items: FacilityItem[] }) {
+  const { setSelectedFacility } = useFacility();
+
+  const handleItemClick = (name: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event from reaching CollapsibleTrigger
+    setSelectedFacility(name);
+  };
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:px-2">
       <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400 group-data-[collapsible=icon]:justify-center">
@@ -72,7 +81,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton tooltip={item.name}>
                   {item.icon && <item.icon />}
-                  <span>{item.name}</span>
+                  <span onClick={(e) => handleItemClick(item.name, e)}>{item.name}</span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
@@ -89,7 +98,9 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                         <CollapsibleTrigger asChild>
                           <SidebarMenuSubButton>
                             {subItem.icon && <subItem.icon />}
-                            <span>{subItem.name}</span>
+                            <span onClick={(e) => handleItemClick(subItem.name, e)}>
+                              {subItem.name}
+                            </span>
                             {subItem.items && (
                               <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/subcollapsible:rotate-90" />
                             )}
@@ -108,7 +119,9 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                   <CollapsibleTrigger asChild>
                                     <SidebarMenuSubButton>
                                       {subSubItem.icon && <subSubItem.icon />}
-                                      <span>{subSubItem.name}</span>
+                                      <span onClick={(e) => handleItemClick(subSubItem.name, e)}>
+                                        {subSubItem.name}
+                                      </span>
                                       {subSubItem.items && (
                                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/subsubcollapsible:rotate-90" />
                                       )}
@@ -118,11 +131,11 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                     <SidebarMenuSub>
                                       {subSubItem.items?.map((finalItem) => (
                                         <SidebarMenuSubItem key={finalItem.key}>
-                                          <SidebarMenuSubButton asChild>
-                                            <a href={finalItem.url}>
-                                              {finalItem.icon && <finalItem.icon />}
-                                              <span>{finalItem.name}</span>
-                                            </a>
+                                          <SidebarMenuSubButton>
+                                            {finalItem.icon && <finalItem.icon />}
+                                            <span onClick={(e) => handleItemClick(finalItem.name, e)}>
+                                              {finalItem.name}
+                                            </span>
                                           </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
                                       ))}
@@ -141,28 +154,6 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
             </SidebarMenuItem>
           </Collapsible>
         ))}
-        <div className="flex gap-2 mt-4 justify-between group-data-[collapsible=icon]:mt-0 group-data-[collapsible=icon]:flex-row group-data-[collapsible=icon]:justify-evenly">
-          <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
-            <AirVent size={18} />
-          </button>
-          <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
-            <img src="/icon/Lamp.svg" alt="Lamp Logo" width={18} height={18} />
-          </button>
-          <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
-            <AudioLines size={18} />
-          </button>
-          <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
-            <img src="/icon/M Wifi.svg" alt="EIU Logo" width={18} height={18} />
-          </button>
-          <button className="rounded-full p-2 bg-white text-blue-700 hover:bg-blue-50">
-            <img
-              src="/icon/Lock.svg"
-              alt="Lock Button"
-              width={18}
-              height={18}
-            />
-          </button>
-        </div>
       </SidebarMenu>
     </SidebarGroup>
   );

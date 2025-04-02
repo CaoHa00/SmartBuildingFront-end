@@ -28,15 +28,17 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/axios";
+import React from "react";
+import { Spinner } from "@/components/ui/spinner";
 
-interface LogUHoo {
-  id: number;
-  // Add other properties as needed
-}
-
-interface LogAqara {
-  id: number;
-  // Add other properties as needed
+interface LogValue {
+  logValueId: number;
+  timeStamp: number;
+  valueResponse: number;
+  value?: {
+    valueId: number;
+    valueType?: string;
+  };
 }
 
 interface Equipment {
@@ -51,7 +53,7 @@ interface Equipment {
     roomId: number;
     roomName: string;
   };
-  logValues: any[];
+  logValues: LogValue[];
 }
 
 interface EquipmentFormData {
@@ -321,59 +323,66 @@ export function EquipmentManagement() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {equipment.map((item) => (
-              <>
-                <TableRow 
-                  key={item.equipmentId}
-                  className="cursor-pointer"
-                  onClick={() => toggleRow(item.equipmentId)}
-                >
-                  <TableCell>{item.equipmentName}</TableCell>
-                  <TableCell>{item.deviceId}</TableCell>
-                  <TableCell>{item.room.roomName}</TableCell>
-                  <TableCell>{item.equipmentType.equipmentTypeName}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEdit(item);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(item.equipmentId);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                {expandedRows.has(item.equipmentId) && item.logValues && item.logValues.length > 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5}>
-                      <div className="p-4 bg-gray-50">
-                        <h4 className="font-semibold mb-2">Log Values:</h4>
-                        <div className="grid grid-cols-3 gap-4">
-                          {item.logValues.map((log: any, index: number) => (
-                            <div key={index} className="p-2 bg-white rounded shadow">
-                              <div>Timestamp: {new Date(log.timestamp).toLocaleString()}</div>
-                              <div>Value: {log.value}</div>
-                              <div>Type: {log.valueType}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  <Spinner className="mx-auto" />
+                </TableCell>
+              </TableRow>
+            ) : (
+              equipment.map((item) => (
+                <React.Fragment key={item.equipmentId}>
+                  <TableRow 
+                    className="cursor-pointer"
+                    onClick={() => toggleRow(item.equipmentId)}
+                  >
+                    <TableCell>{item.equipmentName}</TableCell>
+                    <TableCell>{item.deviceId}</TableCell>
+                    <TableCell>{item.room.roomName}</TableCell>
+                    <TableCell>{item.equipmentType.equipmentTypeName}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(item);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.equipmentId);
+                        }}
+                      >
+                        Delete
+                      </Button>
                     </TableCell>
                   </TableRow>
-                )}
-              </>
-            ))}
+                  {expandedRows.has(item.equipmentId) && item.logValues && item.logValues.length > 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5}>
+                        <div className="p-4 bg-gray-50">
+                          <h4 className="font-semibold mb-2">Log Values:</h4>
+                          <div className="grid grid-cols-3 gap-4">
+                            {item.logValues.map((log: LogValue) => (
+                              <div key={log.logValueId} className="p-2 bg-white rounded shadow">
+                                <div>Timestamp: {new Date(log.timeStamp).toLocaleString()}</div>
+                                <div>Value: {log.valueResponse}</div>
+                                <div>Type: {log.value?.valueType || 'N/A'}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

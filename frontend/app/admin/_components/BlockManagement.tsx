@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 
 interface Block {
   blockId: number;
@@ -37,6 +38,7 @@ export function BlockManagement() {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Partial<Block>>({
     blockName: "",
   });
@@ -47,6 +49,7 @@ export function BlockManagement() {
 
   const fetchBlocks = async () => {
     try {
+      setLoading(true);
       const response = await api.get<Block[]>("/block");
       if (response.data.length > 0) {
         setBlocks(response.data);
@@ -57,6 +60,8 @@ export function BlockManagement() {
         title: "Error",
         description: "Failed to fetch blocks",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -166,30 +171,38 @@ export function BlockManagement() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {blocks.map((block) => (
-              <TableRow
-                key={block.blockId}
-                className="hover:bg-[hsl(var(--tech-blue))/5]"
-              >
-                <TableCell>{block.blockName}</TableCell>
-                {/* <TableCell>{block.floors.length}</TableCell> */}
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                    onClick={() => handleEdit(block)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleDelete(block.blockId)}
-                  >
-                    Delete
-                  </Button>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={2} className="text-center py-8">
+                  <Spinner className="mx-auto" />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              blocks.map((block) => (
+                <TableRow
+                  key={block.blockId}
+                  className="hover:bg-[hsl(var(--tech-blue))/5]"
+                >
+                  <TableCell>{block.blockName}</TableCell>
+                  {/* <TableCell>{block.floors.length}</TableCell> */}
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                      onClick={() => handleEdit(block)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDelete(block.blockId)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
