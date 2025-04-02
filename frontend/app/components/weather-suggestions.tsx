@@ -5,7 +5,9 @@ import Image from "next/image";
 import { useLanguage } from "@/components/providers/language-provider";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import WeatherChart from "./weather-chart";
+
+import dynamic from "next/dynamic";
+const WeatherChart = dynamic(() => import("./weather-chart"), { ssr: false });
 
 interface WeatherComponentProps {
   temperature: number;
@@ -250,6 +252,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Sun"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -258,6 +262,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Moon"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -268,6 +274,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="CloudSun"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -276,6 +284,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="CloudMoon"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -286,6 +296,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="CloudSun"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -294,6 +306,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="CloudMoon"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -304,6 +318,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Cloud"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -312,6 +328,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Cloud"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -322,6 +340,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Cloud"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -330,6 +350,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Cloud"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -340,6 +362,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -348,6 +372,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -358,6 +384,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -366,6 +394,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -376,6 +406,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -384,6 +416,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -394,6 +428,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -402,6 +438,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -412,6 +450,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -420,6 +460,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Rain"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -430,6 +472,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Storm"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -438,6 +482,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Storm"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },
@@ -448,6 +494,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Storm"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
       night: (
@@ -456,6 +504,8 @@ export function getWeatherIcon(weatherCode: number, iconSize: number) {
           alt="Storm"
           width={iconSize}
           height={iconSize}
+          quality={75}
+          priority
         />
       ),
     },

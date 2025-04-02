@@ -14,7 +14,7 @@ interface ApiResponse {
 }
 
 export default function ElectricityUsage() {
-  const url = "http://10.60.253.172:9092/api/qenergy/site-data";
+  const url = "http://10.60.253.172:9090/api/qenergy/site-data";
   const [reading, setReading] = useState<ElectricalValue | null>(null);
 
   async function fetchElectricalReading() {
