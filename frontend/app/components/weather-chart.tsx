@@ -69,30 +69,50 @@ export default function WeatherChart({
     const temperatures = data.map((d) => d.temperature);
 
     temperatures.forEach((temp, index) => {
-      let position = index / (temperatures.length - 1);
+      const position = index / (temperatures.length - 1);
 
       let color = "";
       if (temp >= 20 && temp <= 24) {
         // Green to Yellow (RGB: Green = rgb(0, 255, 0), Yellow = rgb(255, 255, 0))
-        const r = (temp - 20) * (255 / 4); // Gradient from 0 (green) to 255 (yellow)
+        const r = Math.round((temp - 20) * (255 / 4)); // Gradient from 0 (green) to 255 (yellow)
         const g = 255; // Green goes from 255 to 0
         const b = 0; // Constant value
         color = `rgb(${r}, ${g}, ${b})`;
-      } else if (temp >= 25 && temp <= 31) {
+      } else if (temp > 24 && temp <= 32) {
         // Yellow to Orange (RGB: Yellow = rgb(255, 255, 0), Orange = rgb(255, 165, 0))
         const r = 255; // Red stays constant at 255
-        const g = 255 - (temp - 25) * (80 / 6); // Green goes from 255 to 165
+        const g = Math.round(255 - (temp - 25) * (128 / 6)); // Green goes from 255 to 165
         const b = 0; // Constant value
         color = `rgb(${r}, ${g}, ${b})`;
-      } else if (temp >= 32) {
+      } else if (temp > 32) {
         // Orange to Red (RGB: Orange = rgb(255, 165, 0), Red = rgb(255, 0, 0))
         const r = 255; // Red stays constant at 255
-        const g = Math.max(0, 165 - (temp - 32) * (165 / 3)); // Green decreases to 0
+        const g = Math.max(0, 165 - (temp - 32) * (127 / 3)); // Green decreases to 0
         const b = 0; // Constant value
         color = `rgb(${r}, ${g}, ${b})`;
       }
 
-      gradient.addColorStop(position, color);
+      // gradient.addColorStop(position, color);
+
+      // let color = ""; // Default color fallback
+
+      // if (temp >= 20 && temp <= 24) {
+      //   const r = Math.round((temp - 20) * (255 / 4));
+      //   const g = Math.round(255 - (temp - 20) * (255 / 4));
+      //   color = `rgb(${r}, ${g}, 0)`;
+      // } else if (temp >= 25 && temp <= 31) {
+      //   const g = Math.round(255 - (temp - 25) * (128 / 6)); // 255 -> 127
+      //   color = `rgb(255, ${g}, 0)`;
+      // } else if (temp >= 32) {
+      //   const g = Math.max(0, Math.round(127 - (temp - 32) * (127 / 3)));
+      //   color = `rgb(255, ${g}, 0)`;
+      // }
+
+      if (/^rgb\(\d{1,3}, \d{1,3}, \d{1,3}\)$/.test(color)) {
+        gradient.addColorStop(position, color);
+      } else {
+        console.warn(`Invalid color generated: ${color}`);
+      }
     });
 
     return gradient;

@@ -78,6 +78,9 @@ export default {
           "100%": { transform: "translateX(-100%)" },
         },
       },
+      fontFamily: {
+        inter: ["Montserrat", "sans-serif"],
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
