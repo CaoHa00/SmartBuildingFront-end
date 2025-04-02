@@ -172,7 +172,7 @@ export default function WeatherComponent({
   ];
 
   const [index, setIndex] = useState(0);
-  const duration = 10;
+  const duration = 30;
 
   useEffect(() => {
     const englishTimer = setInterval(() => {
