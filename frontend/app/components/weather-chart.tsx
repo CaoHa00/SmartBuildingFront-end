@@ -92,22 +92,6 @@ export default function WeatherChart({
         color = `rgb(${r}, ${g}, ${b})`;
       }
 
-      // gradient.addColorStop(position, color);
-
-      // let color = ""; // Default color fallback
-
-      // if (temp >= 20 && temp <= 24) {
-      //   const r = Math.round((temp - 20) * (255 / 4));
-      //   const g = Math.round(255 - (temp - 20) * (255 / 4));
-      //   color = `rgb(${r}, ${g}, 0)`;
-      // } else if (temp >= 25 && temp <= 31) {
-      //   const g = Math.round(255 - (temp - 25) * (128 / 6)); // 255 -> 127
-      //   color = `rgb(255, ${g}, 0)`;
-      // } else if (temp >= 32) {
-      //   const g = Math.max(0, Math.round(127 - (temp - 32) * (127 / 3)));
-      //   color = `rgb(255, ${g}, 0)`;
-      // }
-
       if (/^rgb\(\d{1,3}, \d{1,3}, \d{1,3}\)$/.test(color)) {
         gradient.addColorStop(position, color);
       } else {
@@ -134,26 +118,19 @@ export default function WeatherChart({
               backgroundColor: "transparent",
               pointBackgroundColor: "#FFFFFF",
               pointBorderColor: "#FFFFFF",
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              clip: false,
+              pointRadius: 2,
+              pointHoverRadius: 2,
             },
           ],
         }}
         options={{
           responsive: true,
           layout: {
-            padding: { bottom: 20, left: 15, right: 15 },
+            padding: { bottom: 10, left: 15, right: 15 },
           },
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function (context: any) {
-                  return `Temp: ${context.raw}°C`;
-                },
-              },
-            },
+            tooltip: { enabled: false },
             datalabels: {
               align: (context: any) => {
                 return context.dataIndex === data.length - 1 ? "end" : "start";
@@ -167,14 +144,13 @@ export default function WeatherChart({
               formatter: function (value: any) {
                 return `${Math.round(value)}°`;
               },
-              clip: false,
               offset: 4,
               padding: { left: 10, right: 10 },
             },
           },
           scales: {
-            x: { display: false }, // Hide x-axis
-            y: { display: false }, // Hide y-axis
+            x: { display: false },
+            y: { display: false },
           },
         }}
       />
