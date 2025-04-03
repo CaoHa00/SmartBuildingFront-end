@@ -61,7 +61,7 @@ export function EnergyChart() {
   const chartData = timeRange === "day" ? dailyData : weeklyData;
 
   return (
-    <Card className="bg-sky-200 h-full">
+    <Card className="bg-sky-200 wshadow-lg rounded-xl p-4">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
@@ -84,7 +84,7 @@ export function EnergyChart() {
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+        <ChartContainer config={chartConfig} className="h-[220px] w-full">
           <LineChart
             data={chartData}
             margin={{
@@ -118,19 +118,6 @@ export function EnergyChart() {
           </LineChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full flex-col gap-2 text-sm text-blue-800">
-          <div className="flex items-center gap-2 font-medium">
-            {timeRange === "day" ? "Daily" : "Weekly"} peak consumption trending
-            up
-            <TrendingUp className="h-4 w-4" />
-          </div>
-          <div className="text-blue-700">
-            Energy consumption patterns (
-            {timeRange === "day" ? "24 hours" : "7 days"})
-          </div>
-        </div>
-      </CardFooter>
     </Card>
   );
 }
