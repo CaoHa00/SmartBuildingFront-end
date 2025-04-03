@@ -3,7 +3,8 @@ import { BlockManagement } from "../../_components/BlockManagement";
 import { FloorManagement } from "../../_components/FloorManagement";
 import { RoomManagement } from "../../_components/RoomManagement";
 import { EquipmentManagement } from "../../_components/EquipmentManagement";
-
+import EquipmentTypeManagement from "../../_components/EquipmentType";
+import CategoryManagement from "../../_components/CategoryManagement";
 
 const FacilityControl = () => {
   return (
@@ -19,22 +20,26 @@ const FacilityControl = () => {
             <TabsTrigger value="floors">Floors</TabsTrigger>
             <TabsTrigger value="rooms">Rooms</TabsTrigger>
             <TabsTrigger value="equipment">Equipments</TabsTrigger>
+            <TabsTrigger value="equipmentType">Equipment Type</TabsTrigger>
+            <TabsTrigger value="category">Category</TabsTrigger>
           </TabsList>
-
           <TabsContent value="blocks">
             <BlockManagement />
           </TabsContent>
-
           <TabsContent value="floors">
             <FloorManagement />
           </TabsContent>
-
           <TabsContent value="rooms">
             <RoomManagement />
           </TabsContent>
-
           <TabsContent value="equipment">
             <EquipmentManagement />
+          </TabsContent>
+          <TabsContent value="equipmentType">
+            <EquipmentTypeManagement />
+          </TabsContent>
+          <TabsContent value="category">
+            <CategoryManagement />
           </TabsContent>
         </Tabs>
       </div>

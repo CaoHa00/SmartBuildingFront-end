@@ -29,32 +29,31 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/axios";
 
-interface LogUHoo {
-  id: number;
-  // Add other properties as needed
-}
-
-interface LogAqara {
-  id: number;
-  // Add other properties as needed
-}
-
 interface Equipment {
   equipmentId: number;
   equipmentName: string;
-  equipmentType: string;
+  deviceId: string;
+  equipmentType: {
+    equipmentTypeId: string;
+    equipmentTypeName: string;
+  };
+  category: {
+    categoryId: number;
+    categoryName: string;
+  };
   room: {
     roomId: number;
     roomName: string;
   };
-  logUHoos: LogUHoo[];
-  logAqaras: LogAqara[];
+  logValues: any[];
 }
 
 interface EquipmentFormData {
   equipmentId?: number;
   equipmentName: string;
-  equipmentType: string;
+  deviceId: string;
+  equipmentTypeId: string;
+  categoryId: number;
   roomId: number;
 }
 
@@ -69,17 +68,25 @@ interface EquipmentType {
   equipmentTypeName: string;
 }
 
+interface Category {
+  categoryId: number;
+  categoryName: string;
+}
+
 export function EquipmentManagement() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [formData, setFormData] = useState<EquipmentFormData>({
     equipmentName: "",
-    equipmentType: "",
+    deviceId: "",
+    equipmentTypeId: "",
+    categoryId: 0,
     roomId: 0,
   });
 
@@ -87,6 +94,7 @@ export function EquipmentManagement() {
     fetchEquipment();
     fetchRooms();
     fetchEquipmentTypes();
+    fetchCategories();
   }, []);
 
   const fetchEquipment = async () => {
@@ -120,7 +128,7 @@ export function EquipmentManagement() {
 
   const fetchEquipmentTypes = async () => {
     try {
-      const { data } = await api.get("/equipment-type");
+      const { data } = await api.get("/equipmentType");
       setEquipmentTypes(data);
     } catch (error) {
       toast({
@@ -131,14 +139,27 @@ export function EquipmentManagement() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.roomId) {
+  const fetchCategories = async () => {
+    try {
+      const { data } = await api.get("/category");
+      setCategories(data);
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please select a room",
+        description: "Failed to fetch categories",
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.roomId || !formData.categoryId || !formData.equipmentTypeId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill all required fields",
       });
       return;
     }
@@ -146,25 +167,35 @@ export function EquipmentManagement() {
     try {
       const payload = {
         equipmentName: formData.equipmentName,
-        equipmentType: formData.equipmentType
+        deviceId: formData.deviceId,
       };
 
       if (isEdit && formData.equipmentId) {
         await api.put(`/equipment/${formData.equipmentId}`, payload);
       } else {
-        await api.post(`/equipment/${formData.roomId}`, payload);
+        await api.post(`/equipment`, payload, {
+          params: {
+            roomId: formData.roomId,
+            equipmentTypeId: formData.equipmentTypeId,
+            categoryId: formData.categoryId,
+          },
+        });
       }
       fetchEquipment();
       setIsOpen(false);
       setFormData({
         equipmentName: "",
-        equipmentType: "",
+        deviceId: "",
+        equipmentTypeId: "",
+        categoryId: 0,
         roomId: 0,
       });
       setIsEdit(false);
       toast({
         title: "Success",
-        description: isEdit ? "Equipment updated successfully" : "Equipment created successfully",
+        description: isEdit
+          ? "Equipment updated successfully"
+          : "Equipment created successfully",
       });
     } catch (error) {
       toast({
@@ -179,7 +210,9 @@ export function EquipmentManagement() {
     setFormData({
       equipmentId: equipment.equipmentId,
       equipmentName: equipment.equipmentName,
-      equipmentType: equipment.equipmentType,
+      deviceId: equipment.deviceId,
+      equipmentTypeId: equipment.equipmentType.equipmentTypeId,
+      categoryId: equipment.category.categoryId,
       roomId: equipment.room.roomId,
     });
     setIsEdit(true);
@@ -215,7 +248,13 @@ export function EquipmentManagement() {
               className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
               onClick={() => {
                 setIsEdit(false);
-                setFormData({ equipmentName: "", equipmentType: "", roomId: 0 });
+                setFormData({
+                  equipmentName: "",
+                  deviceId: "",
+                  equipmentTypeId: "",
+                  categoryId: 0,
+                  roomId: 0,
+                });
               }}
             >
               Add New Equipment
@@ -227,28 +266,55 @@ export function EquipmentManagement() {
                 {isEdit ? "Edit Equipment" : "Add New Equipment"}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 text-xl text-neutral-700">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4 text-xl text-neutral-700"
+            >
               <div>
                 <Label htmlFor="equipmentName">Equipment Name</Label>
                 <Input
                   id="equipmentName"
                   value={formData.equipmentName}
-                  onChange={(e) => setFormData({ ...formData, equipmentName: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      equipmentName: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="deviceId">Device ID</Label>
+                <Input
+                  id="deviceId"
+                  value={formData.deviceId}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      deviceId: e.target.value,
+                    })
+                  }
                   required
                 />
               </div>
               <div>
                 <Label htmlFor="roomId">Room</Label>
-                <Select 
-                  value={String(formData.roomId)} 
-                  onValueChange={(value) => setFormData({ ...formData, roomId: Number(value) })}
+                <Select
+                  value={String(formData.roomId)}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, roomId: Number(value) })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select room" />
                   </SelectTrigger>
                   <SelectContent>
                     {rooms.map((room) => (
-                      <SelectItem key={room.roomId} value={String(room.roomId)}>
+                      <SelectItem
+                        key={`room-${room.roomId}`}
+                        value={String(room.roomId)}
+                      >
                         {room.roomName}
                       </SelectItem>
                     ))}
@@ -257,20 +323,45 @@ export function EquipmentManagement() {
               </div>
               <div>
                 <Label htmlFor="equipmentType">Equipment Type</Label>
-                <Select 
-                  value={formData.equipmentType} 
-                  onValueChange={(value) => setFormData({ ...formData, equipmentType: value })}
+                <Select
+                  value={formData.equipmentTypeId}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, equipmentTypeId: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
                     {equipmentTypes.map((type) => (
-                      <SelectItem 
-                        key={type.equipmentTypeId} 
+                      <SelectItem
+                        key={`type-${type.equipmentTypeId}`}
                         value={type.equipmentTypeId}
                       >
                         {type.equipmentTypeName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={String(formData.categoryId)}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, categoryId: Number(value) })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem
+                        key={`category-${category.categoryId}`}
+                        value={String(category.categoryId)}
+                      >
+                        {category.categoryName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -287,8 +378,10 @@ export function EquipmentManagement() {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Device ID</TableHead>
               <TableHead>Room</TableHead>
               <TableHead>Type</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -296,8 +389,10 @@ export function EquipmentManagement() {
             {equipment.map((item) => (
               <TableRow key={item.equipmentId}>
                 <TableCell>{item.equipmentName}</TableCell>
+                <TableCell>{item.deviceId}</TableCell>
                 <TableCell>{item.room.roomName}</TableCell>
-                <TableCell>{item.equipmentType}</TableCell>
+                <TableCell>{item.equipmentType.equipmentTypeName}</TableCell>
+                <TableCell>{item.category.categoryName}</TableCell>
                 <TableCell>
                   <Button
                     variant="outline"

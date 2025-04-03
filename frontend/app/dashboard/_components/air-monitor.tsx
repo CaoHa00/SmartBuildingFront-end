@@ -8,7 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 async function fetchAirQuality() {
   
   const { data } = await axios.post<AirQualityResponse>(
-    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/currentValue?equipmentId=3`,
+    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/currentValue?equipmentId=4`,
   );
   return data;
 }
