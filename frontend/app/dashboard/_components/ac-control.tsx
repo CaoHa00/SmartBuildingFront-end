@@ -28,65 +28,60 @@ export function AirConditionerControl() {
   const rotation = (percentage / 100) * 360;
 
   return (
-    <Card className="flex flex-col bg-blue-700 rounded-xl p-4">
-      <CardContent className="space-y-6">
-        {/* Header */}
-        <div className="flex items-start">
-          <div className="p-2 rounded-full bg-white">
-            <AirVent color="blue" />
+    <div className="rounded-xl bg-muted/50 w-full h-full shadow-xl p-4">
+      <div className="ml-3">
+        <h2 className="flex font-bold tracking-wide text-xl text-blue-800 leading-none">
+          AIR CONDITIONERS
+        </h2>
+        <p className="tracking-widest text-blue-700 text-xs font-thin leading-none">
+          Auto Cooling
+        </p>
+      </div>
+      <div className="bg-blue-800 text-white p-4 rounded-xl mt-4">
+        <div className="space-y-6">
+          {/* Thermostat Control */}
+          <div className="thermostat-container relative w-[200px] h-[200px] mx-auto">
+            {/* Background track */}
+            <div className="absolute inset-4 rounded-full border-[16px] border-blue-900/30" />
+
+            {/* Progress track */}
+            <div
+              className="absolute inset-4 rounded-full border-[16px] border-t-white border-r-white border-b-transparent border-l-transparent"
+              style={{
+                transform: `rotate(${rotation}deg)`,
+                transition: "transform 0.2s ease",
+              }}
+            />
+
+            {/* Temperature display */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-4xl font-bold text-white">
+                {temperature}°C
+              </span>
+              <span className="text-sm text-neutral-200">Temperature</span>
+            </div>
           </div>
-          <div className="ml-4">
-            <h2 className="font-bold tracking-wide text-xl text-white">
-              AIR CONDITIONERS
-            </h2>
-            <p className="tracking-widest text-sky-100 text-xs font-thin">
-              Auto Cooling
-            </p>
+
+          {/* Mode Controls */}
+          <div className="flex justify-evenly items-center">
+            <button className="text-white">
+              <CircleMinus onClick={decreaseTemp} />
+            </button>
+            <button className="p-2 rounded-full bg-sky-300 text-white">
+              <Wind />
+            </button>
+            <button className="p-3 rounded-full bg-blue-900 text-white">
+              <Snowflake size={30} />
+            </button>
+            <button className="p-2 rounded-full bg-sky-300 text-white">
+              <Droplet />
+            </button>
+            <button className="text-white">
+              <CirclePlus onClick={increaseTemp} />
+            </button>
           </div>
         </div>
-
-        {/* Thermostat Control */}
-        <div className="thermostat-container relative w-[200px] h-[200px] mx-auto">
-          {/* Background track */}
-          <div className="absolute inset-4 rounded-full border-[16px] border-blue-800/30" />
-
-          {/* Progress track */}
-          <div
-            className="absolute inset-4 rounded-full border-[16px] border-t-white border-r-white border-b-transparent border-l-transparent"
-            style={{
-              transform: `rotate(${rotation}deg)`,
-              transition: "transform 0.2s ease",
-            }}
-          />
-
-          {/* Temperature display */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-4xl font-bold text-white">
-              {temperature}°C
-            </span>
-            <span className="text-sm text-blue-200">Temperature</span>
-          </div>
-        </div>
-
-        {/* Mode Controls */}
-        <div className="flex justify-evenly items-center pt-8">
-          <button className="text-white">
-            <CircleMinus onClick={decreaseTemp} />
-          </button>
-          <button className="p-2 rounded-full bg-sky-300 text-white">
-            <Wind />
-          </button>
-          <button className="p-3 rounded-full bg-blue-900 text-white">
-            <Snowflake size={30} />
-          </button>
-          <button className="p-2 rounded-full bg-sky-300 text-white">
-            <Droplet />
-          </button>
-          <button className="text-white">
-            <CirclePlus onClick={increaseTemp} />
-          </button>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
