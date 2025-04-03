@@ -47,17 +47,19 @@ function DashboardContent() {
         </header>
         <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 pt-0">
           <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-3">
-            <ActiveDevice />
+            <AirMonitor />
             <div className="col-1 flex-1 aspect-auto rounded-xl bg-muted/50 md:min-h-min bg-sky-300 shadow-xl">
               <ElectricityCard />
             </div>
-            <AirMonitor />
-            <div className="aspect-video relative rounded-xl bg-blue-700">
-              <AirConditionerControl />
+
+            <EnergyChart />
+            <div className="aspect-video h-full w-full relative rounded-xl bg-blue-200">
+              <ActiveDevice />
             </div>
             <DeviceManager />
-            <div className="row-span-1 grid grid-cols-1 md:grid-cols-1 gap-2 md:gap-4">
-              <EnergyChart />
+            <div className="row-span-1 h-full grid grid-cols-1 md:grid-cols-1 gap-2 md:gap-4">
+              <AirConditionerControl />
+
               {/* <WifiTab />
               <BluetoothTab /> */}
               {/* <div className="col-span-1 md:col-span-2 aspect-[8/3] rounded-xl bg-blue-700 overflow-hidden relative group">
@@ -85,7 +87,7 @@ function DashboardContent() {
                 </div>
               </div> */}
             </div>
-            <AddNewDevice />
+            {/* <AddNewDevice /> */}
           </div>
         </div>
       </SidebarInset>

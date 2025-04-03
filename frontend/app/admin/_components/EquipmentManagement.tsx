@@ -28,39 +28,33 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/axios";
-import React from "react";
-import { Spinner } from "@/components/ui/spinner";
 
-interface LogValue {
-  logValueId: number;
-  timeStamp: number;
-  valueResponse: number;
-  value?: {
-    valueId: number;
-    valueType?: string;
-  };
+interface LogUHoo {
+  id: number;
+  // Add other properties as needed
+}
+
+interface LogAqara {
+  id: number;
+  // Add other properties as needed
 }
 
 interface Equipment {
   equipmentId: number;
   equipmentName: string;
-  deviceId: string;
-  equipmentType: {
-    equipmentId: number;
-    equipmentTypeName: string;
-  };
+  equipmentType: string;
   room: {
     roomId: number;
     roomName: string;
   };
-  logValues: LogValue[];
+  logUHoos: LogUHoo[];
+  logAqaras: LogAqara[];
 }
 
 interface EquipmentFormData {
   equipmentId?: number;
   equipmentName: string;
-  deviceId: string;
-  equipmentTypeId: number;
+  equipmentType: string;
   roomId: number;
 }
 
@@ -71,7 +65,7 @@ interface Room {
 }
 
 interface EquipmentType {
-  equipmentId: number;
+  equipmentTypeId: string;
   equipmentTypeName: string;
 }
 
@@ -85,11 +79,9 @@ export function EquipmentManagement() {
   const [isEdit, setIsEdit] = useState(false);
   const [formData, setFormData] = useState<EquipmentFormData>({
     equipmentName: "",
-    deviceId: "",
-    equipmentTypeId: 0,
+    equipmentType: "",
     roomId: 0,
   });
-  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchEquipment();
@@ -128,7 +120,7 @@ export function EquipmentManagement() {
 
   const fetchEquipmentTypes = async () => {
     try {
-      const { data } = await api.get("/equipmentType");
+      const { data } = await api.get("/equipment-type");
       setEquipmentTypes(data);
     } catch (error) {
       toast({
@@ -142,11 +134,11 @@ export function EquipmentManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.roomId || !formData.equipmentTypeId) {
+    if (!formData.roomId) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please select both room and equipment type",
+        description: "Please select a room",
       });
       return;
     }
@@ -154,20 +146,19 @@ export function EquipmentManagement() {
     try {
       const payload = {
         equipmentName: formData.equipmentName,
-        deviceId: formData.deviceId,
+        equipmentType: formData.equipmentType
       };
 
       if (isEdit && formData.equipmentId) {
         await api.put(`/equipment/${formData.equipmentId}`, payload);
       } else {
-        await api.post(`/equipment?roomId=${formData.roomId}&equipmentTypeId=${formData.equipmentTypeId}`, payload);
+        await api.post(`/equipment/${formData.roomId}`, payload);
       }
       fetchEquipment();
       setIsOpen(false);
       setFormData({
         equipmentName: "",
-        deviceId: "",
-        equipmentTypeId: 0,
+        equipmentType: "",
         roomId: 0,
       });
       setIsEdit(false);
@@ -188,8 +179,7 @@ export function EquipmentManagement() {
     setFormData({
       equipmentId: equipment.equipmentId,
       equipmentName: equipment.equipmentName,
-      deviceId: equipment.deviceId,
-      equipmentTypeId: equipment.equipmentType.equipmentId,
+      equipmentType: equipment.equipmentType,
       roomId: equipment.room.roomId,
     });
     setIsEdit(true);
@@ -213,16 +203,6 @@ export function EquipmentManagement() {
     }
   };
 
-  const toggleRow = (equipmentId: number) => {
-    const newExpandedRows = new Set(expandedRows);
-    if (newExpandedRows.has(equipmentId)) {
-      newExpandedRows.delete(equipmentId);
-    } else {
-      newExpandedRows.add(equipmentId);
-    }
-    setExpandedRows(newExpandedRows);
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -235,7 +215,7 @@ export function EquipmentManagement() {
               className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
               onClick={() => {
                 setIsEdit(false);
-                setFormData({ equipmentName: "", deviceId: "", equipmentTypeId: 0, roomId: 0 });
+                setFormData({ equipmentName: "", equipmentType: "", roomId: 0 });
               }}
             >
               Add New Equipment
@@ -254,15 +234,6 @@ export function EquipmentManagement() {
                   id="equipmentName"
                   value={formData.equipmentName}
                   onChange={(e) => setFormData({ ...formData, equipmentName: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="deviceId">Device ID</Label>
-                <Input
-                  id="deviceId"
-                  value={formData.deviceId}
-                  onChange={(e) => setFormData({ ...formData, deviceId: e.target.value })}
                   required
                 />
               </div>
@@ -287,8 +258,8 @@ export function EquipmentManagement() {
               <div>
                 <Label htmlFor="equipmentType">Equipment Type</Label>
                 <Select 
-                  value={String(formData.equipmentTypeId)} 
-                  onValueChange={(value) => setFormData({ ...formData, equipmentTypeId: Number(value) })}
+                  value={formData.equipmentType} 
+                  onValueChange={(value) => setFormData({ ...formData, equipmentType: value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
@@ -296,8 +267,8 @@ export function EquipmentManagement() {
                   <SelectContent>
                     {equipmentTypes.map((type) => (
                       <SelectItem 
-                        key={type.equipmentId} 
-                        value={String(type.equipmentId)}
+                        key={type.equipmentTypeId} 
+                        value={type.equipmentTypeId}
                       >
                         {type.equipmentTypeName}
                       </SelectItem>
@@ -316,73 +287,34 @@ export function EquipmentManagement() {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Device ID</TableHead>
               <TableHead>Room</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  <Spinner className="mx-auto" />
+            {equipment.map((item) => (
+              <TableRow key={item.equipmentId}>
+                <TableCell>{item.equipmentName}</TableCell>
+                <TableCell>{item.room.roomName}</TableCell>
+                <TableCell>{item.equipmentType}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outline"
+                    className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                    onClick={() => handleEdit(item)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDelete(item.equipmentId)}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
-            ) : (
-              equipment.map((item) => (
-                <React.Fragment key={item.equipmentId}>
-                  <TableRow 
-                    className="cursor-pointer"
-                    onClick={() => toggleRow(item.equipmentId)}
-                  >
-                    <TableCell>{item.equipmentName}</TableCell>
-                    <TableCell>{item.deviceId}</TableCell>
-                    <TableCell>{item.room.roomName}</TableCell>
-                    <TableCell>{item.equipmentType.equipmentTypeName}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEdit(item);
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(item.equipmentId);
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                  {expandedRows.has(item.equipmentId) && item.logValues && item.logValues.length > 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5}>
-                        <div className="p-4 bg-gray-50">
-                          <h4 className="font-semibold mb-2">Log Values:</h4>
-                          <div className="grid grid-cols-3 gap-4">
-                            {item.logValues.map((log: LogValue) => (
-                              <div key={log.logValueId} className="p-2 bg-white rounded shadow">
-                                <div>Timestamp: {new Date(log.timeStamp).toLocaleString()}</div>
-                                <div>Value: {log.valueResponse}</div>
-                                <div>Type: {log.value?.valueType || 'N/A'}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
       </div>

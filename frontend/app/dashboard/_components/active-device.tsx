@@ -4,7 +4,6 @@ import { Switch } from "@/components/ui/switch";
 import {
   AirVent,
   Cctv,
-  LayoutDashboard,
   Lightbulb,
   LucideIcon,
   TvMinimal,
