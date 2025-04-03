@@ -7,10 +7,10 @@ export default function WaterUsageChart() {
 
   const text = isEnglish
     ? {
-        title: "Water Usage",
+        title: "Current Water Usage",
       }
     : {
-        title: "Tần suất sử dụng nước",
+        title: "Mức tiêu thụ nước hiện tại",
       };
   return (
     <div className="row-span-2 bg-[#5e83ba] rounded-xl aspect-auto px-5 py-3 mb-2">
