@@ -6,39 +6,9 @@ import { AirQualityResponse } from "@/types/air-quality";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 async function fetchAirQuality() {
-  const requestBody = {
-    equipmentId: 3,
-    equipmentName: "doanhTest",
-    deviceId: "lumi.54ef441000a4894c",
-    equipmentType: {
-      equipmentTypeId: 2,
-      equipmentTypeName: "Aqara",
-      equipments: [
-        {
-          equipmentId: 3,
-          equipmentName: "lumi.54ef441000a4894c",
-          deviceId: "doanhTest",
-          logValues: []
-        }
-      ]
-    },
-    room: {
-      roomId: 2,
-      roomName: "102",
-      equipments: [
-        {
-          equipmentId: 3,
-          equipmentName: "lumi.54ef441000a4894c",
-          deviceId: "doanhTest",
-          logValues: []
-        }
-      ]
-    }
-  };
-
+  
   const { data } = await axios.post<AirQualityResponse>(
-    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/currentValue`,
-    requestBody
+    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/currentValue?equipmentId=3`,
   );
   return data;
 }
@@ -67,7 +37,7 @@ export function AirMonitor() {
   // if (error) return <div>Error loading data</div>;
 
   return (
-    <div className="w-full max-w-[510px] h-full aspect-video relative rounded-xl bg-muted/50 p-2 mx-auto">
+    <div className="w-full max-w-[610px] h-full aspect-video relative rounded-xl bg-muted/50 p-2 mx-auto">
       <div className="h-1/4 relative rounded-xl bg-gradient-to-r from-blue-600 to-sky-300 mb-2">
         <div className="italic tracking-widest text-[10px] md:text-xs font-bold text-center text-white p-1">
           Humidity
