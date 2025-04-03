@@ -9,11 +9,11 @@ export default function ElectricityUsageAnalytics() {
 
   const text = isEnglish
     ? {
-        title: "Week Usage",
+        title: "This Week Usage",
         efficiency: "Efficiency",
       }
     : {
-        title: "Tần suất sử dụng tuần",
+        title: "Mức tiêu thụ tuần",
         efficiency: "Hiệu năng sử dụng",
       };
 
@@ -32,17 +32,17 @@ export default function ElectricityUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[10px] h-[20px] md:text-lg"
+                : "text-[13px] h-[20px] md:text-lg"
             }
           >
             {text.title}
           </p>
           <p className="text-sm md:text-xl">
-            <span className="font-bold">25,5</span> KwH
+            <span className="font-bold"></span> kWH
           </p>
         </div>
         <div className="absolute right-0 p-1 md:p-3">
-          <MoveUp size={18} className="h-12" color="red" />
+          <MoveUp size={14} className="h-14" color="red" />
         </div>
       </div>
       <div className="w-1/2 relative flex pl-2 md:pl-5 pr-3">
@@ -58,17 +58,17 @@ export default function ElectricityUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[9px] h-[20px] md:text-lg"
+                : "text-[9px] h-[20px] md:text-lg pt-1"
             }
           >
             {text.efficiency}
           </p>
           <p className="text-sm md:text-xl">
-            <span className="font-bold">43,5</span> %
+            <span className="font-bold"></span> %
           </p>
         </div>
         <div className="absolute right-0 p-1 md:p-3">
-          <MoveUp size={18} className="h-12" color="#02f506" />
+          <MoveUp size={14} className="h-14" color="#02f506" />
         </div>
       </div>
     </div>

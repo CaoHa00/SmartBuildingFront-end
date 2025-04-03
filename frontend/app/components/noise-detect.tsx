@@ -8,7 +8,7 @@ export default function NoiseDetect() {
 
   const text = isEnglish
     ? {
-        title: "Noise Detect",
+        title: "Sound Pressure Level",
         statusMin: "Minimum",
         statusMid: "Average",
         statusMax: "Maximum",
