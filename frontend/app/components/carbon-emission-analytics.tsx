@@ -4,16 +4,16 @@ import { MoveUp } from "lucide-react";
 import Image from "next/image";
 import { useLanguage } from "@/components/providers/language-provider";
 
-export default function WaterUsageAnalytics() {
+export default function CarbonEmissionAnalytics() {
   const { isEnglish } = useLanguage();
 
   const text = isEnglish
     ? {
-        title: "This Week Usage",
+        title: "This Week Emission",
         efficiency: "Efficiency",
       }
     : {
-        title: "Mức tiêu thụ tuần",
+        title: "Mức độ thải tuần",
         efficiency: "Hiệu năng sử dụng",
       };
   return (
@@ -30,14 +30,14 @@ export default function WaterUsageAnalytics() {
           <p
             className={
               isEnglish
-                ? "text-sm md:text-xl"
+                ? "text-[12px] md:text-xl"
                 : "text-[13px] h-[20px] md:text-lg"
             }
           >
             {text.title}
           </p>
           <p className="text-sm md:text-xl">
-            <span className="font-bold"></span> L
+            <span className="font-bold"></span> tCO₂
           </p>
         </div>
         <div className="absolute right-0 p-1 md:p-3">
