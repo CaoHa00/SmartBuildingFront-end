@@ -24,7 +24,6 @@ export async function fetchWeatherData() {
     const url = "https://api.open-meteo.com/v1/forecast";
     const responses = await fetchWeatherApi(url, params);
     const response = responses[0];
-    console.log(response);
 
     if (!response) throw new Error("Failed to fetch weather data");
 
