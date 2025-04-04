@@ -14,7 +14,7 @@ export default function TopBar() {
             priority
           />
           <h1 className="relative text-4xl md:text-5xl text-white font-bold mx-[75px] md:mx-72">
-            BLOCK B8
+            BLOCK 8
           </h1>
           <Image
             className="relative bg-white rounded-xl px-3 py-2 md:w-[200px] md:h-[60px]"

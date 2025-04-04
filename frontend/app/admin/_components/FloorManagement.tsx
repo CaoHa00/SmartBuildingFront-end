@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 
 interface Floor {
   floorId: number;
@@ -55,6 +56,7 @@ export function FloorManagement() {
   const [formData, setFormData] = useState<Partial<Floor>>({
     floorName: "",
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchFloors();
@@ -63,6 +65,7 @@ export function FloorManagement() {
 
   const fetchFloors = async () => {
     try {
+      setLoading(true);
       const response = await api.get<Floor[]>("/floor");
       if (response.data.length > 0) {
         setFloors(response.data);
@@ -73,6 +76,8 @@ export function FloorManagement() {
         title: "Error",
         description: "Failed to fetch floors",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -253,30 +258,38 @@ export function FloorManagement() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {floors.map((floor) => (
-              <TableRow
-                key={floor.floorId}
-                className="hover:bg-[hsl(var(--tech-blue))/5]"
-              >
-                <TableCell>{floor.floorName}</TableCell>
-                <TableCell>{floor.block.blockName}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                    onClick={() => handleEdit(floor)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleDelete(floor.floorId)}
-                  >
-                    Delete
-                  </Button>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center py-8">
+                  <Spinner className="mx-auto" />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              floors.map((floor) => (
+                <TableRow
+                  key={floor.floorId}
+                  className="hover:bg-[hsl(var(--tech-blue))/5]"
+                >
+                  <TableCell>{floor.floorName}</TableCell>
+                  <TableCell>{floor.block.blockName}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                      onClick={() => handleEdit(floor)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDelete(floor.floorId)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

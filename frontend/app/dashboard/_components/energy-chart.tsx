@@ -25,6 +25,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const dailyData = [
   { time: "00:00", peak: 120, offPeak: 80 },
@@ -58,15 +59,16 @@ const chartConfig = {
 
 export function EnergyChart() {
   const [timeRange, setTimeRange] = useState("day");
+  const isMobile = useIsMobile();
   const chartData = timeRange === "day" ? dailyData : weeklyData;
 
   return (
-    <Card className="bg-sky-200 h-full">
-      <CardHeader>
-        <div className="flex justify-between items-center">
+    <Card className={`bg-sky-200 shadow-lg rounded-xl ${isMobile ? 'p-2' : 'p-4'}`}>
+      <CardHeader className={isMobile ? 'px-2 py-3' : ''}>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
           <div>
-            <CardTitle className="font-bold text-2xl uppercase text-blue-800">
-              Energy Consumption Overview
+            <CardTitle className={`font-bold uppercase text-blue-800 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
+              Energy Consumption
             </CardTitle>
             <CardDescription className="font-medium text-sm text-blue-800">
               Peak vs Off-Peak Usage (kWh)
@@ -83,8 +85,8 @@ export function EnergyChart() {
           </Select>
         </div>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+      <CardContent className={isMobile ? 'px-2' : ''}>
+        <ChartContainer config={chartConfig} className={`${isMobile ? 'h-[180px]' : 'h-[220px]'} w-full`}>
           <LineChart
             data={chartData}
             margin={{
@@ -118,19 +120,6 @@ export function EnergyChart() {
           </LineChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full flex-col gap-2 text-sm text-blue-800">
-          <div className="flex items-center gap-2 font-medium">
-            {timeRange === "day" ? "Daily" : "Weekly"} peak consumption trending
-            up
-            <TrendingUp className="h-4 w-4" />
-          </div>
-          <div className="text-blue-700">
-            Energy consumption patterns (
-            {timeRange === "day" ? "24 hours" : "7 days"})
-          </div>
-        </div>
-      </CardFooter>
     </Card>
   );
 }

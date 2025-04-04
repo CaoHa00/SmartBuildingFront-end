@@ -5,13 +5,15 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutGrid,
-  Building2,
   Building,
-  DoorClosed,
-  Cpu,
   UserCircle2,
+  Logs,
+  Settings,
+  Cctv,
+  Wallpaper,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
+
 
 const sidebarItems = [
   {
@@ -20,24 +22,29 @@ const sidebarItems = [
     icon: LayoutGrid,
   },
   {
-    title: "Blocks",
-    href: "/admin/blocks",
+    title: "Facility Control",
+    href: "/admin/facility-control",
     icon: Building,
   },
   {
-    title: "Floors",
-    href: "/admin/floors",
-    icon: Building2,
+    title: "Standee Control",
+    href: "/admin/standee-control",
+    icon: Wallpaper,
   },
   {
-    title: "Rooms",
-    href: "/admin/rooms",
-    icon: DoorClosed,
+    title: "Logs",
+    href: "/admin/logs",
+    icon: Logs,
   },
   {
-    title: "Equipment",
-    href: "/admin/devices",
-    icon: Cpu,
+    title: "CCTV",
+    href: "/admin/cctv",
+    icon: Cctv,
+  },
+  {
+    title: "Settings",
+    href: "/admin/settings",
+    icon: Settings,
   },
   {
     title: "Users",
@@ -57,6 +64,7 @@ export default function AdminLayout({
     <div className="flex min-h-screen bg-background">
       <aside className="w-64 border-r border-sidebar-border bg-sidebar-background">
         <div className="p-6 border-b border-sidebar-border">
+          <img src="/icon/logo-15yrs.svg" alt="Logo" className="h-12 w-auto" />
           <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
             Smart Building
           </h2>

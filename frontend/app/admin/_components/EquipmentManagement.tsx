@@ -29,23 +29,17 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/axios";
 
-interface LogUHoo {
-  id: number;
-  // Add other properties as needed
-}
-
-interface LogAqara {
-  id: number;
-  // Add other properties as needed
-}
-
 interface Equipment {
   equipmentId: number;
   equipmentName: string;
   deviceId: string;
   equipmentType: {
-    equipmentId: number;
+    equipmentTypeId: string;
     equipmentTypeName: string;
+  };
+  category: {
+    categoryId: number;
+    categoryName: string;
   };
   room: {
     roomId: number;
@@ -58,7 +52,8 @@ interface EquipmentFormData {
   equipmentId?: number;
   equipmentName: string;
   deviceId: string;
-  equipmentTypeId: number;
+  equipmentTypeId: string;
+  categoryId: number;
   roomId: number;
 }
 
@@ -69,8 +64,13 @@ interface Room {
 }
 
 interface EquipmentType {
-  equipmentId: number;
+  equipmentTypeId: string;
   equipmentTypeName: string;
+}
+
+interface Category {
+  categoryId: number;
+  categoryName: string;
 }
 
 export function EquipmentManagement() {
@@ -79,20 +79,22 @@ export function EquipmentManagement() {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [formData, setFormData] = useState<EquipmentFormData>({
     equipmentName: "",
     deviceId: "",
-    equipmentTypeId: 0,
+    equipmentTypeId: "",
+    categoryId: 0,
     roomId: 0,
   });
-  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchEquipment();
     fetchRooms();
     fetchEquipmentTypes();
+    fetchCategories();
   }, []);
 
   const fetchEquipment = async () => {
@@ -137,14 +139,27 @@ export function EquipmentManagement() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.roomId || !formData.equipmentTypeId) {
+  const fetchCategories = async () => {
+    try {
+      const { data } = await api.get("/category");
+      setCategories(data);
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please select both room and equipment type",
+        description: "Failed to fetch categories",
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.roomId || !formData.categoryId || !formData.equipmentTypeId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill all required fields",
       });
       return;
     }
@@ -158,20 +173,29 @@ export function EquipmentManagement() {
       if (isEdit && formData.equipmentId) {
         await api.put(`/equipment/${formData.equipmentId}`, payload);
       } else {
-        await api.post(`/equipment?roomId=${formData.roomId}&equipmentTypeId=${formData.equipmentTypeId}`, payload);
+        await api.post(`/equipment`, payload, {
+          params: {
+            roomId: formData.roomId,
+            equipmentTypeId: formData.equipmentTypeId,
+            categoryId: formData.categoryId,
+          },
+        });
       }
       fetchEquipment();
       setIsOpen(false);
       setFormData({
         equipmentName: "",
         deviceId: "",
-        equipmentTypeId: 0,
+        equipmentTypeId: "",
+        categoryId: 0,
         roomId: 0,
       });
       setIsEdit(false);
       toast({
         title: "Success",
-        description: isEdit ? "Equipment updated successfully" : "Equipment created successfully",
+        description: isEdit
+          ? "Equipment updated successfully"
+          : "Equipment created successfully",
       });
     } catch (error) {
       toast({
@@ -187,7 +211,8 @@ export function EquipmentManagement() {
       equipmentId: equipment.equipmentId,
       equipmentName: equipment.equipmentName,
       deviceId: equipment.deviceId,
-      equipmentTypeId: equipment.equipmentType.equipmentId,
+      equipmentTypeId: equipment.equipmentType.equipmentTypeId,
+      categoryId: equipment.category.categoryId,
       roomId: equipment.room.roomId,
     });
     setIsEdit(true);
@@ -211,16 +236,6 @@ export function EquipmentManagement() {
     }
   };
 
-  const toggleRow = (equipmentId: number) => {
-    const newExpandedRows = new Set(expandedRows);
-    if (newExpandedRows.has(equipmentId)) {
-      newExpandedRows.delete(equipmentId);
-    } else {
-      newExpandedRows.add(equipmentId);
-    }
-    setExpandedRows(newExpandedRows);
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -233,7 +248,13 @@ export function EquipmentManagement() {
               className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
               onClick={() => {
                 setIsEdit(false);
-                setFormData({ equipmentName: "", deviceId: "", equipmentTypeId: 0, roomId: 0 });
+                setFormData({
+                  equipmentName: "",
+                  deviceId: "",
+                  equipmentTypeId: "",
+                  categoryId: 0,
+                  roomId: 0,
+                });
               }}
             >
               Add New Equipment
@@ -245,13 +266,21 @@ export function EquipmentManagement() {
                 {isEdit ? "Edit Equipment" : "Add New Equipment"}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 text-xl text-neutral-700">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4 text-xl text-neutral-700"
+            >
               <div>
                 <Label htmlFor="equipmentName">Equipment Name</Label>
                 <Input
                   id="equipmentName"
                   value={formData.equipmentName}
-                  onChange={(e) => setFormData({ ...formData, equipmentName: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      equipmentName: e.target.value,
+                    })
+                  }
                   required
                 />
               </div>
@@ -260,22 +289,32 @@ export function EquipmentManagement() {
                 <Input
                   id="deviceId"
                   value={formData.deviceId}
-                  onChange={(e) => setFormData({ ...formData, deviceId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      deviceId: e.target.value,
+                    })
+                  }
                   required
                 />
               </div>
               <div>
                 <Label htmlFor="roomId">Room</Label>
-                <Select 
-                  value={String(formData.roomId)} 
-                  onValueChange={(value) => setFormData({ ...formData, roomId: Number(value) })}
+                <Select
+                  value={String(formData.roomId)}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, roomId: Number(value) })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select room" />
                   </SelectTrigger>
                   <SelectContent>
                     {rooms.map((room) => (
-                      <SelectItem key={room.roomId} value={String(room.roomId)}>
+                      <SelectItem
+                        key={`room-${room.roomId}`}
+                        value={String(room.roomId)}
+                      >
                         {room.roomName}
                       </SelectItem>
                     ))}
@@ -284,20 +323,45 @@ export function EquipmentManagement() {
               </div>
               <div>
                 <Label htmlFor="equipmentType">Equipment Type</Label>
-                <Select 
-                  value={String(formData.equipmentTypeId)} 
-                  onValueChange={(value) => setFormData({ ...formData, equipmentTypeId: Number(value) })}
+                <Select
+                  value={formData.equipmentTypeId}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, equipmentTypeId: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
                     {equipmentTypes.map((type) => (
-                      <SelectItem 
-                        key={type.equipmentId} 
-                        value={String(type.equipmentId)}
+                      <SelectItem
+                        key={`type-${type.equipmentTypeId}`}
+                        value={type.equipmentTypeId}
                       >
                         {type.equipmentTypeName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={String(formData.categoryId)}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, categoryId: Number(value) })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem
+                        key={`category-${category.categoryId}`}
+                        value={String(category.categoryId)}
+                      >
+                        {category.categoryName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -317,62 +381,34 @@ export function EquipmentManagement() {
               <TableHead>Device ID</TableHead>
               <TableHead>Room</TableHead>
               <TableHead>Type</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {equipment.map((item) => (
-              <>
-                <TableRow 
-                  key={item.equipmentId}
-                  className="cursor-pointer"
-                  onClick={() => toggleRow(item.equipmentId)}
-                >
-                  <TableCell>{item.equipmentName}</TableCell>
-                  <TableCell>{item.deviceId}</TableCell>
-                  <TableCell>{item.room.roomName}</TableCell>
-                  <TableCell>{item.equipmentType.equipmentTypeName}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEdit(item);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(item.equipmentId);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-                {expandedRows.has(item.equipmentId) && item.logValues && item.logValues.length > 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5}>
-                      <div className="p-4 bg-gray-50">
-                        <h4 className="font-semibold mb-2">Log Values:</h4>
-                        <div className="grid grid-cols-3 gap-4">
-                          {item.logValues.map((log: any, index: number) => (
-                            <div key={index} className="p-2 bg-white rounded shadow">
-                              <div>Timestamp: {new Date(log.timestamp).toLocaleString()}</div>
-                              <div>Value: {log.value}</div>
-                              <div>Type: {log.valueType}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </>
+              <TableRow key={item.equipmentId}>
+                <TableCell>{item.equipmentName}</TableCell>
+                <TableCell>{item.deviceId}</TableCell>
+                <TableCell>{item.room.roomName}</TableCell>
+                <TableCell>{item.equipmentType.equipmentTypeName}</TableCell>
+                <TableCell>{item.category.categoryName}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outline"
+                    className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                    onClick={() => handleEdit(item)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDelete(item.equipmentId)}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
             ))}
           </TableBody>
         </Table>

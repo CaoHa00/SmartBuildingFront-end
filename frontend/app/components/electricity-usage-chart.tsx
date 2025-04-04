@@ -23,6 +23,7 @@ export default function ElectricityUsageChart({
   return (
     <div className="row-span-2 bg-[#5e83ba] rounded-xl aspect-auto px-5 py-3 mb-2">
       <p className="text-base md:text-2xl tracking-wide">{text.title}</p>
+
       <div className="flex w-full justify-around">
         <div className="text-center mt-2 w-full border-r border-white">
           <p className="text-base">Current</p>
@@ -39,6 +40,7 @@ export default function ElectricityUsageChart({
           <p className="text-base">kWH</p>
         </div>
       </div>
+
     </div>
   );
 }

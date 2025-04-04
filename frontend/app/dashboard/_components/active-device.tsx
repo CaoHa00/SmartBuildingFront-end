@@ -1,7 +1,13 @@
 "use client";
 
 import { Switch } from "@/components/ui/switch";
-import { AirVent, Cctv, LayoutDashboard, Lightbulb, LucideIcon, TvMinimal } from "lucide-react";
+import {
+  AirVent,
+  Cctv,
+  Lightbulb,
+  LucideIcon,
+  TvMinimal,
+} from "lucide-react";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -62,11 +68,13 @@ export default function ActiveDevice({ devices = mockDevices }) {
   };
 
   return (
-    <div className={`rounded-xl bg-muted/50 w-full h-full ${
-      isMobile ? 'col-span-1' : 'col-span-2 md:col-span-1'
-    } shadow-xl p-4`}>
+    <div
+      className={`rounded-xl bg-muted/50 w-full h-full ${
+        isMobile ? "col-span-1" : "col-span-2 md:col-span-1"
+      } shadow-xl p-4`}
+    >
       <div className="ml-3">
-        <h2 className="font-bold tracking-wide text-xl text-blue-800 leading-none">
+        <h2 className="flex font-bold tracking-wide text-xl text-blue-800 leading-none">
           Active Device
         </h2>
         <p className="tracking-widest text-blue-700 text-xs font-thin leading-none">
@@ -74,29 +82,33 @@ export default function ActiveDevice({ devices = mockDevices }) {
         </p>
       </div>
       <div className="bg-blue-800 text-white p-4 rounded-xl mt-4">
-        <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
-          <LayoutDashboard className="h-6 w-6" />
-          Room 103.B11
-        </h2>
-        <div className="grid grid-cols-1 h-[500px] md:grid-cols-2 auto-rows-max rounded-xl bg-blue-800 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 auto-rows-max rounded-xl bg-blue-800 gap-4">
           {activeDevices.map((device) => (
-            <div key={device.id} 
+            <div
+              key={device.id}
               className={`bg-neutral-200 text-blue-700 p-4 rounded-xl shadow-lg ${
-                isMobile ? 'p-3' : ''
-              }`}>
+                isMobile ? "p-3" : ""
+              }`}
+            >
               <div className="flex flex-col h-full gap-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl"><device.icon /></span>
+                    <span className="text-2xl">
+                      <device.icon />
+                    </span>
                     <div>
-                      <h3 className="font-bold text-lg leading-tight">{device.name}</h3>
+                      <h3 className="font-bold text-lg leading-tight">
+                        {device.name}
+                      </h3>
                       <p className="text-sm text-gray-500">{device.type}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <span
                       className={`h-3 w-3 rounded-full ${
-                        device.status === "online" ? "bg-green-500" : "bg-red-500"
+                        device.status === "online"
+                          ? "bg-green-500"
+                          : "bg-red-500"
                       }`}
                     />
                     <Switch
