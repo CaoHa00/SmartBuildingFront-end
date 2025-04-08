@@ -44,8 +44,6 @@ const CO2BarChart = ({ co2Emission }: CO2BarChartProps) => {
       0,
       chartArea.top
     );
-
-    // Full smooth gradient based on value
     gradientFill.addColorStop(0, "rgba(0, 200, 0, 1)");
     gradientFill.addColorStop(0.3, "rgba(255, 255, 0, 1)");
     gradientFill.addColorStop(0.6, "rgba(255, 165, 0, 1)");

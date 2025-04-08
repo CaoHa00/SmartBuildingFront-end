@@ -15,14 +15,13 @@ export default function GaugesComponents({
   uvIndex,
   humidity,
 }: GaugesProps) {
-  const electricalReading = useTotalElectricalReading();
-
+  const reading = useTotalElectricalReading();
   return (
     <div className="grid grid-cols-2 gap-2 h-full">
       <UVGauge uvIndex={uvIndex} />
       <HumidityGauge humidity={humidity} />
       <TempGauge temperature={temperature} />
-      <CO2Gauge electricity={electricalReading?.electricalReading} />
+      <CO2Gauge electricity={reading?.electricalReading} />
     </div>
   );
 }

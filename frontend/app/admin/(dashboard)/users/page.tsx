@@ -1,4 +1,4 @@
-import { UserManagement } from "../../_components/UserManagement";
+import { UserManagement } from "./_components/UserManagement";
 
 const UserManagementPage = () => {
   return (
