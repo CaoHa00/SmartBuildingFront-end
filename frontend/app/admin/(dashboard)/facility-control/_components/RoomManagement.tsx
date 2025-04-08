@@ -29,11 +29,19 @@ import {
 import { api } from "@/lib/axios";
 import { useToast } from "@/hooks/use-toast";
 
+interface Equipment {
+  equipmentId: number;
+  equipmentName: string;
+  deviceId: string;
+  equipmentType?: string;
+  equipmentStatus?: string;
+}
+
 interface Room {
   roomId: number;
   roomName: string;
   floor: Floor;
-  equipment: any[];
+  equipment: Equipment[];
 }
 
 interface NewRoomData {
@@ -62,6 +70,9 @@ export function RoomManagement() {
   const [formData, setFormData] = useState<Partial<Room>>({
     roomName: "",
   });
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false);
+  const [roomEquipment, setRoomEquipment] = useState<Equipment[]>([]);
 
   useEffect(() => {
     fetchRooms();
@@ -174,6 +185,26 @@ export function RoomManagement() {
       });
     }
   };
+
+  const fetchEquipmentByRoomId = async (roomId: number) => {
+    try {
+      const response = await api.get<Equipment[]>(`/room/${roomId}/equipment`);
+      setRoomEquipment(response.data || []);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch equipment",
+      });
+    }
+  };
+
+  const handleViewEquipment = async (room: Room) => {
+    setSelectedRoom(room);
+    setIsEquipmentDialogOpen(true);
+    await fetchEquipmentByRoomId(room.roomId);
+  };
+
   console.log("Rooms data:", rooms);
   console.log("Floors data:", floors);
   return (
@@ -246,12 +277,49 @@ export function RoomManagement() {
         </Dialog>
       </div>
 
+      <Dialog open={isEquipmentDialogOpen} onOpenChange={setIsEquipmentDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+              Equipment in {selectedRoom?.roomName}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {roomEquipment.length === 0 ? (
+              <p className="text-neutral-700">No equipment in this room</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Device ID</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {roomEquipment.map((eq) => (
+                    <TableRow key={eq.equipmentId}>
+                      <TableCell>{eq.equipmentName}</TableCell>
+                      <TableCell>{eq.equipmentType}</TableCell>
+                      <TableCell>{eq.equipmentStatus || 'N/A'}</TableCell>
+                      <TableCell>{eq.deviceId}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="rounded-md border border-border text-neutral-700">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Floors</TableHead>
+              <TableHead>Floor</TableHead>
+              <TableHead>Equipment</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -261,6 +329,37 @@ export function RoomManagement() {
                 <TableCell>{room.roomName}</TableCell>
                 <TableCell>{room.floor.floorName}</TableCell>
                 <TableCell>
+                  <div className="space-y-1">
+                    {room.equipment && room.equipment.length > 0 ? (
+                      room.equipment.map((eq) => (
+                        <div 
+                          key={eq.equipmentId} 
+                          className="flex items-center gap-2 p-1 rounded-md bg-slate-50"
+                        >
+                          <span className="font-medium">{eq.equipmentName}</span>
+                          <span className="text-sm text-muted-foreground">({eq.equipmentType})</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            eq.equipmentStatus === 'Active' 
+                              ? 'bg-green-100 text-green-700' 
+                              : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {eq.equipmentStatus || 'N/A'}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <span className="text-sm text-muted-foreground">No equipment</span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Button 
+                    variant="outline"
+                    className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                    onClick={() => handleViewEquipment(room)}
+                  >
+                    View Equipment
+                  </Button>
                   <Button
                     variant="outline"
                     className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
