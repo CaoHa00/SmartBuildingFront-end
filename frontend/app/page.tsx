@@ -2,11 +2,11 @@ import TopBar from "./components/top-bar";
 import NoiseDetect from "./components/noise-detect";
 import AirQuality from "./components/air-quality";
 import ElectricityUsage from "./components/electricity-usage";
-import WaterUsage from "./components/water-usage";
 import EnergyComponent from "./components/energy-component";
 import { LanguageProvider } from "@/components/providers/language-provider";
 import BorderLines from "./components/border-lines";
 import GetRealWeather from "./components/get-real-weather";
+import CarbonEmission from "./components/carbon-emission";
 
 export default function Home() {
   return (
@@ -25,7 +25,7 @@ export default function Home() {
             </div>
             <div className="grid bg-[#0f4da8] p-2 rounded-xl grid-cols-2 gap-2 mb-2">
               <ElectricityUsage />
-              <WaterUsage />
+              <CarbonEmission />
             </div>
             <div className="bg-[#0f4da8] p-2 rounded-xl mb-1">
               <EnergyComponent />

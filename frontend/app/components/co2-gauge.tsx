@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
 interface CO2Props {
-  electricity: number;
+  electricity?: number;
 }
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
@@ -16,7 +16,7 @@ export default function CO2Gauge({ electricity }: CO2Props) {
   const { isEnglish } = useLanguage();
 
   function CalculateCarbonFootprint(electricity: number) {
-    return (electricity * 0.8) / 1000;
+    return Math.round(((electricity * 0.8) / 1000) * 100) / 100;
   }
 
   const text = isEnglish
@@ -79,7 +79,7 @@ export default function CO2Gauge({ electricity }: CO2Props) {
       >
         <GaugeComponent
           {...gaugeConfig}
-          value={CalculateCarbonFootprint(electricity)}
+          value={CalculateCarbonFootprint(electricity!)}
         />
       </div>
     </div>

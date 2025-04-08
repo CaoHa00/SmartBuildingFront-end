@@ -31,7 +31,7 @@ export default function ElectricityUsageAnalytics() {
           <p
             className={
               isEnglish
-                ? "text-sm md:text-xl"
+                ? "text-[12px] md:text-xl"
                 : "text-[13px] h-[20px] md:text-lg"
             }
           >
