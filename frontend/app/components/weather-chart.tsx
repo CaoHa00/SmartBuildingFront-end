@@ -80,7 +80,7 @@ export default function WeatherChart({
       } else if (temp > 24 && temp <= 32) {
         // Yellow to Orange (RGB: Yellow = rgb(255, 255, 0), Orange = rgb(255, 165, 0))
         const r = 255; // Red stays constant at 255
-        const g = Math.round(255 - (temp - 25) * (128 / 6)); // Green goes from 255 to 165
+        const g = Math.round(255 - (temp - 25) * (128 / 7)); // Green goes from 255 to 165
         const b = 0; // Constant value
         color = `rgb(${r}, ${g}, ${b})`;
       } else if (temp > 32) {
@@ -146,7 +146,7 @@ export default function WeatherChart({
                 const max = Math.max(...values);
                 const min = Math.min(...values);
 
-                const highThreshold = max - (max - min) * 0.1;
+                const highThreshold = max - (max - min) * 0.2;
 
                 if (currentNumber >= highThreshold) return "bottom";
                 return "top";

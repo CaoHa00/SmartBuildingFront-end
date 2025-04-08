@@ -2,11 +2,11 @@ import TopBar from "./components/top-bar";
 import NoiseDetect from "./components/noise-detect";
 import AirQuality from "./components/air-quality";
 import ElectricityUsage from "./components/electricity-usage";
-import CarbonEmission from "./components/carbon-emission";
 import EnergyComponent from "./components/energy-component";
 import { LanguageProvider } from "@/components/providers/language-provider";
 import BorderLines from "./components/border-lines";
 import GetRealWeather from "./components/get-real-weather";
+import CarbonEmission from "./components/carbon-emission";
 
 export default function Home() {
   return (

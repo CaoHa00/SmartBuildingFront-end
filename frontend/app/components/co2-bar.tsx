@@ -2,37 +2,41 @@
 
 import { Bar } from "react-chartjs-2";
 import {
-  Chart,
+  Chart as ChartJS,
   BarElement,
   CategoryScale,
   LinearScale,
   Tooltip,
+  Chart,
 } from "chart.js";
-import annotationPlugin from "chartjs-plugin-annotation";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import { useRef, useState, useEffect } from "react";
 
-// Register chart.js components
-Chart.register(
+ChartJS.register(
   BarElement,
   CategoryScale,
   LinearScale,
   Tooltip,
-  annotationPlugin
+  ChartDataLabels
 );
 
-// CO2BarChartProps type definition
 interface CO2BarChartProps {
-  co2Emission: number; // CO₂ emission value from the parent component
+  co2Emission: number;
 }
 
 const CO2BarChart = ({ co2Emission }: CO2BarChartProps) => {
-  const maxCO2 = 1; // Set the max CO₂ limit (1t)
-  const chartRef = useRef<any>(null); // Reference to the chart instance
-  const [gradient, setGradient] = useState<CanvasGradient | null>(null); // Store the gradient
+  const maxCO2 = 1;
+  const chartRef = useRef<Chart<"bar"> | null>(null);
+  const [gradient, setGradient] = useState<string | CanvasGradient>(
+    "rgba(0, 200, 0, 1)"
+  );
 
-  // Function to create the gradient (green to red)
-  const createGradient = (ctx: CanvasRenderingContext2D, chartArea: any) => {
-    if (!ctx || !chartArea) return null;
+  const onChartReady = (chart: Chart<"bar">) => {
+    if (!chart) return;
+    chartRef.current = chart;
+
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return;
 
     const gradientFill = ctx.createLinearGradient(
       0,
@@ -40,82 +44,87 @@ const CO2BarChart = ({ co2Emission }: CO2BarChartProps) => {
       0,
       chartArea.top
     );
-    gradientFill.addColorStop(0, "rgba(0, 200, 0, 1)"); // Green (low)
-    gradientFill.addColorStop(0.5, "rgba(255, 165, 0, 1)"); // Yellow (moderate)
-    gradientFill.addColorStop(1, "rgba(255, 0, 0, 1)"); // Red (high)
+    gradientFill.addColorStop(0, "rgba(0, 200, 0, 1)");
+    gradientFill.addColorStop(0.3, "rgba(255, 255, 0, 1)");
+    gradientFill.addColorStop(0.6, "rgba(255, 165, 0, 1)");
+    gradientFill.addColorStop(1, "rgba(255, 0, 0, 1)");
 
-    return gradientFill;
+    setGradient(gradientFill);
   };
-  // useEffect hook to set the gradient once the chart instance is initialized
-  useEffect(() => {
-    const chartInstance = chartRef.current?.chart;
-    if (chartInstance) {
-      const chartArea = chartInstance.chartArea;
-      const ctx = chartInstance.ctx;
-      if (ctx && chartArea) {
-        const newGradient = createGradient(ctx, chartArea);
-        setGradient(newGradient);
-      }
-      chartInstance.update();
-    }
-  }, [co2Emission]); // Runs on initial mount or when `co2Emission` changes
 
-  // Chart data: it uses the maxCO2 value and applies the gradient
+  useEffect(() => {
+    if (chartRef.current) {
+      const chart = chartRef.current;
+      if (chart.chartArea) {
+        onChartReady(chart);
+        chart.update();
+      }
+    }
+  }, [co2Emission]);
+
+  const clampedCO2Emission = Math.min(co2Emission, maxCO2);
+
   const data = {
-    labels: [""], // Empty label to center the bar
+    labels: [""],
     datasets: [
       {
-        data: [Math.min(co2Emission, maxCO2)], // Use min(co2Emission, maxCO2) to clamp the value
-        backgroundColor: gradient ?? "rgba(0, 200, 0, 1)", // Apply the gradient or fallback color
+        data: [clampedCO2Emission],
+        backgroundColor: gradient,
+        borderWidth: 1.5,
       },
     ],
   };
 
-  // Chart options, similar to what you might have in the WeatherChart
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 14, // increase to reveal the label
+      },
+    },
     plugins: {
       tooltip: { enabled: false },
       legend: { display: false },
-      annotation: {
-        annotations: {
-          line1: {
-            // Annotation line for 1t CO₂
-            xMin: 0,
-            xMax: 0,
-            yMin: maxCO2,
-            yMax: maxCO2,
-            borderColor: "white",
-            borderWidth: 2,
-            label: {
-              content: "1t CO₂", // Label content
-              position: "center",
-              font: {
-                size: 12,
-                family: "Montserrat, sans-serif",
-                weight: "bold",
-              },
-              color: "#FFFFFF", // Label color
-            },
-          },
+      datalabels: {
+        display: true,
+        align: "end" as const,
+        anchor: "end" as const,
+        offset: -4,
+        color: "white",
+        font: {
+          family: "Montserrat, sans-serif",
+          size: 14,
         },
+        formatter: (value: number) => `${value.toFixed(1)}tCO₂`,
       },
     },
     scales: {
       x: { display: false },
       y: {
-        display: false, // Hide the y-axis
+        display: false,
         min: 0,
-        max: maxCO2, // Set max limit for the bar
+        max: maxCO2,
+        beginAtZero: true,
       },
     },
   };
 
-  // Return the Bar component with the chart data and options
   return (
-    <div className="h-[84px] w-12 mx-auto">
-      <Bar ref={chartRef} data={data} options={options} />
+    <div className="h-[70px] w-12 mx-auto">
+      <Bar
+        data={data}
+        options={options}
+        ref={(node) => {
+          if (node && node.chartArea) {
+            onChartReady(node);
+          } else {
+            setTimeout(() => {
+              if (node && node.chartArea) onChartReady(node);
+            }, 100);
+          }
+        }}
+      />
     </div>
   );
 };
