@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useElectricityData } from "@/hooks/useElectricityData";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { Zap } from "lucide-react";
 
 const formatNumber = (value: number | undefined | null, decimals: number = 2) => {
@@ -51,7 +51,7 @@ export function ElectricityCard() {
               Total Electric
             </p>
             <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
-              {formatNumber(data?.forward_energy_total)} kWh
+              {formatNumber(data?.forward_energy_power)} kWh
             </p>
           </div>
           <div className="space-y-2 md:space-y-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
@@ -63,7 +63,7 @@ export function ElectricityCard() {
               Active Power
             </p>
             <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
-              {formatNumber(data?.power)} kW
+              {formatNumber(data?.active_power)} kW
             </p>
           </div>
           <div className="space-y-2 md:space-y-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
@@ -96,7 +96,7 @@ export function ElectricityCard() {
             isMobile ? "text-xs" : "text-sm"
           } text-blue-600/70 italic`}
         >
-          Last updated: {formatDistanceToNow(safeDate(data?.timestamp))} ago
+          Last updated: {format(safeDate(data?.timestamp), 'HH:mm:ss')}
         </div>
       </CardContent>
     </Card>
