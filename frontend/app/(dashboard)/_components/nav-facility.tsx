@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import { useFacility } from "@/app/context/facility-context";
+import { useRouter } from "next/navigation";
 
 interface FacilityItem {
   key: number;
@@ -57,10 +58,12 @@ interface FacilityItem {
 
 export function NavFacility({ items }: { items: FacilityItem[] }) {
   const { setSelectedFacility } = useFacility();
+  const router = useRouter();
 
-  const handleItemClick = (name: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event from reaching CollapsibleTrigger
+  const handleItemClick = (name: string, url: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedFacility(name);
+    router.push(url);
   };
 
   return (
@@ -81,7 +84,9 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton tooltip={item.name}>
                   {item.icon && <item.icon />}
-                  <span onClick={(e) => handleItemClick(item.name, e)}>{item.name}</span>
+                  <span onClick={(e) => handleItemClick(item.name, item.url, e)}>
+                    {item.name}
+                  </span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
@@ -98,7 +103,11 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                         <CollapsibleTrigger asChild>
                           <SidebarMenuSubButton>
                             {subItem.icon && <subItem.icon />}
-                            <span onClick={(e) => handleItemClick(subItem.name, e)}>
+                            <span
+                              onClick={(e) =>
+                                handleItemClick(subItem.name, subItem.url, e)
+                              }
+                            >
                               {subItem.name}
                             </span>
                             {subItem.items && (
@@ -119,7 +128,15 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                   <CollapsibleTrigger asChild>
                                     <SidebarMenuSubButton>
                                       {subSubItem.icon && <subSubItem.icon />}
-                                      <span onClick={(e) => handleItemClick(subSubItem.name, e)}>
+                                      <span
+                                        onClick={(e) =>
+                                          handleItemClick(
+                                            subSubItem.name,
+                                            subSubItem.url,
+                                            e
+                                          )
+                                        }
+                                      >
                                         {subSubItem.name}
                                       </span>
                                       {subSubItem.items && (
@@ -130,10 +147,22 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                   <CollapsibleContent>
                                     <SidebarMenuSub>
                                       {subSubItem.items?.map((finalItem) => (
-                                        <SidebarMenuSubItem key={finalItem.key}>
+                                        <SidebarMenuSubItem
+                                          key={finalItem.key}
+                                        >
                                           <SidebarMenuSubButton>
-                                            {finalItem.icon && <finalItem.icon />}
-                                            <span onClick={(e) => handleItemClick(finalItem.name, e)}>
+                                            {finalItem.icon && (
+                                              <finalItem.icon />
+                                            )}
+                                            <span
+                                              onClick={(e) =>
+                                                handleItemClick(
+                                                  finalItem.name,
+                                                  finalItem.url,
+                                                  e
+                                                )
+                                              }
+                                            >
                                               {finalItem.name}
                                             </span>
                                           </SidebarMenuSubButton>
