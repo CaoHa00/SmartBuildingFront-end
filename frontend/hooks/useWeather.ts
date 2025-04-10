@@ -53,7 +53,6 @@ export const useWeather = () => {
         }
 
         const data = await response.json();
-        console.log('Weather API response:', data); // Debug log
 
         if (!data?.current) {
           throw new Error('Invalid weather data format');

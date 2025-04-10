@@ -14,8 +14,8 @@ import {
   DoorClosed,
 } from "lucide-react";
 
-import { NavFacility } from "@/app/dashboard/_components/nav-facility";
-import { NavDevices } from "@/app/dashboard/_components/nav-devices";
+import { NavFacility } from "./nav-facility";
+import { NavDevices } from "./nav-devices";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -25,7 +25,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { NavScheduler } from "@/app/dashboard/_components/nav-scheduler";
+import { NavScheduler } from "./nav-scheduler";
 import { NavHelper } from "./nav-helper";
 // This is sample data.
 const data = {
@@ -80,13 +80,13 @@ const data = {
 };
 
 interface Room {
-  roomId: number;  
-  roomName: string; 
+  roomId: number;
+  roomName: string;
   floorId: number;
 }
 
 interface Floor {
-  floorId: number;  
+  floorId: number;
   floorName: string;
   blockId: number;
   rooms: Room[];
@@ -106,7 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       try {
         const response = await api.get<Block[]>("/block");
         if (response.data.length > 0) {
-          const formattedBlocks = response.data.map(block => ({
+          const formattedBlocks = response.data.map((block) => ({
             blockId: block.blockId,
             blockName: block.blockName,
             floors: block.floors,
@@ -128,28 +128,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavFacility
-          items={blocks.map(block => ({
+          items={blocks.map((block) => ({
             key: block.blockId,
             name: block.blockName,
             url: `/block/${block.blockId}`,
             icon: LayoutDashboard,
-            items: block.floors?.map(floor => ({
-              key: floor.floorId ,
+            items: block.floors?.map((floor) => ({
+              key: floor.floorId,
               name: floor.floorName,
               url: `/block/${block.blockId}/floor/${floor.floorId}`,
               icon: Layers,
-              items: floor.rooms?.map(room => ({
-                key: room.roomId ,
+              items: floor.rooms?.map((room) => ({
+                key: room.roomId,
                 name: room.roomName,
                 url: `/block/${block.blockId}/floor/${floor.floorId}/room/${room.roomId}`,
                 icon: DoorClosed,
-              }))
+              })),
             })),
           }))}
         />
         <NavScheduler scheduler={data.scheduler} />
         <NavDevices devices={[]} />
-        <NavHelper items={data.NavHelper} className="mt-auto font-bold text-blue-800" />
+        <NavHelper
+          items={data.NavHelper}
+          className="mt-auto font-bold text-blue-800"
+        />
       </SidebarContent>
       <SidebarFooter className="flex flex-col items-start">
         <NavUser user={data.user} />

@@ -74,14 +74,7 @@ const EquipmentTypeManagement = () => {
   };
 
   const handleUpdate = async (id: number) => {
-    if (!editName.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Equipment type name cannot be empty",
-      });
-      return;
-    }
+
     try {
       await api.put(`/equipmentType/${id}`, {
         equipmentTypeName: editName
@@ -148,6 +141,7 @@ const EquipmentTypeManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -155,6 +149,9 @@ const EquipmentTypeManagement = () => {
           <TableBody>
             {equipmentTypes.map((type) => (
               <TableRow key={type.equipmentId}>
+                <TableCell>
+                  {type.equipmentId}
+                </TableCell>
                 <TableCell>
                   {editingId === type.equipmentId ? (
                     <Input
