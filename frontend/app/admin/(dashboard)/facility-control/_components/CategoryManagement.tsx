@@ -148,6 +148,7 @@ const CategoryManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -155,6 +156,7 @@ const CategoryManagement = () => {
           <TableBody>
             {categories.map((category) => (
               <TableRow key={category.categoryId}>
+                <TableCell>{category.categoryId}</TableCell>
                 <TableCell>
                   {editingId === category.categoryId ? (
                     <Input

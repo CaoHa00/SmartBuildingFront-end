@@ -1,5 +1,5 @@
 "use client";
-import { AppSidebar } from "./_components/app-sidebar";
+import { AppSidebar } from "../../_components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -7,14 +7,14 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { EnergyChart } from "./room/[roomId]/_components/energy-chart";
-import ActiveDevice from "./room/[roomId]/_components/active-device";
-import DeviceManager from "./room/[roomId]/_components/device-manager";
-import { AirConditionerControl } from "./room/[roomId]/_components/ac-control";
-import { AirMonitor } from "./room/[roomId]/_components/air-monitor";
+import { EnergyChart } from "./_components/energy-chart";
+import ActiveDevice from "./_components/active-device";
+import DeviceManager from "./_components/device-manager";
+import { AirConditionerControl } from "./_components/ac-control";
+import { AirMonitor } from "./_components/air-monitor";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FacilityProvider, useFacility } from "@/app/context/facility-context";
-import { ElectricityCard } from "./room/[roomId]/_components/electricity-card";
+import { ElectricityCard } from "./_components/electricity-card";
 
 function DashboardContent() {
   const isMobile = useIsMobile();
