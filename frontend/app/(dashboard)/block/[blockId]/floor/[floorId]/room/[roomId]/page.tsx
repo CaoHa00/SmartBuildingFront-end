@@ -1,5 +1,5 @@
 "use client";
-import { AppSidebar } from "../../_components/app-sidebar";
+import { AppSidebar } from "../../../../../../_components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -16,7 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { FacilityProvider, useFacility } from "@/app/context/facility-context";
 import { ElectricityCard } from "./_components/electricity-card";
 
-function DashboardContent() {
+function RoomIdPage() {
   const isMobile = useIsMobile();
   const { selectedFacility } = useFacility();
 
@@ -93,7 +93,7 @@ function DashboardContent() {
 export default function Page() {
   return (
     <FacilityProvider>
-      <DashboardContent />
+      <RoomIdPage />
     </FacilityProvider>
   );
 }

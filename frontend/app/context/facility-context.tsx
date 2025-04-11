@@ -6,7 +6,7 @@ type FacilityContextType = {
   setSelectedFacility: (name: string) => void;
 };
 
-const FacilityContext = createContext<FacilityContextType>({ 
+const FacilityContext = createContext<FacilityContextType>({
   selectedFacility: "Room 103.B11",
   setSelectedFacility: () => {} 
 });
