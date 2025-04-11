@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BuildingModel2D } from "./_components/BuildingModel2D";
+import { BuildingModel3D } from "./_components/BuildingModel3D";
 import { CO2EmissionChart } from "./_components/CO2EmissionChart";
 import {
   AlertCircle,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import WeatherForecast from "./_components/WetherForecast";
 
 interface StatCardProps {
   title: string;
@@ -68,7 +69,19 @@ export default function AdminDashboard() {
           <TabsContent value="ligting"></TabsContent>
         </Tabs>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid row-span-2 sm:grid-cols-1 gap-4">
+          <Card className="bg-blue-800">
+            <CardHeader>
+              <CardTitle className="text-xl text-blue-100">
+                Building Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BuildingModel3D />
+            </CardContent>
+          </Card>
+        </div>
         <StatCard
           title="Average Temperature"
           value="22°C"
@@ -81,6 +94,18 @@ export default function AdminDashboard() {
           icon={UserRoundCheck}
           note="Current Occupancy"
         />
+        <div className="grid row-span-3 sm:grid-cols-1 gap-4">
+          <Card className="bg-blue-800">
+            <CardHeader>
+              <CardTitle className="text-xl text-blue-100">
+                Weather Forecast
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <WeatherForecast />
+            </CardContent>
+          </Card>
+        </div>
         <StatCard title="Energy Usage" value="4.2 kWh" icon={Zap} note="" />
         <StatCard
           title="CO2"
@@ -95,17 +120,10 @@ export default function AdminDashboard() {
           note="Equipment Running Today"
         />
         <StatCard title="Active Alerts" value="2" icon={AlertCircle} note="" />
+        <StatCard title="Active Alerts" value="2" icon={AlertCircle} note="" />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Building Overview</CardTitle>
-            <BuildingModel2D />
-          </CardHeader>
-          <CardContent></CardContent>
-        </Card>
-
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">
@@ -116,17 +134,15 @@ export default function AdminDashboard() {
             <CO2EmissionChart />
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
-            <CardTitle>Temperature Zones</CardTitle>
+            <CardTitle className="text-xl">Temperature Zones</CardTitle>
           </CardHeader>
           <CardContent></CardContent>
         </Card>
-
         <Card>
           <CardHeader>
-            <CardTitle>Recent Alerts</CardTitle>
+            <CardTitle className="text-xl">Scheduler</CardTitle>
           </CardHeader>
           <CardContent></CardContent>
         </Card>

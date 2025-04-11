@@ -1,3 +1,4 @@
+
 import TopBar from "./_components/top-bar";
 import NoiseDetect from "./_components/noise-detect";
 import AirQuality from "./_components/air-quality";
@@ -28,6 +29,7 @@ export default function StandeeDashboard() {
           <div className="bg-[#0f4da8] p-2 rounded-xl mb-1">
             <EnergyComponent />
           </div>
+
         </div>
       </section>
     </div>
