@@ -1,10 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BlockManagement } from "../../_components/BlockManagement";
-import { FloorManagement } from "../../_components/FloorManagement";
-import { RoomManagement } from "../../_components/RoomManagement";
-import { EquipmentManagement } from "../../_components/EquipmentManagement";
-import EquipmentTypeManagement from "../../_components/EquipmentType";
-import CategoryManagement from "../../_components/CategoryManagement";
+import { BlockManagement } from "./_components/BlockManagement";
+import { FloorManagement } from "./_components/FloorManagement";
+import { RoomManagement } from "./_components/RoomManagement";
+import { EquipmentManagement } from "./_components/EquipmentManagement";
+import EquipmentTypeManagement from "./_components/EquipmentType";
+import CategoryManagement from "./_components/CategoryManagement";
 
 const FacilityControl = () => {
   return (

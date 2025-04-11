@@ -21,8 +21,7 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend,
-  ChartDataLabels
+  Legend
 );
 
 interface WeatherChartProps {
@@ -87,7 +86,7 @@ export default function WeatherChart({
       } else if (temp > 32) {
         // Orange to Red (RGB: Orange = rgb(255, 165, 0), Red = rgb(255, 0, 0))
         const r = 255; // Red stays constant at 255
-        const g = Math.round(127 - (temp - 32) * (127 / 3)); // Green decreases to 0
+        const g = Math.round(165 - (temp - 32) * (127 / 3)); // Green decreases to 0
         const b = 0; // Constant value
         color = `rgb(${r}, ${g}, ${b})`;
       }
@@ -170,6 +169,7 @@ export default function WeatherChart({
             y: { display: false },
           },
         }}
+        plugins={[ChartDataLabels]}
       />
       <div className="flex justify-between mt-2">
         {data.map((d, index) => (

@@ -1,8 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useElectricityData } from "@/hooks/useElectricityData";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { Zap } from "lucide-react";
+
+const formatNumber = (value: number | undefined | null, decimals: number = 2) => {
+  if (value === undefined || value === null) return "0";
+  return value.toFixed(decimals);
+};
+
+const safeDate = (timestamp: any) => {
+  if (!timestamp) return new Date();
+  const date = new Date(timestamp);
+  return isNaN(date.getTime()) ? new Date() : date;
+};
 
 export function ElectricityCard() {
   const { data, isLoading, error } = useElectricityData();
@@ -40,7 +51,7 @@ export function ElectricityCard() {
               Total Electric
             </p>
             <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
-              {data.forward_energy_total.toFixed(2)} kWh
+              {formatNumber(data?.forward_energy_power)} kWh
             </p>
           </div>
           <div className="space-y-2 md:space-y-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
@@ -52,7 +63,7 @@ export function ElectricityCard() {
               Active Power
             </p>
             <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
-              {data.power.toFixed(2)} kW
+              {formatNumber(data?.active_power)} kW
             </p>
           </div>
           <div className="space-y-2 md:space-y-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
@@ -64,7 +75,7 @@ export function ElectricityCard() {
               Current
             </p>
             <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
-              {data.current.toFixed(1)} A
+              {formatNumber(data?.current, 1)} A
             </p>
           </div>
           <div className="space-y-2 md:space-y-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
@@ -76,7 +87,7 @@ export function ElectricityCard() {
               Voltage
             </p>
             <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
-              {data.voltage.toFixed(1)} V
+              {formatNumber(data?.voltage, 1)} V
             </p>
           </div>
         </div>
@@ -85,7 +96,7 @@ export function ElectricityCard() {
             isMobile ? "text-xs" : "text-sm"
           } text-blue-600/70 italic`}
         >
-          Last updated: {formatDistanceToNow(data.timestamp)} ago
+          Last updated: {format(safeDate(data?.timestamp), 'HH:mm:ss')}
         </div>
       </CardContent>
     </Card>

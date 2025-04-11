@@ -83,7 +83,7 @@ export default function CO2Gauge({ electricity }: CO2Props) {
       >
         <GaugeComponent
           {...gaugeConfig}
-          value={CalculateCarbonFootprint(electricity!)}
+          value={CalculateCarbonFootprint(electricity ?? 0)}
         />
       </div>
     </div>
