@@ -30,18 +30,18 @@ export default function ElectricityUsageChart({
 
       <div className="flex w-full justify-around">
         <div className="text-center mt-2 w-full border-r border-white">
-          <p className="text-sm">{text.current}</p>
-          <p className="text-2xl">
+          <p className="text-sm md:text-xl">{text.current}</p>
+          <p className="text-2xl md:text-3xl">
             {Math.round((currentElectricalReading ?? 0) * 100) / 100}
           </p>
-          <p className="text-sm">kW</p>
+          <p className="text-sm md:text-base">kW</p>
         </div>
         <div className="text-center mt-2 w-full">
-          <p className="text-sm">{text.total}</p>
-          <p className="text-2xl">
+          <p className="text-sm md:text-xl">{text.total}</p>
+          <p className="text-2xl md:text-3xl">
             {Math.round((totalElectricalReading ?? 0) * 100) / 100}
           </p>
-          <p className="text-sm">kWh</p>
+          <p className="text-sm md:text-base">kWh</p>
         </div>
       </div>
     </div>

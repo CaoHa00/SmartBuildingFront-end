@@ -30,13 +30,13 @@ export default function NoiseDetect() {
         <div className="w-1/3 flex border-r border-white">
           <div className="w-full">
             <div className="flex justify-center">
-              <Ear size={12} className="h-5" />
+              <Ear size={12} className="h-5 md:h-7" />
               <p className="text-xs md:text-base font-bold px-1 pt-[1px]">
                 {text.statusMin}
               </p>
               <Square
                 size={10}
-                className="h-5"
+                className="h-5 md:h-7"
                 fill="#16c91a"
                 color="#16c91a"
               />
@@ -49,17 +49,22 @@ export default function NoiseDetect() {
         <div className="w-1/3 flex border-r border-white">
           <div className="w-full">
             <div className="flex justify-center">
-              <Ear size={12} className="h-5" />
+              <Ear size={12} className="h-5 md:h-7" />
               <p
                 className={
                   isEnglish
                     ? "text-xs md:text-base font-bold px-1 pt-[1px]"
-                    : "text-[11px] leading-none pt-[4px] font-bold px-1"
+                    : "text-[11px] md:text-base leading-none pt-[4px] md:pt-0 font-bold px-1"
                 }
               >
                 {text.statusMid}
               </p>
-              <Square size={10} className="h-5" fill="yellow" color="yellow" />
+              <Square
+                size={10}
+                className="h-5 md:h-7"
+                fill="yellow"
+                color="yellow"
+              />
             </div>
             <p className="text-xs md:text-base font-bold text-center">
               72.4 dB
@@ -69,11 +74,11 @@ export default function NoiseDetect() {
         <div className="w-1/3 flex">
           <div className="w-full">
             <div className="flex justify-center">
-              <Ear size={12} className="h-5" />
+              <Ear size={12} className="h-5 md:h-7" />
               <p className="text-xs md:text-base font-bold px-1 pt-[1px]">
                 {text.statusMax}
               </p>
-              <Square size={10} className="h-5" fill="red" color="red" />
+              <Square size={10} className="h-5 md:h-7" fill="red" color="red" />
             </div>
             <p className="text-xs md:text-base font-bold text-center">
               81.2 dB

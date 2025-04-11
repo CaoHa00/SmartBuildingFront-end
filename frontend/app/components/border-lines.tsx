@@ -1,7 +1,7 @@
 export default function BorderLines() {
   return (
     <>
-      <div className="absolute top-0 w-screen h-screen z-50">
+      <div className="absolute top-0 w-screen h-screen z-50 md:hidden">
         <div className="flex">
           <div className="w-[220px] ml-[12px] mt-1 rounded-t-xl border-l-2 border-t-2 border-r-2 border-white h-[36px]"></div>
           <div className="w-[268px] h-[36px]"></div>

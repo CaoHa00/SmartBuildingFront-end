@@ -31,7 +31,7 @@ export default function useCurrentElectricalReading() {
 
     const poll = async () => {
       await fetchCurrentElectricalReading();
-      timeoutId = setTimeout(poll, 30 * 60 * 1000);
+      timeoutId = setTimeout(poll, 10 * 60 * 1000);
     };
 
     poll();
