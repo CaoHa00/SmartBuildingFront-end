@@ -7,11 +7,11 @@ export default function EnergySave() {
 
   const text = isEnglish
     ? {
-        title: "Energy Save up 124,7% this year",
+        title: "Energy Save up _% this year",
         description: "Show Total Energy for the last year",
       }
     : {
-        title: "Tiết kiệm năng lượng lên đến 124,7% trong năm",
+        title: "Tiết kiệm năng lượng lên đến _% trong năm",
         description: "Thể hiện tổng năng lượng tiêu hao trong năm qua",
       };
   return (
@@ -20,14 +20,14 @@ export default function EnergySave() {
         className={
           isEnglish
             ? "md:text-xl ml-3 text-sm font-bold"
-            : "md:text-xl ml-3 text-[13px] font-bold"
+            : "md:text-xl ml-3 text-[12px] font-bold"
         }
       >
         {text.title}
       </p>
       <p
         className={
-          isEnglish ? "md:text-xl ml-3 text-sm" : "md:text-xl ml-3 text-[13px]"
+          isEnglish ? "md:text-xl ml-3 text-sm" : "md:text-xl ml-3 text-[12px]"
         }
       >
         {text.description}

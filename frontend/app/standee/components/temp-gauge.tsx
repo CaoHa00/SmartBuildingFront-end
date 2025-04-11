@@ -63,15 +63,19 @@ export default function TempGauge({ temperature }: TempProps) {
   return (
     <div className="bg-[#5e83ba] rounded-xl aspect-auto md:p-5">
       <div className="text-base font-bold px-3 py-2 flex justify-between">
-        <p>
+        <p className="md:text-2xl">
           <span className="not-italic text-2xl">🌡️</span>{" "}
-          <span className={isEnglish ? "text-[13px]" : ""}>{text.title}</span>
+          <span
+            className={isEnglish ? "text-[13px] md:text-2xl" : "md:text-2xl"}
+          >
+            {text.title}
+          </span>
         </p>
         {/* <p className="font-bold text-2xl">{Math.round(temperature)}°</p> */}
       </div>
       <div
         className="w-full text-center md:h-28"
-        style={{ width: "100%", height: "150px", overflow: "hidden" }}
+        style={{ width: "100%", height: "100%", overflow: "hidden" }}
       >
         <GaugeComponent
           {...gaugeConfig}

@@ -59,7 +59,7 @@ export default function UVGauge({ uvIndex }: UVProps) {
   return (
     <div className="bg-[#5e83ba] rounded-xl aspect-auto md:p-5">
       <div className="font-bold text-base px-3 pt-2 flex justify-between">
-        <p>
+        <p className="md:text-2xl">
           <span className="not-italic text-2xl">☀️</span> {text.title}
         </p>
         {/* <p className="text-white text-2xl font-bold not-italic">

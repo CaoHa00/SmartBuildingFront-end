@@ -32,7 +32,7 @@ export default function ElectricityUsageAnalytics() {
             className={
               isEnglish
                 ? "text-[12px] md:text-xl"
-                : "text-[13px] h-[20px] md:text-lg"
+                : "text-[13px] h-[20px] md:h-[28px] md:text-xl"
             }
           >
             {text.title}
@@ -41,8 +41,11 @@ export default function ElectricityUsageAnalytics() {
             <span className="font-bold"></span> kWH
           </p>
         </div>
-        <div className="absolute right-0 p-1 md:p-3">
-          <MoveUp size={14} className="h-14" color="red" />
+        <div className="absolute right-0 bottom-0 p-1 md:p-3 md:pb-1">
+          <MoveUp
+            className="h-[14px] w-[14px] md:h-[20px] md:w-[20px]"
+            color="red"
+          />
         </div>
       </div>
       <div className="w-1/2 relative flex pl-2 md:pl-5 pr-3">
@@ -58,7 +61,7 @@ export default function ElectricityUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[9px] h-[20px] md:text-lg pt-1"
+                : "text-[9px] h-[20px] md:h-[28px] md:text-xl pt-1 md:pt-0"
             }
           >
             {text.efficiency}
@@ -67,8 +70,11 @@ export default function ElectricityUsageAnalytics() {
             <span className="font-bold"></span> %
           </p>
         </div>
-        <div className="absolute right-0 p-1 md:p-3">
-          <MoveUp size={14} className="h-14" color="#02f506" />
+        <div className="absolute right-0 bottom-0 p-1 md:p-3 md:pb-1">
+          <MoveUp
+            className="h-[14px] w-[14px] md:h-[20px] md:w-[20px]"
+            color="#02f506"
+          />
         </div>
       </div>
     </div>
