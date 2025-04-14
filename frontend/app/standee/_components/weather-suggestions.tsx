@@ -90,7 +90,7 @@ export default function WeatherComponent({
 
   const isMdUp = useMediaQuery("(min-width: 768px)");
   const iconSize = isMdUp ? 200 : 100;
-  const weatherIcon = getWeatherIcon(weatherCode, iconSize);
+  const weatherIcon = getWeatherIcon(weatherCode, iconSize, new Date());
 
   const content = [
     <div key="1">
@@ -242,8 +242,12 @@ function getWeatherDescription(
     : "Thời tiết không xác định";
 }
 
-export function getWeatherIcon(weatherCode: number, iconSize: number) {
-  const hour = new Date().getHours();
+export function getWeatherIcon(
+  weatherCode: number,
+  iconSize: number,
+  timestamp: Date
+) {
+  const hour = timestamp.getHours();
   const isDaytime = hour >= 6 && hour < 18;
   const icons: {
     [key: number]: { day: React.ReactNode; night: React.ReactNode };

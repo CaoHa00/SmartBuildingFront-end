@@ -125,7 +125,7 @@ export default function WeatherChart({
         options={{
           responsive: true,
           layout: {
-            padding: { bottom: 10, left: 15, right: 15 },
+            padding: { top: 20, left: 15, right: 15 },
           },
           plugins: {
             legend: { display: false },
@@ -177,7 +177,9 @@ export default function WeatherChart({
             key={index}
             className="flex flex-col items-center text-xs relative"
           >
-            <span className="h-7">{getWeatherIcon(d.weatherCode, 24)}</span>
+            <span className="h-7">
+              {getWeatherIcon(d.weatherCode, 24, d.timestamp)}
+            </span>
             <span>{d.time}</span>
           </div>
         ))}
