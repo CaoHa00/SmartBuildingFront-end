@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { AirQualityResponse } from "@/types/air-quality";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useElectricityData } from "@/hooks/useElectricityData";
 
 async function fetchAirQuality() {
   
@@ -32,9 +33,18 @@ export function AirMonitor() {
     queryFn: fetchAirQuality,
     refetchInterval: 30000,
   });
-
-  // if (isLoading) return <div>Loading...</div>;
-  // if (error) return <div>Error loading data</div>;
+  
+  const { data: electricityData } = useElectricityData();
+  
+  // Calculate CO2 emissions (kg) from forward energy power
+  const co2Emissions = electricityData?.forward_energy_power 
+    ? (electricityData.forward_energy_power * 0.5).toFixed(2) 
+    : null;
+    
+  // Calculate CO emissions (kg) - approximately 0.1% of CO2
+  const coEmissions = co2Emissions 
+    ? (Number(co2Emissions) * 0.001).toFixed(3)
+    : null;
 
   return (
     <div className="w-full h-full aspect-video relative rounded-xl bg-muted/50 p-2 mx-auto">
@@ -62,7 +72,7 @@ export function AirMonitor() {
       </div>
       <div className="h-1/3 relative rounded-xl bg-gradient-to-r from-blue-600 to-sky-300">
         <div className="text-xl md:text-2xl text-center font-bold text-white pt-2">
-          700-1000 PPM
+          {coEmissions ?? 'N/A'} - {co2Emissions ?? 'N/A'} kg
         </div>
         <div className="flex items-center justify-between px-4 md:px-8 font-bold text-lg md:text-xl text-white">
           <p>CO</p>

@@ -16,8 +16,6 @@ export function MusicPlayerCard() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(75);
   const [progress, setProgress] = useState(30);
 
   return (
