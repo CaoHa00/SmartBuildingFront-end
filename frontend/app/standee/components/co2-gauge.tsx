@@ -4,39 +4,42 @@ import { useLanguage } from "@/components/providers/language-provider";
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
-interface TempProps {
-  temperature: number;
+interface CO2Props {
+  electricity?: number;
 }
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
   ssr: false,
 });
 
-export default function TempGauge({ temperature }: TempProps) {
+export default function CO2Gauge({ electricity }: CO2Props) {
   const { isEnglish } = useLanguage();
+
+  function CalculateCarbonFootprint(electricity: number) {
+    return Math.round(((electricity * 0.8) / 1000) * 100) / 100;
+  }
 
   const text = isEnglish
     ? {
-        title: "Temperature",
+        title: "CO2 Emission",
       }
     : {
-        title: "Nhiệt độ",
+        title: "Lượng khí thải CO₂",
       };
 
   const gaugeConfig = useMemo(
     () => ({
       minValue: 0,
-      maxValue: 50,
+      maxValue: 1.027397260273973,
       type: "radial" as "radial",
-      size: 200,
+      size: 400,
       arc: {
         cornerRadius: 1,
         subArcs: [
-          { limit: 10, color: "#fff", showTick: true },
-          { limit: 20, color: "#fde704", showTick: true },
-          { limit: 30, color: "#fd8004", showTick: true },
-          { limit: 40, color: "#fd7a04", showTick: true },
-          { limit: 50, color: "#e80612", showTick: true },
+          { limit: 0.25, color: "#16c91a", showTick: true },
+          { limit: 0.5, color: "#fde704", showTick: true },
+          { limit: 0.75, color: "#fd8004", showTick: true },
+          { limit: 1.027397260273973, color: "#e80612", showTick: true },
         ],
         padding: 0.005,
         gradient: true,
@@ -45,8 +48,8 @@ export default function TempGauge({ temperature }: TempProps) {
       pointer: { elastic: true },
       labels: {
         valueLabel: {
-          style: { fontSize: 45, fontWeight: "bold", textShadow: "none" },
-          formatTextValue: (value: any) => value + "º",
+          style: { fontSize: 50, fontWeight: "bold", textShadow: "none" },
+          formatTextValue: (value: any) => value + "t",
         },
         tickLabels: {
           type: "outer" as "outer",
@@ -57,17 +60,18 @@ export default function TempGauge({ temperature }: TempProps) {
         },
       },
     }),
-    [temperature]
+    [electricity]
   );
 
   return (
     <div className="bg-[#5e83ba] rounded-xl aspect-auto md:p-5">
-      <div className="text-base font-bold px-3 py-2 flex justify-between">
-        <p>
-          <span className="not-italic text-2xl">🌡️</span>{" "}
-          <span className={isEnglish ? "text-[13px]" : ""}>{text.title}</span>
+      <div className="font-bold text-base tracking-wide px-3 py-2 flex">
+        <p className="my-auto">
+          <span className="text-2xl not-italic">🌤️</span>{" "}
+          <span className={isEnglish ? "text-[13px]" : "text-[9px]"}>
+            {text.title}
+          </span>
         </p>
-        {/* <p className="font-bold text-2xl">{Math.round(temperature)}°</p> */}
       </div>
       <div
         className="w-full text-center md:h-28"
@@ -75,11 +79,8 @@ export default function TempGauge({ temperature }: TempProps) {
       >
         <GaugeComponent
           {...gaugeConfig}
-          value={Math.round(temperature * 10) / 10}
+          value={CalculateCarbonFootprint(electricity ?? 0)}
         />
-        {/* <p className="text-4xl font-bold text-white">
-          {Math.round(temperature)}ºC
-        </p> */}
       </div>
     </div>
   );
