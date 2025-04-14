@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { MusicPlayerCard } from "./music-player-card";
+import { MusicPlayerCard } from "../../../components/ui/music-player-card";
 
 export function NavDevices({
   devices,
