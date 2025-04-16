@@ -24,15 +24,6 @@ interface Room {
   roomId: number;
   roomName: string;
   equipments: Equipment[];
-  // Adding these properties to maintain compatibility with RoomCard
-  status: "available" | "occupied";
-  temperature: number;
-  humidity: number;
-  devices: {
-    ac: boolean;
-    light: boolean;
-    tv: boolean;
-  };
 }
 
 interface FloorResponse {
@@ -61,21 +52,7 @@ export function FloorIdPage() {
   const fetchRooms = async () => {
     try {
       const response = await api.get<FloorResponse>(`/floor/${params.floorId}`);
-      // Transform the API response to match our component needs
-      const transformedRooms = response.data.rooms.map(room => ({
-        ...room,
-        // Deriving status based on equipment presence with explicit type
-        status: room.equipments.length > 0 ? "occupied" as const : "available" as const,
-        // These are placeholder values - you might want to get real data from sensors
-        temperature: 25,
-        humidity: 50,
-        devices: {
-          ac: room.equipments.some(e => e.equipmentName.toLowerCase().includes('ac')),
-          light: room.equipments.some(e => e.equipmentName.toLowerCase().includes('light')),
-          tv: room.equipments.some(e => e.equipmentName.toLowerCase().includes('tv'))
-        }
-      }));
-      setRooms(transformedRooms);
+      setRooms(response.data.rooms);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -110,7 +87,6 @@ export function FloorIdPage() {
 
   // Helper function to extract room number
   const getRoomNumber = (roomName: string) => {
-    // Match the first sequence of numbers in the room name
     const match = roomName.match(/\d+/);
     return match ? parseInt(match[0]) : 0;
   };
@@ -163,11 +139,8 @@ export function FloorIdPage() {
                       onClick={() => handleRoomClick(room.roomId.toString())}
                     >
                       <RoomCard
+                        roomId={room.roomId.toString()}
                         roomName={room.roomName}
-                        status={room.status}
-                        temperature={room.temperature}
-                        humidity={room.humidity}
-                        devices={room.devices}
                       />
                     </div>
                   ))}
@@ -192,11 +165,8 @@ export function FloorIdPage() {
                       onClick={() => handleRoomClick(room.roomId.toString())}
                     >
                       <RoomCard
+                        roomId={room.roomId.toString()}
                         roomName={room.roomName}
-                        status={room.status}
-                        temperature={room.temperature}
-                        humidity={room.humidity}
-                        devices={room.devices}
                       />
                     </div>
                   ))}

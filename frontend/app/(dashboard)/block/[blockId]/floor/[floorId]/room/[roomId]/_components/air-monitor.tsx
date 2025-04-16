@@ -9,7 +9,7 @@ import { useElectricityData } from "@/hooks/useElectricityData";
 async function fetchAirQuality() {
   
   const { data } = await axios.post<AirQualityResponse>(
-    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/currentValue?equipmentId=10018`,
+    `http://10.60.253.172:9090/api/aqara/currentValue?equipmentId=10018`,
   );
   return data;
 }
