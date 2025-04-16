@@ -1,12 +1,12 @@
 "use client";
 
 import { Switch } from "@/components/ui/switch";
-import { Cctv, Cpu, Lightbulb, LucideIcon } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { api } from "@/lib/axios";
 import { useParams } from "next/navigation";
-import { Category, getCategoryIcon } from '@/types/category';
+import { Category, getCategoryIcon } from "@/types/category";
 
 interface Device {
   id: string;
@@ -33,23 +33,38 @@ export default function ActiveDevice() {
   const params = useParams();
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Add explicit error logging for each request
-        const [equipmentResponse, statusResponse, categoryResponse] = await Promise.all([
-          api.get(`/room/${params.roomId}`),
-          api.get(`/room/${params.roomId}/status`),
-          api.get('/category')  // Changed from '/api/category' to '/category' since baseURL already includes '/api'
-        ]);
+        setError(null);
+        setLoading(true);
 
-        console.log('Category Response:', categoryResponse.data); // Debug log
+        const [equipmentResponse, statusResponse, categoryResponse] =
+          await Promise.all([
+            api.get(`/room/${params.roomId}`).catch((err) => {
+              console.error("Equipment fetch error:", err);
+              throw new Error("Failed to fetch equipment data");
+            }),
+            api.get(`/room/${params.roomId}/status`).catch((err) => {
+              console.error("Status fetch error:", err);
+              throw new Error("Failed to fetch status data");
+            }),
+            api.get("/category").catch((err) => {
+              console.error("Category fetch error:", err);
+              throw new Error("Failed to fetch category data");
+            }),
+          ]);
+
+        if (!equipmentResponse.data?.equipments) {
+          throw new Error("Invalid equipment data received");
+        }
 
         const equipmentList = equipmentResponse.data.equipments;
-        const statusList = statusResponse.data;
-        const categoryList = categoryResponse.data;
+        const statusList = statusResponse.data || [];
+        const categoryList = categoryResponse.data || [];
 
         const mappedDevices = equipmentList.map((equipment: Equipment) => {
           const status = statusList.find(
@@ -59,24 +74,39 @@ export default function ActiveDevice() {
               s.valueName === "humidity"
           );
 
-          const category = categoryList.find((c: Category) => c.categoryId === equipment.categoryId);
-          console.log('Matching category for equipment:', equipment.categoryId, category); // Debug log
-          
+          const category = categoryList.find(
+            (c: Category) => c.categoryId === equipment.categoryId
+          );
+          console.log(
+            "Matching category for equipment:",
+            equipment.categoryId,
+            category
+          ); // Debug log
+
           return {
             id: equipment.equipmentId.toString(),
             name: equipment.equipmentName,
-            icon: getCategoryIcon(category?.categoryName || ''),
+            icon: getCategoryIcon(category?.categoryName || ""),
             status: "online",
-            type: equipment.equipmentTypeName || "Equipment Type " + equipment.equipmentTypeId,
-            categoryName: category?.categoryName || "Unknown Category"
+            type:
+              equipment.equipmentTypeName ||
+              "Equipment Type " + equipment.equipmentTypeId,
+            categoryName: category?.categoryName || "Sensor",
           };
         });
 
         setDevices(mappedDevices);
         setCategories(categoryList);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred"
+        );
+        setDevices([]);
+        setCategories([]);
+      } finally {
         setLoading(false);
       }
     };
@@ -111,7 +141,25 @@ export default function ActiveDevice() {
   if (loading) {
     return (
       <div className="rounded-xl bg-muted/50 w-full h-full shadow-xl p-4">
-        Loading...
+        <div className="flex items-center justify-center h-full">
+          <p>Loading devices...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl bg-muted/50 w-full h-full shadow-xl p-4">
+        <div className="flex flex-col items-center justify-center h-full text-red-600">
+          <p>Error: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
@@ -149,7 +197,9 @@ export default function ActiveDevice() {
                       <h3 className="font-bold text-lg leading-tight">
                         {device.name}
                       </h3>
-                      <p className="text-sm font-medium text-blue-600">{device.categoryName}</p>
+                      <p className="text-sm font-medium text-blue-600">
+                        {device.categoryName}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

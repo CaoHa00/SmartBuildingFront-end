@@ -11,9 +11,20 @@ import {
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { RoomCard } from "./_components/roomCard";
+import { api } from "@/lib/axios";
+import { useToast } from "@/hooks/use-toast";
+
+interface Equipment {
+  equipmentId: number;
+  equipmentName: string;
+  deviceId: string;
+}
 
 interface Room {
+  roomId: number;
   roomName: string;
+  equipments: Equipment[];
+  // Adding these properties to maintain compatibility with RoomCard
   status: "available" | "occupied";
   temperature: number;
   humidity: number;
@@ -24,6 +35,13 @@ interface Room {
   };
 }
 
+interface FloorResponse {
+  floorId: number;
+  floorName: string;
+  blockId: number;
+  rooms: Room[];
+}
+
 export function FloorIdPage() {
   const router = useRouter();
   const params = useParams();
@@ -31,6 +49,7 @@ export function FloorIdPage() {
   const { selectedFacility } = useFacility();
   const [rooms, setRooms] = useState<Array<Room>>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   // Helper function to chunk arrays into groups
   const chunkArray = (arr: any[], size: number) => {
@@ -39,34 +58,38 @@ export function FloorIdPage() {
     );
   };
 
-  const generateRooms = () => {
-    const generatedRooms: Room[] = Array.from({ length: 16 }, (_, i) => {
-      const isOccupied = Math.random() < 0.5;
-      return {
-        roomName: `Room ${101 + i}`,
-        status: isOccupied ? "occupied" : "available",
-        temperature: Math.floor(Math.random() * (30 - 18 + 1)) + 18,
-        humidity: Math.floor(Math.random() * (75 - 30 + 1)) + 30,
+  const fetchRooms = async () => {
+    try {
+      const response = await api.get<FloorResponse>(`/floor/${params.floorId}`);
+      // Transform the API response to match our component needs
+      const transformedRooms = response.data.rooms.map(room => ({
+        ...room,
+        // Deriving status based on equipment presence with explicit type
+        status: room.equipments.length > 0 ? "occupied" as const : "available" as const,
+        // These are placeholder values - you might want to get real data from sensors
+        temperature: 25,
+        humidity: 50,
         devices: {
-          ac: isOccupied,
-          light: isOccupied,
-          tv: isOccupied && Math.random() < 0.5,
-        },
-      };
-    });
-
-    return generatedRooms.sort((a, b) => {
-      const aNum = parseInt(a.roomName.replace(/\D/g, "")) || 0;
-      const bNum = parseInt(b.roomName.replace(/\D/g, "")) || 0;
-      return aNum - bNum;
-    });
+          ac: room.equipments.some(e => e.equipmentName.toLowerCase().includes('ac')),
+          light: room.equipments.some(e => e.equipmentName.toLowerCase().includes('light')),
+          tv: room.equipments.some(e => e.equipmentName.toLowerCase().includes('tv'))
+        }
+      }));
+      setRooms(transformedRooms);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch rooms"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    // Only generate rooms on the client side
-    setRooms(generateRooms());
-    setIsLoading(false);
-  }, []);
+    fetchRooms();
+  }, [params.floorId]);
 
   const handleRoomClick = (roomName: string) => {
     const roomNumber = roomName.replace(/\D/g, "");
@@ -85,12 +108,19 @@ export function FloorIdPage() {
     );
   }
 
-  // Filter even and odd rooms
+  // Helper function to extract room number
+  const getRoomNumber = (roomName: string) => {
+    // Match the first sequence of numbers in the room name
+    const match = roomName.match(/\d+/);
+    return match ? parseInt(match[0]) : 0;
+  };
+
+  // Filter even and odd rooms based on the numeric part only
   const evenRooms = rooms.filter(
-    (room) => parseInt(room.roomName.replace(/\D/g, "")) % 2 === 0
+    (room) => getRoomNumber(room.roomName) % 2 === 0
   );
   const oddRooms = rooms.filter(
-    (room) => parseInt(room.roomName.replace(/\D/g, "")) % 2 !== 0
+    (room) => getRoomNumber(room.roomName) % 2 !== 0
   );
 
   // Chunk rooms into rows of 5
@@ -130,7 +160,7 @@ export function FloorIdPage() {
                     <div 
                       key={`even-${rowIndex}-${index}`} 
                       className="w-full cursor-pointer"
-                      onClick={() => handleRoomClick(room.roomName)}
+                      onClick={() => handleRoomClick(room.roomId.toString())}
                     >
                       <RoomCard
                         roomName={room.roomName}
@@ -159,7 +189,7 @@ export function FloorIdPage() {
                     <div 
                       key={`odd-${rowIndex}-${index}`} 
                       className="w-full cursor-pointer"
-                      onClick={() => handleRoomClick(room.roomName)}
+                      onClick={() => handleRoomClick(room.roomId.toString())}
                     >
                       <RoomCard
                         roomName={room.roomName}

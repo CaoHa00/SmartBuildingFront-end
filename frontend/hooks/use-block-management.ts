@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { api } from "@/lib/axios";
 import { useToast } from "@/hooks/use-toast";
-import { Block, Floor, Room, Equipment, NewBlockData, NewFloorData, NewRoomData, NewEquipmentData } from '@/types/block-management';
+import { Block, NewBlockData, NewFloorData, NewRoomData, NewEquipmentData } from '@/types/block-management';
 
 export function useBlockManagement() {
   const { toast } = useToast();
@@ -132,14 +132,50 @@ export function useBlockManagement() {
 
   const handleUpdateRoom = async (roomId: number, roomData: NewRoomData) => {
     try {
-      await api.put(`/room/${roomId}`, roomData);
-      await fetchBlocks();
-      return true;
-    } catch (error) {
+      if (!roomId) {
+        throw new Error('Room ID is required');
+      }
+      if (!roomData.roomName?.trim()) {
+        throw new Error('Room name is required');
+      }
+      if (!roomData.floorId) {
+        throw new Error('Floor ID is required');
+      }
+
+      console.log('Updating room:', { roomId, roomData });
+      
+      const response = await api.put(`/room/${roomId}`, {
+        roomName: roomData.roomName.trim(),
+        floorId: roomData.floorId
+      });
+      
+      if (response.status === 200) {
+        await fetchBlocks();
+        toast({
+          title: "Success",
+          description: "Room updated successfully"
+        });
+        return true;
+      }
+      
+      throw new Error(response.data?.message || 'Failed to update room');
+    } catch (error: any) {
+      console.error('Room update error:', {
+        error,
+        roomId,
+        roomData,
+        response: error.response,
+        status: error.response?.status
+      });
+      
+      const errorMessage = error.response?.data?.message 
+        || error.message 
+        || 'Failed to update room';
+        
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update room",
+        description: errorMessage
       });
       return false;
     }

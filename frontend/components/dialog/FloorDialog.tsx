@@ -45,9 +45,9 @@ export function FloorDialog({
             {isEdit ? "Edit Floor" : "Add New Floor"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-neutral-700">
           <div>
-            <Label htmlFor="floorName" className="text-neutral-700">
+            <Label htmlFor="floorName">
               Floor Name
             </Label>
             <Input
