@@ -202,7 +202,7 @@ export default function ActiveDevice() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-center gap-6">
                     <span
                       className={`h-3 w-3 rounded-full ${
                         device.status === "online"
