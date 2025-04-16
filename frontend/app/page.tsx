@@ -6,13 +6,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-
-// import { EnergyChart } from "./room/[roomId]/_components/energy-chart";
-// import { ElectricityCard } from "./room/[roomId]/_components/electricity-card";
 import { CampusMap } from "./(dashboard)/_components/campus-map";
 import { CampusStats } from "./(dashboard)/_components/campus-stats";
 import { BuildingList } from "./(dashboard)/_components/building-list";
-// import { BuildingOverview } from "./_components/building-overview";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FacilityProvider } from "@/app/context/facility-context";
 

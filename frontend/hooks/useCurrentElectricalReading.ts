@@ -31,7 +31,8 @@ export default function useCurrentElectricalReading() {
 
     const poll = async () => {
       await fetchCurrentElectricalReading();
-      timeoutId = setTimeout(poll, 30 * 60 * 1000);
+      // Update every 15 minutes (900000 milliseconds)
+      timeoutId = setTimeout(poll, 15 * 60 * 1000);
     };
 
     poll();

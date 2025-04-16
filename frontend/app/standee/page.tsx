@@ -17,7 +17,7 @@ export default function Home() {
           <SuggestionRunner />
           <div className="grid grid-cols-2 gap-2">
             <WeatherComponent />
-            <GaugesComponents />
+            <GaugesComponents temperature={0} uvIndex={0} humidity={0} />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <NoiseDetect />

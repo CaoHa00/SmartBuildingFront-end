@@ -10,10 +10,16 @@ import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FacilityProvider, useFacility } from "@/app/context/facility-context";
 import { FloorCard } from "../../_components/floor-card";
+import useCurrentElectricalReading from "@/hooks/useCurrentElectricalReading";
+import useTotalElectricalReading from "@/hooks/useTotalElectricalReading";
+import useCO2Emissions from "@/hooks/useCO2Emissions";
 
 export const BlockIdPage = () => {
   const isMobile = useIsMobile();
   const { selectedFacility } = useFacility();
+  const currentReading = useCurrentElectricalReading();
+  const totalReading = useTotalElectricalReading();
+  const co2Reading = useCO2Emissions();
   const [floors] = useState([
     { name: 'Floor 1', occupancy: 25, temperature: 24, humidity: 65, totalRooms: 12, activeRooms: 8 },
     { name: 'Floor 2', occupancy: 18, temperature: 23, humidity: 62, totalRooms: 10, activeRooms: 7 },
@@ -22,8 +28,15 @@ export const BlockIdPage = () => {
   ]);
 
   const stats = {
-    electricity: { value: '2,400 kWh', highestFloor: 'Floor 3' },
-    co2: { value: '1,200 kg', highestFloor: 'Floor 2' },
+    electricity: { 
+      value: `Current: ${currentReading?.electricalReading?.toFixed(2) ?? '0'} kW`, 
+      highestFloor: 'Floor 3',
+      total: `${totalReading?.electricalReading?.toFixed(2) ?? '0'} kWh`
+    },
+    co2: { 
+      value: `${co2Reading?.co2Emissions?.toFixed(2) ?? '0'} kg/h`, 
+      highestFloor: 'Floor 2' 
+    },
     water: { value: '5,000 L', highestFloor: 'Floor 4' },
     rooms: { total: floors.reduce((acc, f) => acc + f.totalRooms, 0), 
              active: floors.reduce((acc, f) => acc + f.activeRooms, 0) }
@@ -63,6 +76,7 @@ export const BlockIdPage = () => {
             <div className="mt-2">
               <span className="text-2xl font-bold text-blue-800">{stats.electricity.value}</span>
               <p className="text-sm text-gray-600 mt-1">Highest in {stats.electricity.highestFloor}</p>
+              <p className="text-sm text-gray-600 mt-1">Total: {stats.electricity.total}</p>
             </div>
           </div>
           

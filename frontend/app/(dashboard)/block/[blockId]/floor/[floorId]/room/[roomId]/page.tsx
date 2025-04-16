@@ -15,10 +15,31 @@ import { AirMonitor } from "./_components/air-monitor";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FacilityProvider, useFacility } from "@/app/context/facility-context";
 import { ElectricityCard } from "./_components/electricity-card";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/axios";
 
 function RoomIdPage() {
   const isMobile = useIsMobile();
-  const { selectedFacility } = useFacility();
+  const params = useParams();
+  const { selectedFacility, setSelectedFacility } = useFacility();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRoomDetails = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(`/room/${params.roomId}`);
+        setSelectedFacility(response.data.roomName);
+      } catch (error) {
+        console.error('Failed to fetch room details:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRoomDetails();
+  }, [params.roomId, setSelectedFacility]);
 
   return (
     <SidebarProvider>
@@ -37,7 +58,6 @@ function RoomIdPage() {
             <h1 className={`${isMobile ? "text-lg" : "text-xl"} font-bold`}>
               {selectedFacility}
             </h1>
-            {/* <SearchBar/> */}
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 pt-0">
