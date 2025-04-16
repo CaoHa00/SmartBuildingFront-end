@@ -18,7 +18,7 @@ import { BlockDialog } from "@/components/dialog/BlockDialog";
 import { FloorDialog } from "@/components/dialog/FloorDialog";
 import { RoomDialog } from "@/components/dialog/RoomDialog";
 import { EquipmentDialog } from "@/components/dialog/EquipmentDialog";
-import { Block, Floor, Room, Equipment } from "@/types/block-management";
+import { Block, Floor, Room, Equipment, NewRoomData } from "@/types/block-management";
 
 export function BlockManagement() {
   const {
@@ -76,6 +76,21 @@ export function BlockManagement() {
 
   const toggleRoom = (roomId: number) => {
     setExpandedRooms((prev) => ({ ...prev, [roomId]: !prev[roomId] }));
+  };
+
+  const handleRoomDialogSubmit = async (data: NewRoomData) => {
+    console.log("Submitting room data:", { ...data, floorId: selectedFloorId });
+    const success = editingRoom
+      ? await handleUpdateRoom(editingRoom.roomId, data)
+      : await handleAddRoom({ ...data, floorId: selectedFloorId! });
+    if (success) {
+      setRoomDialogOpen(false);
+      // Expand the floor to show the new room
+      if (!editingRoom) {
+        setExpandedFloors((prev) => ({ ...prev, [selectedFloorId!]: true }));
+      }
+      await fetchBlocks();
+    }
   };
 
   return (
@@ -350,6 +365,10 @@ export function BlockManagement() {
             : await handleAddFloor(data);
           if (success) {
             setFloorDialogOpen(false);
+            // Expand the block to show the new floor
+            if (!editingFloor) {
+              setExpandedBlocks((prev) => ({ ...prev, [selectedBlockId!]: true }));
+            }
           }
         }}
       />
@@ -360,14 +379,7 @@ export function BlockManagement() {
         isEdit={!!editingRoom}
         initialData={editingRoom}
         floorId={selectedFloorId}
-        onSubmit={async (data) => {
-          const success = editingRoom
-            ? await handleUpdateRoom(editingRoom.roomId, data)
-            : await handleAddRoom(data);
-          if (success) {
-            setRoomDialogOpen(false);
-          }
-        }}
+        onSubmit={handleRoomDialogSubmit}
       />
 
       <EquipmentDialog

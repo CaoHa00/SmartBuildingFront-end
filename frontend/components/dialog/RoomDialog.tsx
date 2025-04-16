@@ -32,8 +32,22 @@ export function RoomDialog({
     floorId: initialData?.floorId || floorId || 0
   });
 
+  // Update form data when initialData or floorId changes
+  React.useEffect(() => {
+    setFormData({
+      roomName: initialData?.roomName || "",
+      floorId: initialData?.floorId || floorId || 0
+    });
+  }, [initialData, floorId]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.roomName.trim()) {
+      return; // Don't submit if room name is empty
+    }
+    if (!formData.floorId) {
+      return; // Don't submit if floorId is not set
+    }
     onSubmit(formData);
   };
 
@@ -45,21 +59,25 @@ export function RoomDialog({
             {isEdit ? "Edit Room" : "Add New Room"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-neutral-700">
           <div>
-            <Label htmlFor="roomName" className="text-neutral-700">
-              Room Name
-            </Label>
+            <Label htmlFor="roomName">Room Name</Label>
             <Input
               id="roomName"
               value={formData.roomName}
               onChange={(e) =>
-                setFormData({ ...formData, roomName: e.target.value })
+                setFormData({ ...formData, roomName: e.target.value.trim() })
               }
               required
+              placeholder="Enter room name"
             />
           </div>
-          <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
+          <Button 
+            type="submit"
+            disabled={!formData.roomName.trim() || !formData.floorId}
+          >
+            {isEdit ? "Update" : "Save"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>
