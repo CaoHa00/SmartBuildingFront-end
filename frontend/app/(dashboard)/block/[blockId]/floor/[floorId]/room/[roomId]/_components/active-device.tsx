@@ -1,15 +1,12 @@
 "use client";
 
 import { Switch } from "@/components/ui/switch";
-import {
-  AirVent,
-  Cctv,
-  Lightbulb,
-  LucideIcon,
-  TvMinimal,
-} from "lucide-react";
-import { useState } from "react";
+import { Cctv, Cpu, Lightbulb, LucideIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { api } from "@/lib/axios";
+import { useParams } from "next/navigation";
+import { Category, getCategoryIcon } from '@/types/category';
 
 interface Device {
   id: string;
@@ -17,55 +14,107 @@ interface Device {
   icon: LucideIcon;
   status: "online" | "offline";
   type: string;
+  categoryName?: string;
 }
 
-const mockDevices: Device[] = [
-  {
-    id: "1",
-    name: "Room AC",
-    status: "online",
-    type: "Climate Control",
-    icon: AirVent,
-  },
-  {
-    id: "2",
-    name: "Smart Light",
-    status: "online",
-    type: "Lighting",
-    icon: Lightbulb,
-  },
-  {
-    id: "3",
-    name: "Security Cam",
-    status: "offline",
-    type: "Security",
-    icon: Cctv,
-  },
-  {
-    id: "4",
-    name: "Smart TV",
-    status: "online",
-    type: "Entertainment",
-    icon: TvMinimal,
-  },
-];
+interface Equipment {
+  equipmentId: number;
+  equipmentName: string;
+  deviceId: string;
+  equipmentTypeId?: number;
+  equipmentTypeName?: string;
+  equipmentStatus?: string;
+  roomId: number;
+  categoryId: number;
+}
 
-export default function ActiveDevice({ devices = mockDevices }) {
+export default function ActiveDevice() {
   const isMobile = useIsMobile();
-  const [activeDevices, setActiveDevices] = useState(devices);
+  const params = useParams();
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
 
-  const toggleDeviceStatus = (deviceId: string) => {
-    setActiveDevices((prevDevices) =>
-      prevDevices.map((device) =>
-        device.id === deviceId
-          ? {
-              ...device,
-              status: device.status === "online" ? "offline" : "online",
-            }
-          : device
-      )
-    );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Add explicit error logging for each request
+        const [equipmentResponse, statusResponse, categoryResponse] = await Promise.all([
+          api.get(`/room/${params.roomId}`),
+          api.get(`/room/${params.roomId}/status`),
+          api.get('/category')  // Changed from '/api/category' to '/category' since baseURL already includes '/api'
+        ]);
+
+        console.log('Category Response:', categoryResponse.data); // Debug log
+
+        const equipmentList = equipmentResponse.data.equipments;
+        const statusList = statusResponse.data;
+        const categoryList = categoryResponse.data;
+
+        const mappedDevices = equipmentList.map((equipment: Equipment) => {
+          const status = statusList.find(
+            (s: any) =>
+              s.valueName === "light status" ||
+              s.valueName === "temperature" ||
+              s.valueName === "humidity"
+          );
+
+          const category = categoryList.find((c: Category) => c.categoryId === equipment.categoryId);
+          console.log('Matching category for equipment:', equipment.categoryId, category); // Debug log
+          
+          return {
+            id: equipment.equipmentId.toString(),
+            name: equipment.equipmentName,
+            icon: getCategoryIcon(category?.categoryName || ''),
+            status: "online",
+            type: equipment.equipmentTypeName || "Equipment Type " + equipment.equipmentTypeId,
+            categoryName: category?.categoryName || "Unknown Category"
+          };
+        });
+
+        setDevices(mappedDevices);
+        setCategories(categoryList);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params.roomId]);
+
+  const toggleDeviceStatus = async (deviceId: string) => {
+    try {
+      // Update device status through Aqara API
+      const value =
+        devices.find((d) => d.id === deviceId)?.status === "online" ? 0 : 1;
+      await api.post(
+        `/aqara/light-control?equipmentId=${deviceId}&value=${value}&buttonPosition=2`
+      );
+
+      setDevices((prevDevices) =>
+        prevDevices.map((device) =>
+          device.id === deviceId
+            ? {
+                ...device,
+                status: device.status === "online" ? "offline" : "online",
+              }
+            : device
+        )
+      );
+    } catch (error) {
+      console.error("Error toggling device status:", error);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="rounded-xl bg-muted/50 w-full h-full shadow-xl p-4">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div
@@ -75,7 +124,7 @@ export default function ActiveDevice({ devices = mockDevices }) {
     >
       <div className="ml-3">
         <h2 className="flex font-bold tracking-wide text-xl text-blue-800 leading-none">
-          Active Device
+          Active Devices
         </h2>
         <p className="tracking-widest text-blue-700 text-xs font-thin leading-none">
           Track active devices for connectivity
@@ -83,7 +132,7 @@ export default function ActiveDevice({ devices = mockDevices }) {
       </div>
       <div className="bg-blue-800 text-white p-4 rounded-xl mt-4">
         <div className="grid grid-cols-1 md:grid-cols-2 auto-rows-max rounded-xl bg-blue-800 gap-4">
-          {activeDevices.map((device) => (
+          {devices.map((device) => (
             <div
               key={device.id}
               className={`bg-neutral-200 text-blue-700 p-4 rounded-xl shadow-lg ${
@@ -100,7 +149,7 @@ export default function ActiveDevice({ devices = mockDevices }) {
                       <h3 className="font-bold text-lg leading-tight">
                         {device.name}
                       </h3>
-                      <p className="text-sm text-gray-500">{device.type}</p>
+                      <p className="text-sm font-medium text-blue-600">{device.categoryName}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

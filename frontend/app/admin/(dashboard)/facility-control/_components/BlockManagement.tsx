@@ -1,9 +1,6 @@
 "use client";
 
 import React from "react";
-import { useState, useEffect } from "react";
-import { api } from "@/lib/axios";
-import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -13,363 +10,61 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  ChevronDown,
-  ChevronRight,
-  Building2,
-  DoorClosed,
-  Cpu,
-  Circle,
-  CirclePlus,
-} from "lucide-react";
-
-interface Equipment {
-  equipmentId: number;
-  equipmentName: string;
-  deviceId: string;
-}
-
-interface Room {
-  roomId: number;
-  roomName: string;
-  equipments: Equipment[];
-}
-
-interface Floor {
-  floorId: number;
-  floorName: string;
-  rooms: Room[];
-}
-
-interface Block {
-  blockId: number;
-  blockName: string;
-  floors: Floor[];
-}
-
-interface NewBlockData {
-  blockName: string;
-}
-
-interface NewFloorData {
-  blockId: number;
-  floorName: string;
-}
-
-interface NewRoomData {
-  floorId: number;
-  roomName: string;
-}
-
-interface NewEquipmentData {
-  roomId: number;
-  equipmentName: string;
-  deviceId: string;
-}
-
-function ExpandableRow({
-  isOpen,
-  onClick,
-  level = 0,
-  icon: Icon,
-  name,
-  count,
-  id,
-}: {
-  isOpen: boolean;
-  onClick: () => void;
-  level?: number;
-  icon: any;
-  name: string;
-  count?: number;
-  id?: number;
-}) {
-  return (
-    <div
-      className="flex items-center gap-2 cursor-pointer"
-      style={{ paddingLeft: `${level * 20}px` }}
-      onClick={onClick}
-    >
-      {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-      <Icon size={16} />
-      <span>
-        {name}{" "}
-        {id && <span className="text-sm text-muted-foreground">(ID: {id})</span>}
-      </span>
-      {count !== undefined && (
-        <span className="text-sm text-muted-foreground">({count})</span>
-      )}
-    </div>
-  );
-}
+import { Building2, DoorClosed, Cpu, CirclePlus } from "lucide-react";
+import { useBlockManagement } from "@/hooks/use-block-management";
+import { ExpandableRow } from "@/components/dialog/ExpandableRow";
+import { BlockDialog } from "@/components/dialog/BlockDialog";
+import { FloorDialog } from "@/components/dialog/FloorDialog";
+import { RoomDialog } from "@/components/dialog/RoomDialog";
+import { EquipmentDialog } from "@/components/dialog/EquipmentDialog";
+import { Block, Floor, Room, Equipment } from "@/types/block-management";
 
 export function BlockManagement() {
-  const { toast } = useToast();
-  const [blocks, setBlocks] = useState<Block[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<Partial<Block>>({
-    blockName: "",
-  });
-  const [expandedBlocks, setExpandedBlocks] = useState<Record<number, boolean>>(
-    {}
-  );
-  const [expandedFloors, setExpandedFloors] = useState<Record<number, boolean>>(
-    {}
-  );
-  const [expandedRooms, setExpandedRooms] = useState<Record<number, boolean>>(
-    {}
-  );
+  const {
+    blocks,
+    loading,
+    equipmentStates,
+    fetchBlocks,
+    handleAddBlock,
+    handleUpdateBlock,
+    handleDeleteBlock,
+    handleAddFloor,
+    handleUpdateFloor,
+    handleDeleteFloor,
+    handleAddRoom,
+    handleUpdateRoom,
+    handleDeleteRoom,
+    handleAddEquipment,
+    handleUpdateEquipment,
+    handleDeleteEquipment,
+    handleEquipmentControl,
+  } = useBlockManagement();
 
-  const [isFloorDialogOpen, setIsFloorDialogOpen] = useState(false);
-  const [isRoomDialogOpen, setIsRoomDialogOpen] = useState(false);
-  const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false);
+  const [expandedBlocks, setExpandedBlocks] = React.useState<Record<number, boolean>>({});
+  const [expandedFloors, setExpandedFloors] = React.useState<Record<number, boolean>>({});
+  const [expandedRooms, setExpandedRooms] = React.useState<Record<number, boolean>>({});
 
-  const [floorFormData, setFloorFormData] = useState<
-    Partial<Floor & { blockId: number }>
-  >({});
-  const [roomFormData, setRoomFormData] = useState<
-    Partial<Room & { floorId: number }>
-  >({});
-  const [equipmentFormData, setEquipmentFormData] = useState<
-    Partial<Equipment & { roomId: number }>
-  >({});
+  // Dialog states
+  const [blockDialogOpen, setBlockDialogOpen] = React.useState(false);
+  const [floorDialogOpen, setFloorDialogOpen] = React.useState(false);
+  const [roomDialogOpen, setRoomDialogOpen] = React.useState(false);
+  const [equipmentDialogOpen, setEquipmentDialogOpen] = React.useState(false);
 
-  const [isFloorEdit, setIsFloorEdit] = useState(false);
-  const [isRoomEdit, setIsRoomEdit] = useState(false);
-  const [isEquipmentEdit, setIsEquipmentEdit] = useState(false);
+  // Edit states
+  const [editingBlock, setEditingBlock] = React.useState<Block | undefined>();
+  const [editingFloor, setEditingFloor] = React.useState<Floor & { blockId: number } | undefined>();
+  const [editingRoom, setEditingRoom] = React.useState<Room & { floorId: number } | undefined>();
+  const [editingEquipment, setEditingEquipment] = React.useState<Equipment & { roomId: number } | undefined>();
 
-  useEffect(() => {
+  // Adding states
+  const [selectedBlockId, setSelectedBlockId] = React.useState<number>();
+  const [selectedFloorId, setSelectedFloorId] = React.useState<number>();
+  const [selectedRoomId, setSelectedRoomId] = React.useState<number>();
+
+  React.useEffect(() => {
     fetchBlocks();
-  }, []);
-
-  const fetchBlocks = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get<Block[]>("/block");
-      if (response.data.length > 0) {
-        setBlocks(response.data);
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch blocks",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (isEdit) {
-        await api.put(`/block/${formData.blockId}`, formData);
-      } else {
-        const newBlock: NewBlockData = {
-          blockName: formData.blockName || "",
-        };
-        await api.post("/block", newBlock);
-      }
-      fetchBlocks();
-      setIsOpen(false);
-      setFormData({ blockName: "" });
-      setIsEdit(false);
-      toast({
-        title: "Success",
-        description: `Block ${isEdit ? "updated" : "created"} successfully`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to ${isEdit ? "update" : "create"} block`,
-      });
-    }
-  };
-
-  const handleDelete = async (blockId: number) => {
-    try {
-      await api.delete(`/block/${blockId}`);
-      fetchBlocks();
-      toast({
-        title: "Success",
-        description: "Block deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete block",
-      });
-    }
-  };
-
-  const handleEdit = (block: Block) => {
-    setFormData(block);
-    setIsEdit(true);
-    setIsOpen(true);
-  };
-
-  const handleFloorSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (isFloorEdit) {
-        await api.put(`/floor/${floorFormData.floorId}`, floorFormData);
-      } else {
-        const newFloor: NewFloorData = {
-          blockId: floorFormData.blockId!,
-          floorName: floorFormData.floorName || "",
-        };
-        await api.post("/floor", newFloor);
-      }
-      fetchBlocks();
-      setIsFloorDialogOpen(false);
-      setFloorFormData({});
-      setIsFloorEdit(false);
-      toast({
-        title: "Success",
-        description: `Floor ${
-          isFloorEdit ? "updated" : "created"
-        } successfully`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to ${isFloorEdit ? "update" : "create"} floor`,
-      });
-    }
-  };
-
-  const handleRoomSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (isRoomEdit) {
-        await api.put(`/room/${roomFormData.roomId}`, roomFormData);
-      } else {
-        const newRoom: NewRoomData = {
-          floorId: roomFormData.floorId!,
-          roomName: roomFormData.roomName || "",
-        };
-        await api.post("/room", newRoom);
-      }
-      fetchBlocks();
-      setIsRoomDialogOpen(false);
-      setRoomFormData({});
-      setIsRoomEdit(false);
-      toast({
-        title: "Success",
-        description: `Room ${isRoomEdit ? "updated" : "created"} successfully`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to ${isRoomEdit ? "update" : "create"} room`,
-      });
-    }
-  };
-
-  const handleEquipmentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (isEquipmentEdit) {
-        await api.put(
-          `/equipment/${equipmentFormData.equipmentId}`,
-          equipmentFormData
-        );
-      } else {
-        const newEquipment: NewEquipmentData = {
-          roomId: equipmentFormData.roomId!,
-          equipmentName: equipmentFormData.equipmentName || "",
-          deviceId: equipmentFormData.deviceId || "",
-        };
-        await api.post("/equipment", newEquipment);
-      }
-      fetchBlocks();
-      setIsEquipmentDialogOpen(false);
-      setEquipmentFormData({});
-      setIsEquipmentEdit(false);
-      toast({
-        title: "Success",
-        description: `Equipment ${
-          isEquipmentEdit ? "updated" : "created"
-        } successfully`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to ${
-          isEquipmentEdit ? "update" : "create"
-        } equipment`,
-      });
-    }
-  };
-
-  const handleDeleteFloor = async (floorId: number) => {
-    try {
-      await api.delete(`/floor/${floorId}`);
-      fetchBlocks();
-      toast({
-        title: "Success",
-        description: "Floor deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete floor",
-      });
-    }
-  };
-
-  const handleDeleteRoom = async (roomId: number) => {
-    try {
-      await api.delete(`/room/${roomId}`);
-      fetchBlocks();
-      toast({
-        title: "Success",
-        description: "Room deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete room",
-      });
-    }
-  };
-
-  const handleDeleteEquipment = async (equipmentId: number) => {
-    try {
-      await api.delete(`/equipment/${equipmentId}`);
-      fetchBlocks();
-      toast({
-        title: "Success",
-        description: "Equipment deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete equipment",
-      });
-    }
-  };
+  }, []); // Only run once on mount
 
   const toggleBlock = (blockId: number) => {
     setExpandedBlocks((prev) => ({ ...prev, [blockId]: !prev[blockId] }));
@@ -389,43 +84,15 @@ export function BlockManagement() {
         <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
           Block Management
         </h2>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button
-              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-              onClick={() => {
-                setIsEdit(false);
-                setFormData({ blockName: "" });
-              }}
-            >
-              Add New Block
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                {isEdit ? "Edit Block" : "Add New Block"}
-              </DialogTitle>
-            </DialogHeader>
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-4 text-xl text-neutral-700"
-            >
-              <div>
-                <Label htmlFor="blockName">Block Name</Label>
-                <Input
-                  id="blockName"
-                  value={formData.blockName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, blockName: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <Button
+          className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+          onClick={() => {
+            setEditingBlock(undefined);
+            setBlockDialogOpen(true);
+          }}
+        >
+          Add New Block
+        </Button>
       </div>
 
       <div className="rounded-md border border-border text-neutral-700">
@@ -461,13 +128,16 @@ export function BlockManagement() {
                       <Button
                         variant="outline"
                         className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                        onClick={() => handleEdit(block)}
+                        onClick={() => {
+                          setEditingBlock(block);
+                          setBlockDialogOpen(true);
+                        }}
                       >
                         Edit
                       </Button>
                       <Button
                         variant="destructive"
-                        onClick={() => handleDelete(block.blockId)}
+                        onClick={() => handleDeleteBlock(block.blockId)}
                       >
                         Delete
                       </Button>
@@ -475,9 +145,9 @@ export function BlockManagement() {
                         variant="outline"
                         className="ml-2"
                         onClick={() => {
-                          setFloorFormData({ blockId: block.blockId });
-                          setIsFloorEdit(false);
-                          setIsFloorDialogOpen(true);
+                          setSelectedBlockId(block.blockId);
+                          setEditingFloor(undefined);
+                          setFloorDialogOpen(true);
                         }}
                       >
                         <CirclePlus />
@@ -504,9 +174,8 @@ export function BlockManagement() {
                               variant="outline"
                               className="mr-2"
                               onClick={() => {
-                                setFloorFormData(floor);
-                                setIsFloorEdit(true);
-                                setIsFloorDialogOpen(true);
+                                setEditingFloor({ ...floor, blockId: block.blockId });
+                                setFloorDialogOpen(true);
                               }}
                             >
                               Edit
@@ -521,9 +190,9 @@ export function BlockManagement() {
                               variant="outline"
                               className="ml-2"
                               onClick={() => {
-                                setRoomFormData({ floorId: floor.floorId });
-                                setIsRoomEdit(false);
-                                setIsRoomDialogOpen(true);
+                                setSelectedFloorId(floor.floorId);
+                                setEditingRoom(undefined);
+                                setRoomDialogOpen(true);
                               }}
                             >
                               <CirclePlus />
@@ -552,18 +221,15 @@ export function BlockManagement() {
                                     variant="outline"
                                     className="mr-2"
                                     onClick={() => {
-                                      setRoomFormData(room);
-                                      setIsRoomEdit(true);
-                                      setIsRoomDialogOpen(true);
+                                      setEditingRoom({ ...room, floorId: floor.floorId });
+                                      setRoomDialogOpen(true);
                                     }}
                                   >
                                     Edit
                                   </Button>
                                   <Button
                                     variant="destructive"
-                                    onClick={() =>
-                                      handleDeleteRoom(room.roomId)
-                                    }
+                                    onClick={() => handleDeleteRoom(room.roomId)}
                                   >
                                     Delete
                                   </Button>
@@ -571,11 +237,9 @@ export function BlockManagement() {
                                     variant="outline"
                                     className="ml-2"
                                     onClick={() => {
-                                      setEquipmentFormData({
-                                        roomId: room.roomId,
-                                      });
-                                      setIsEquipmentEdit(false);
-                                      setIsEquipmentDialogOpen(true);
+                                      setSelectedRoomId(room.roomId);
+                                      setEditingEquipment(undefined);
+                                      setEquipmentDialogOpen(true);
                                     }}
                                   >
                                     <CirclePlus />
@@ -606,15 +270,18 @@ export function BlockManagement() {
                                         variant="outline"
                                         className="mr-2"
                                         onClick={() => {
-                                          setEquipmentFormData(equipment);
-                                          setIsEquipmentEdit(true);
-                                          setIsEquipmentDialogOpen(true);
+                                          setEditingEquipment({
+                                            ...equipment,
+                                            roomId: room.roomId,
+                                          });
+                                          setEquipmentDialogOpen(true);
                                         }}
                                       >
                                         Edit
                                       </Button>
                                       <Button
                                         variant="destructive"
+                                        className="mr-2"
                                         onClick={() =>
                                           handleDeleteEquipment(
                                             equipment.equipmentId
@@ -622,6 +289,25 @@ export function BlockManagement() {
                                         }
                                       >
                                         Delete
+                                      </Button>
+                                      <Button
+                                        variant={
+                                          equipmentStates[equipment.equipmentId]
+                                            ? "default"
+                                            : "secondary"
+                                        }
+                                        onClick={() =>
+                                          handleEquipmentControl(
+                                            equipment.equipmentId,
+                                            equipmentStates[equipment.equipmentId]
+                                              ? 1
+                                              : 0
+                                          )
+                                        }
+                                      >
+                                        {equipmentStates[equipment.equipmentId]
+                                          ? "On"
+                                          : "Off"}
                                       </Button>
                                     </TableCell>
                                   </TableRow>
@@ -637,108 +323,68 @@ export function BlockManagement() {
         </Table>
       </div>
 
-      <Dialog open={isFloorDialogOpen} onOpenChange={setIsFloorDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-neutral-700">
-              {isFloorEdit ? "Edit Floor" : "Add New Floor"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleFloorSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="floorName" className="text-neutral-700">
-                Floor Name
-              </Label>
-              <Input
-                id="floorName"
-                value={floorFormData.floorName || ""}
-                onChange={(e) =>
-                  setFloorFormData({
-                    ...floorFormData,
-                    floorName: e.target.value,
-                  })
-                }
-                required
-              />
-            </div>
-            <Button type="submit">{isFloorEdit ? "Update" : "Save"}</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <BlockDialog
+        open={blockDialogOpen}
+        onOpenChange={setBlockDialogOpen}
+        isEdit={!!editingBlock}
+        initialData={editingBlock}
+        onSubmit={async (data) => {
+          const success = editingBlock
+            ? await handleUpdateBlock(editingBlock.blockId, data)
+            : await handleAddBlock(data);
+          if (success) {
+            setBlockDialogOpen(false);
+          }
+        }}
+      />
 
-      <Dialog open={isRoomDialogOpen} onOpenChange={setIsRoomDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-neutral-700">
-              {isRoomEdit ? "Edit Room" : "Add New Room"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleRoomSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="roomName" className="text-neutral-700">
-                Room Name
-              </Label>
-              <Input
-                id="roomName"
-                value={roomFormData.roomName || ""}
-                onChange={(e) =>
-                  setRoomFormData({ ...roomFormData, roomName: e.target.value })
-                }
-                required
-              />
-            </div>
-            <Button type="submit">{isRoomEdit ? "Update" : "Save"}</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <FloorDialog
+        open={floorDialogOpen}
+        onOpenChange={setFloorDialogOpen}
+        isEdit={!!editingFloor}
+        initialData={editingFloor}
+        blockId={selectedBlockId}
+        onSubmit={async (data) => {
+          const success = editingFloor
+            ? await handleUpdateFloor(editingFloor.floorId, data)
+            : await handleAddFloor(data);
+          if (success) {
+            setFloorDialogOpen(false);
+          }
+        }}
+      />
 
-      <Dialog
-        open={isEquipmentDialogOpen}
-        onOpenChange={setIsEquipmentDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-neutral-700">
-              {isEquipmentEdit ? "Edit Equipment" : "Add New Equipment"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleEquipmentSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="equipmentName" className="text-neutral-700">
-                Equipment Name
-              </Label>
-              <Input
-                id="equipmentName"
-                value={equipmentFormData.equipmentName || ""}
-                onChange={(e) =>
-                  setEquipmentFormData({
-                    ...equipmentFormData,
-                    equipmentName: e.target.value,
-                  })
-                }
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="deviceId" className="text-neutral-700">
-                Device ID
-              </Label>
-              <Input
-                id="deviceId"
-                value={equipmentFormData.deviceId || ""}
-                onChange={(e) =>
-                  setEquipmentFormData({
-                    ...equipmentFormData,
-                    deviceId: e.target.value,
-                  })
-                }
-                required
-              />
-            </div>
-            <Button type="submit">{isEquipmentEdit ? "Update" : "Save"}</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <RoomDialog
+        open={roomDialogOpen}
+        onOpenChange={setRoomDialogOpen}
+        isEdit={!!editingRoom}
+        initialData={editingRoom}
+        floorId={selectedFloorId}
+        onSubmit={async (data) => {
+          const success = editingRoom
+            ? await handleUpdateRoom(editingRoom.roomId, data)
+            : await handleAddRoom(data);
+          if (success) {
+            setRoomDialogOpen(false);
+          }
+        }}
+      />
+
+      <EquipmentDialog
+        open={equipmentDialogOpen}
+        onOpenChange={setEquipmentDialogOpen}
+        isEdit={!!editingEquipment}
+        initialData={editingEquipment}
+        roomId={selectedRoomId}
+        onSubmit={async (data) => {
+          const success = editingEquipment
+            ? await handleUpdateEquipment(editingEquipment.equipmentId, data)
+            : await handleAddEquipment(data);
+          if (success) {
+            setEquipmentDialogOpen(false);
+          }
+        }}
+      />
     </div>
   );
 }

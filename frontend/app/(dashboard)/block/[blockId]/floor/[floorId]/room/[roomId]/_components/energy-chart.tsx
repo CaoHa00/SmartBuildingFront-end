@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import {
@@ -26,33 +26,23 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useElectricityData } from "@/hooks/useElectricityData";
+import useCurrentElectricalReading from "@/hooks/useCurrentElectricalReading";
+import useTotalElectricalReading from "@/hooks/useTotalElectricalReading";
 
-const dailyData = [
-  { time: "00:00", peak: 120, offPeak: 80 },
-  { time: "04:00", peak: 90, offPeak: 60 },
-  { time: "08:00", peak: 180, offPeak: 120 },
-  { time: "12:00", peak: 280, offPeak: 190 },
-  { time: "16:00", peak: 245, offPeak: 160 },
-  { time: "20:00", peak: 190, offPeak: 130 },
-];
-
-const weeklyData = [
-  { time: "Monday", peak: 1860, offPeak: 1200 },
-  { time: "Tuesday", peak: 2050, offPeak: 1400 },
-  { time: "Wednesday", peak: 2370, offPeak: 1650 },
-  { time: "Thursday", peak: 1730, offPeak: 1100 },
-  { time: "Friday", peak: 2090, offPeak: 1380 },
-  { time: "Saturday", peak: 1540, offPeak: 1020 },
-  { time: "Sunday", peak: 1340, offPeak: 920 },
-];
+interface ChartDataPoint {
+  time: string;
+  power: number;
+  accumulated: number;
+}
 
 const chartConfig = {
-  peak: {
-    label: "Peak Hours",
+  power: {
+    label: "Active Power (kW)",
     color: "hsl(215, 100%, 50%)",
   },
-  offPeak: {
-    label: "Off-Peak Hours",
+  accumulated: {
+    label: "Total Energy (kWh)",
     color: "hsl(215, 70%, 70%)",
   },
 } satisfies ChartConfig;
@@ -60,7 +50,28 @@ const chartConfig = {
 export function EnergyChart() {
   const [timeRange, setTimeRange] = useState("day");
   const isMobile = useIsMobile();
-  const chartData = timeRange === "day" ? dailyData : weeklyData;
+  const { data: liveData } = useElectricityData();
+  const currentReading = useCurrentElectricalReading();
+  const totalReading = useTotalElectricalReading();
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+
+  useEffect(() => {
+    if (liveData?.active_power !== undefined) {
+      const now = new Date();
+      const newDataPoint = {
+        time: now.toLocaleTimeString(),
+        power: liveData.active_power,
+        accumulated: totalReading?.electricalReading || 0,
+      };
+
+      setChartData(prevData => {
+        const newData = [...prevData, newDataPoint];
+        // Keep last 24 points for daily view, or last 7 points for weekly view
+        const maxPoints = timeRange === "day" ? 24 : 7;
+        return newData.slice(-maxPoints);
+      });
+    }
+  }, [liveData, totalReading, timeRange]);
 
   return (
     <Card className={`bg-sky-200 shadow-lg rounded-xl ${isMobile ? 'p-2' : 'p-4'}`}>
@@ -71,7 +82,7 @@ export function EnergyChart() {
               Energy Consumption
             </CardTitle>
             <CardDescription className="font-medium text-sm text-blue-800">
-              Peak vs Off-Peak Usage (kWh)
+              Power Usage & Total Energy
             </CardDescription>
           </div>
           <Select value={timeRange} onValueChange={setTimeRange}>
@@ -104,14 +115,14 @@ export function EnergyChart() {
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Line
-              dataKey="peak"
+              dataKey="power"
               type="monotone"
               stroke="#1e40af"
               strokeWidth={2.5}
               dot={{ fill: "#1e40af", r: 4 }}
             />
             <Line
-              dataKey="offPeak"
+              dataKey="accumulated"
               type="monotone"
               stroke="#60a5fa"
               strokeWidth={2.5}
