@@ -1,11 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/components/providers/language-provider";
-
-interface ElectricalValueProps {
-  currentElectricalReading?: number;
-  totalElectricalReading?: number;
-}
+import { ElectricalValueProps } from "@/types/electricity";
 
 export default function ElectricityUsageChart({
   currentElectricalReading,

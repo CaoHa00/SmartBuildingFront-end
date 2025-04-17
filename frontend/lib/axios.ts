@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const api = axios.create({
   // Using direct URL for testing - consider moving to environment variable later
-  baseURL: "http://10.60.253.172:9090/api",
+  baseURL: "http://10.60.253.172:9092/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -16,7 +16,7 @@ api.interceptors.response.use(
       // Server responded with error status
       console.error("API Response Error:", {
         status: error.response.status,
-        data: error.response.data
+        data: error.response.data,
       });
     } else if (error.request) {
       // Request made but no response received

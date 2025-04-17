@@ -4,13 +4,8 @@ import HumidityGauge from "./humidity-gauge";
 import CO2Gauge from "./co2-gauge";
 import TempGauge from "./temp-gauge";
 import UVGauge from "./uv-gauge";
-import useTotalElectricalReading from "@/hooks/useTotalElectricalReading";
-
-interface GaugesProps {
-  temperature: number;
-  uvIndex: number;
-  humidity: number;
-}
+import useTotalElectricalReading from "@/hooks/use-total-electrical-reading";
+import { GaugesProps } from "@/types/gauges";
 
 export default function GaugesComponents({
   temperature,

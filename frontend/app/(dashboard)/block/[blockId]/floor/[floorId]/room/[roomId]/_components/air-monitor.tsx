@@ -2,13 +2,12 @@
 import { Droplet, TriangleAlert, Waves } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { AirQualityResponse } from "@/types/air-quality";
+import { AirQualityResponse } from "@/types/indoor-air-quality";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 async function fetchAirQuality() {
-  
   const { data } = await axios.post<AirQualityResponse>(
-    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/currentValue?equipmentId=10018`,
+    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/currentValue?equipmentId=10018`
   );
   return data;
 }
@@ -70,7 +69,8 @@ export function AirMonitor() {
           <p>CO₂</p>
         </div>
         <div className="text-[10px] md:text-[12px] text-center font-bold text-white/80 italic absolute bottom-1 w-full">
-          Last update: {data?.timeStamp ? formatTimeUTC7(data.timeStamp) : "N/A"}
+          Last update:{" "}
+          {data?.timeStamp ? formatTimeUTC7(data.timeStamp) : "N/A"}
         </div>
       </div>
     </div>

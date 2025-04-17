@@ -2,34 +2,9 @@
 
 import { Leaf } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
-import { useState, useEffect } from "react";
-
-interface AirQualityData {
-  time: Date;
-  pm2_5: number;
-  pm10: number;
-  sulphur_dioxide: number;
-  nitrogen_dioxide: number;
-  ozone: number;
-  carbon_monoxide: number;
-  us_aqi: number;
-}
-
-async function fetchAirQuality(): Promise<AirQualityData | null> {
-  try {
-    const response = await fetch("/api/air-quality", { cache: "no-store" });
-    if (!response.ok) throw new Error("Failed to fetch air quality data");
-    const data = await response.json();
-
-    return {
-      ...data,
-      time: new Date(data.time),
-    };
-  } catch (error) {
-    console.error("Error fetching air quality data:", error);
-    return null;
-  }
-}
+import { useOutdoorAirQuality } from "@/hooks/use-outdoor-air-quality";
+import { Card, CardContent } from "@/components/ui/card";
+import { AirQualityData } from "@/types/outdoor-air-quality";
 
 function getAQIColor(aqi: number): string {
   if (aqi <= 50) return "#02f506"; // Green (Healthy)
@@ -74,22 +49,7 @@ const pollutantLabels: { [key: string]: string } = {
 
 export default function AirQuality() {
   const { isEnglish } = useLanguage();
-  const [airQualityData, setAirQualityData] = useState<AirQualityData | null>(
-    null
-  );
-
-  useEffect(() => {
-    async function updateAirQuality() {
-      const data = await fetchAirQuality();
-      if (data) setAirQualityData(data);
-    }
-
-    updateAirQuality();
-    const interval = setInterval(updateAirQuality, 60000);
-
-    return () => clearInterval(interval);
-  }, []);
-  if (!airQualityData) return <p>Loading Air Quality data...</p>;
+  const { airQualityData } = useOutdoorAirQuality();
 
   const text = isEnglish
     ? {
@@ -98,6 +58,16 @@ export default function AirQuality() {
     : {
         title: "Chất lượng không khí",
       };
+
+  if (!airQualityData) {
+    return (
+      <Card className="w-[350px]">
+        <CardContent>
+          <p className="text-destructive">Failed to load air quality data</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="bg-[#5e83ba] rounded-xl aspect-auto px-3 py-3">

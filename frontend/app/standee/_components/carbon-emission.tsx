@@ -2,7 +2,7 @@
 
 import CarbonEmissionAnalytics from "./carbon-emission-analytics";
 import CarbonEmissionChart from "./carbon-emission-chart";
-import useTotalElectricalReading from "@/hooks/useTotalElectricalReading";
+import useTotalElectricalReading from "@/hooks/use-total-electrical-reading";
 
 export default function CarbonEmission() {
   const reading = useTotalElectricalReading();

@@ -2,13 +2,10 @@
 
 import { useLanguage } from "@/components/providers/language-provider";
 import CO2BarChart from "./co2-bar";
-
-interface ElectricalValueProps {
-  electricalReading?: number;
-}
+import { ElectricalValueProps } from "@/types/electricity";
 
 export default function CarbonEmissionChart({
-  electricalReading,
+  totalElectricalReading,
 }: ElectricalValueProps) {
   const { isEnglish } = useLanguage();
 
@@ -27,7 +24,9 @@ export default function CarbonEmissionChart({
       };
 
   const validReading =
-    electricalReading && !isNaN(electricalReading) ? electricalReading : 0;
+    totalElectricalReading && !isNaN(totalElectricalReading)
+      ? totalElectricalReading
+      : 0;
 
   function CalculateCarbonFootprint(electricity: number) {
     return Math.round(((electricity * 0.8) / 1000) * 100) / 100;
