@@ -7,18 +7,11 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import dynamic from "next/dynamic";
-import useMediaQuery from "@/hooks/useMediaQuery";
-const WeatherChart = dynamic(() => import("./weather-chart"), { ssr: false });
+import useMediaQuery from "@/hooks/use-media-query";
+import { useClock } from "@/hooks/use-clock";
+import { WeatherComponentProps } from "@/types/weather";
 
-interface WeatherComponentProps {
-  temperature: number;
-  weatherCode: number;
-  dailyMinTemp: number;
-  dailyMaxTemp: number;
-  hourlyTemp2m: number[];
-  hourlyWeatherCodes: number[];
-  hourlyTime: Date[];
-}
+const WeatherChart = dynamic(() => import("./weather-chart"), { ssr: false });
 
 export default function WeatherComponent({
   temperature,
@@ -76,12 +69,7 @@ export default function WeatherComponent({
     }
   );
 
-  const formattedTime = currentTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
+  const clock = useClock();
 
   const text = {
     date: formattedDate,
@@ -186,17 +174,10 @@ export default function WeatherComponent({
     };
   }, [content.length]);
 
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 500);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
   return (
     <div className="bg-[#5e83ba] relative rounded-xl aspect-auto px-3 h-[483px] md:h-[767px] overflow-hidden">
       <div className="absolute pt-3 top-0 right-0 font-bold text-2xl md:text-4xl pr-3">
-        {formattedTime}
+        {clock}
       </div>
       <AnimatePresence mode="wait">
         <motion.div

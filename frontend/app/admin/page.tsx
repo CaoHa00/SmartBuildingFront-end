@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import WeatherForecast from "./_components/WetherForecast";
+import WeatherForecast from "./_components/WeatherForecast";
 
 interface StatCardProps {
   title: string;

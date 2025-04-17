@@ -1,4 +1,4 @@
-import { useWeather } from "../../../hooks/useWeather";
+import { useWeather } from "../../../hooks/use-weather";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Thermometer,
@@ -19,9 +19,8 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { InfoIcon, AlertTriangle, AlertCircle } from "lucide-react";
-import { format } from "date-fns";
+import { useClock } from "@/hooks/use-clock";
 
 const WeatherIcon = ({
   condition,
@@ -68,7 +67,8 @@ const NewsIcon = ({ severity }: { severity: string }) => {
 };
 
 const WeatherForecast = () => {
-  const { weather, loading } = useWeather();
+  const { adminWeather, loading } = useWeather();
+  const clock = useClock();
 
   if (loading) {
     return (
@@ -89,7 +89,7 @@ const WeatherForecast = () => {
     );
   }
 
-  if (!weather) {
+  if (!adminWeather) {
     return (
       <Card className="w-[350px]">
         <CardContent>
@@ -99,20 +99,23 @@ const WeatherForecast = () => {
     );
   }
 
-  const formatDateTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return {
-      date: format(date, "EEEE, MMMM d, yyyy"),
-      time: format(date, "h:mm a"),
-    };
-  };
+  const formattedDate = adminWeather.timestamp.toLocaleDateString(undefined, {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-  const { date, time } = formatDateTime(weather.timestamp);
+  // const formattedTime = adminWeather.timestamp.toLocaleTimeString("en-US", {
+  //   hour: "2-digit",
+  //   minute: "2-digit",
+  //   hour12: false,
+  // });
 
   return (
     <div
       className={`flex flex-col gap-4 ${
-        weather.isDaytime
+        adminWeather.isDaytime
           ? "bg-gradient-to-b from-blue-100 to-blue-50"
           : "bg-gradient-to-b from-slate-900 to-slate-800"
       } p-6 rounded-lg`}
@@ -122,13 +125,13 @@ const WeatherForecast = () => {
           <MapPin className="w-4 h-4 text-primary" />
           <span
             className={`text-2xl font-semibold ${
-              weather.isDaytime ? "text-slate-900" : "text-white"
+              adminWeather.isDaytime ? "text-slate-900" : "text-white"
             }`}
           >
-            {weather.location}
+            {adminWeather.location}
           </span>
         </div>
-        {weather.isDaytime ? (
+        {adminWeather.isDaytime ? (
           <Sunrise className="w-6 h-6 text-orange-500" />
         ) : (
           <Sunset className="w-6 h-6 text-indigo-400" />
@@ -137,54 +140,54 @@ const WeatherForecast = () => {
 
       <div
         className={`text-sm ${
-          weather.isDaytime ? "text-slate-600" : "text-slate-300"
+          adminWeather.isDaytime ? "text-slate-600" : "text-slate-300"
         }`}
       >
-        <p>{date}</p>
-        <p>{time}</p>
+        <p>{formattedDate}</p>
+        <p>{clock}</p>
       </div>
 
       <div className="space-y-3">
         <div className="flex items-center gap-4">
           <WeatherIcon
-            condition={weather.condition}
-            isDaytime={weather.isDaytime}
+            condition={adminWeather.condition}
+            isDaytime={adminWeather.isDaytime}
           />
           <span
             className={`text-2xl font-semibold ${
-              weather.isDaytime ? "text-slate-900" : "text-white"
+              adminWeather.isDaytime ? "text-slate-900" : "text-white"
             }`}
           >
-            {weather.condition}
+            {adminWeather.condition}
           </span>
         </div>
 
         <div
           className={`space-y-2 ${
-            weather.isDaytime ? "text-slate-700" : "text-slate-200"
+            adminWeather.isDaytime ? "text-slate-700" : "text-slate-200"
           }`}
         >
           <div className="flex items-center gap-2">
             <Thermometer className="w-4 h-4 text-orange-500" />
-            <p>Temperature: {weather.temperature}°C</p>
+            <p>Temperature: {adminWeather.temperature}°C</p>
           </div>
           <div className="flex items-center gap-2">
             <Droplets className="w-4 h-4 text-blue-500" />
-            <p>Humidity: {weather.humidity}%</p>
+            <p>Humidity: {adminWeather.humidity}%</p>
           </div>
           <div className="flex items-center gap-2">
             <Wind className="w-4 h-4 text-slate-500" />
-            <p>Wind Speed: {weather.windSpeed} km/h</p>
+            <p>Wind Speed: {adminWeather.windSpeed} km/h</p>
           </div>
           <div className="flex items-center gap-2">
             <Umbrella className="w-4 h-4 text-indigo-500" />
-            <p>Precipitation: {weather.precipitation} mm</p>
+            <p>Precipitation: {adminWeather.precipitation} mm</p>
           </div>
         </div>
       </div>
 
       <div className="space-y-4">
-        {weather.news.map((news, index) => (
+        {adminWeather.news.map((news, index) => (
           <Alert
             key={index}
             variant={news.severity === "warning" ? "destructive" : "default"}

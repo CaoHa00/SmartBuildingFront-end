@@ -1,10 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useElectricityData } from "@/hooks/useElectricityData";
+import { useElectricityData } from "@/hooks/use-electricity-data";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { format } from "date-fns";
 import { Zap } from "lucide-react";
 
-const formatNumber = (value: number | undefined | null, decimals: number = 2) => {
+const formatNumber = (
+  value: number | undefined | null,
+  decimals: number = 2
+) => {
   if (value === undefined || value === null) return "0";
   return value.toFixed(decimals);
 };
@@ -50,7 +53,11 @@ export function ElectricityCard() {
             >
               Total Electric
             </p>
-            <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
+            <p
+              className={`${
+                isMobile ? "text-lg" : "text-2xl"
+              } font-bold tracking-tight`}
+            >
               {formatNumber(data?.forward_energy_power)} kWh
             </p>
           </div>
@@ -62,7 +69,11 @@ export function ElectricityCard() {
             >
               Active Power
             </p>
-            <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
+            <p
+              className={`${
+                isMobile ? "text-lg" : "text-2xl"
+              } font-bold tracking-tight`}
+            >
               {formatNumber(data?.active_power)} kW
             </p>
           </div>
@@ -74,7 +85,11 @@ export function ElectricityCard() {
             >
               Current
             </p>
-            <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
+            <p
+              className={`${
+                isMobile ? "text-lg" : "text-2xl"
+              } font-bold tracking-tight`}
+            >
               {formatNumber(data?.current, 1)} A
             </p>
           </div>
@@ -86,7 +101,11 @@ export function ElectricityCard() {
             >
               Voltage
             </p>
-            <p className={`${isMobile ? "text-lg" : "text-2xl"} font-bold tracking-tight`}>
+            <p
+              className={`${
+                isMobile ? "text-lg" : "text-2xl"
+              } font-bold tracking-tight`}
+            >
               {formatNumber(data?.voltage, 1)} V
             </p>
           </div>
@@ -96,7 +115,7 @@ export function ElectricityCard() {
             isMobile ? "text-xs" : "text-sm"
           } text-blue-600/70 italic`}
         >
-          Last updated: {format(safeDate(data?.timestamp), 'HH:mm:ss')}
+          Last updated: {format(safeDate(data?.timestamp), "HH:mm:ss")}
         </div>
       </CardContent>
     </Card>

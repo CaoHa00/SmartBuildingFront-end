@@ -5,3 +5,8 @@ export interface ElectricityData {
   voltage: number;
   timestamp: number;
 }
+
+export interface ElectricalValueProps {
+  currentElectricalReading: number;
+  totalElectricalReading: number;
+}

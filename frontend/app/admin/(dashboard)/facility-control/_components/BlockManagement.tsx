@@ -29,52 +29,64 @@ import {
   Building2,
   DoorClosed,
   Cpu,
-  Circle,
-  CirclePlus,
 } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectValue,
+  SelectItem,
+} from "@/components/ui/select";
+
+interface Space {
+  spaceId: string;
+  spaceName: string;
+  parentId: string;
+  spaceTypeId: string;
+  spaceTypeName: string;
+  children: Space[];
+  equipments: Equipment[];
+}
+
+interface SpaceType {
+  spaceTypeId: string;
+  spaceTypeName: string;
+}
+
+interface NewSpaceData {
+  spaceName: string;
+  spaceTypeId: string;
+  spaceTypeName: string;
+  parentId: string;
+  children: Space[];
+  equipment: Equipment[];
+}
 
 interface Equipment {
   equipmentId: number;
   equipmentName: string;
   deviceId: string;
-}
-
-interface Room {
-  roomId: number;
-  roomName: string;
-  equipments: Equipment[];
-}
-
-interface Floor {
-  floorId: number;
-  floorName: string;
-  rooms: Room[];
-}
-
-interface Block {
-  blockId: number;
-  blockName: string;
-  floors: Floor[];
-}
-
-interface NewBlockData {
-  blockName: string;
-}
-
-interface NewFloorData {
-  blockId: number;
-  floorName: string;
-}
-
-interface NewRoomData {
-  floorId: number;
-  roomName: string;
+  equipmentTypeId: string;
+  categoryId: number;
+  spaceId: string;
+  logValue: number | null;
 }
 
 interface NewEquipmentData {
-  roomId: number;
   equipmentName: string;
   deviceId: string;
+}
+
+interface EquipmentType {
+  equipmentTypeId: string;
+  equipmentTypeName: string;
+  equipments: any[];
+}
+
+interface Category {
+  categoryId: number;
+  categoryName: string;
+  equipments: any[];
 }
 
 function ExpandableRow({
@@ -92,7 +104,7 @@ function ExpandableRow({
   icon: any;
   name: string;
   count?: number;
-  id?: number;
+  id?: string;
 }) {
   return (
     <div
@@ -104,7 +116,9 @@ function ExpandableRow({
       <Icon size={16} />
       <span>
         {name}{" "}
-        {id && <span className="text-sm text-muted-foreground">(ID: {id})</span>}
+        {id && (
+          <span className="text-sm text-muted-foreground">(ID: {id})</span>
+        )}
       </span>
       {count !== undefined && (
         <span className="text-sm text-muted-foreground">({count})</span>
@@ -115,60 +129,98 @@ function ExpandableRow({
 
 export function BlockManagement() {
   const { toast } = useToast();
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [spaces, setSpaces] = useState<Space[]>([]);
+  const [spaceTypes, setSpaceType] = useState<SpaceType[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<Partial<Block>>({
-    blockName: "",
+  const [formData, setFormData] = useState<
+    Partial<Space & { parentId: string }>
+  >({
+    spaceName: "",
   });
-  const [expandedBlocks, setExpandedBlocks] = useState<Record<number, boolean>>(
+  const [expandedSpaces, setExpandedSpaces] = useState<Record<string, boolean>>(
     {}
   );
-  const [expandedFloors, setExpandedFloors] = useState<Record<number, boolean>>(
-    {}
-  );
-  const [expandedRooms, setExpandedRooms] = useState<Record<number, boolean>>(
-    {}
-  );
-
-  const [isFloorDialogOpen, setIsFloorDialogOpen] = useState(false);
-  const [isRoomDialogOpen, setIsRoomDialogOpen] = useState(false);
+  const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
+  const [viewMode, setViewMode] = useState<
+    "blockManagement" | "equipmentTable"
+  >("blockManagement");
+  const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
   const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false);
-
-  const [floorFormData, setFloorFormData] = useState<
-    Partial<Floor & { blockId: number }>
-  >({});
-  const [roomFormData, setRoomFormData] = useState<
-    Partial<Room & { floorId: number }>
-  >({});
   const [equipmentFormData, setEquipmentFormData] = useState<
-    Partial<Equipment & { roomId: number }>
+    Partial<Equipment & { spaceId: string }>
   >({});
-
-  const [isFloorEdit, setIsFloorEdit] = useState(false);
-  const [isRoomEdit, setIsRoomEdit] = useState(false);
   const [isEquipmentEdit, setIsEquipmentEdit] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    fetchBlocks();
+    fetchSpaces();
+    fetchSpaceTypes();
+    fetchEquipmentTypes();
+    fetchCategories();
   }, []);
 
-  const fetchBlocks = async () => {
+  const fetchSpaces = async () => {
     try {
       setLoading(true);
-      const response = await api.get<Block[]>("/block");
+      const response = await api.get<Space[]>("/spaces/all");
       if (response.data.length > 0) {
-        setBlocks(response.data);
+        setSpaces(response.data);
+      }
+      return response.data;
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch spaces",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSpaceTypes = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get<SpaceType[]>("/space-types");
+      if (response.data.length > 0) {
+        setSpaceType(response.data);
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch blocks",
+        description: "Failed to fetch space types",
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchEquipmentTypes = async () => {
+    try {
+      const response = await api.get<EquipmentType[]>("/equipmentType");
+      setEquipmentTypes(response.data);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch equipment types",
+      });
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get<Category[]>("/category");
+      setCategories(response.data);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch categories",
+      });
     }
   };
 
@@ -176,16 +228,21 @@ export function BlockManagement() {
     e.preventDefault();
     try {
       if (isEdit) {
-        await api.put(`/block/${formData.blockId}`, formData);
+        await api.put(`/spaces/${formData.spaceId}`, formData);
       } else {
-        const newBlock: NewBlockData = {
-          blockName: formData.blockName || "",
+        const newSpace: NewSpaceData = {
+          spaceName: formData.spaceName || "",
+          spaceTypeId: formData.spaceTypeId || "",
+          spaceTypeName: formData.spaceTypeName || "",
+          parentId: formData.parentId || "",
+          equipment: [],
+          children: [],
         };
-        await api.post("/block", newBlock);
+        await api.post("/spaces", newSpace);
       }
-      fetchBlocks();
+      fetchSpaces();
       setIsOpen(false);
-      setFormData({ blockName: "" });
+      setFormData({ spaceName: "" });
       setIsEdit(false);
       toast({
         title: "Success",
@@ -200,106 +257,72 @@ export function BlockManagement() {
     }
   };
 
-  const handleDelete = async (blockId: number) => {
+  const handleDelete = async (spaceId: string) => {
     try {
-      await api.delete(`/block/${blockId}`);
-      fetchBlocks();
+      await api.delete(`/spaces/${spaceId}`);
+      fetchSpaces();
       toast({
         title: "Success",
-        description: "Block deleted successfully",
+        description: "Space deleted successfully",
       });
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete block",
+        description: "Failed to delete space",
       });
     }
   };
 
-  const handleEdit = (block: Block) => {
-    setFormData(block);
+  const handleEdit = (space: Space) => {
+    setFormData(space);
     setIsEdit(true);
     setIsOpen(true);
-  };
-
-  const handleFloorSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (isFloorEdit) {
-        await api.put(`/floor/${floorFormData.floorId}`, floorFormData);
-      } else {
-        const newFloor: NewFloorData = {
-          blockId: floorFormData.blockId!,
-          floorName: floorFormData.floorName || "",
-        };
-        await api.post("/floor", newFloor);
-      }
-      fetchBlocks();
-      setIsFloorDialogOpen(false);
-      setFloorFormData({});
-      setIsFloorEdit(false);
-      toast({
-        title: "Success",
-        description: `Floor ${
-          isFloorEdit ? "updated" : "created"
-        } successfully`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to ${isFloorEdit ? "update" : "create"} floor`,
-      });
-    }
-  };
-
-  const handleRoomSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (isRoomEdit) {
-        await api.put(`/room/${roomFormData.roomId}`, roomFormData);
-      } else {
-        const newRoom: NewRoomData = {
-          floorId: roomFormData.floorId!,
-          roomName: roomFormData.roomName || "",
-        };
-        await api.post("/room", newRoom);
-      }
-      fetchBlocks();
-      setIsRoomDialogOpen(false);
-      setRoomFormData({});
-      setIsRoomEdit(false);
-      toast({
-        title: "Success",
-        description: `Room ${isRoomEdit ? "updated" : "created"} successfully`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to ${isRoomEdit ? "update" : "create"} room`,
-      });
-    }
   };
 
   const handleEquipmentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (isEquipmentEdit) {
-        await api.put(
+        const response = await api.put(
           `/equipment/${equipmentFormData.equipmentId}`,
           equipmentFormData
         );
+        if (selectedSpace) {
+          const updatedEquipment = response.data;
+          setSelectedSpace((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  equipments: prev.equipments.map((eq) =>
+                    eq.equipmentId === updatedEquipment.equipmentId
+                      ? updatedEquipment
+                      : eq
+                  ),
+                }
+              : null
+          );
+        }
       } else {
         const newEquipment: NewEquipmentData = {
-          roomId: equipmentFormData.roomId!,
           equipmentName: equipmentFormData.equipmentName || "",
           deviceId: equipmentFormData.deviceId || "",
         };
-        await api.post("/equipment", newEquipment);
+        const response = await api.post(
+          `/equipment?spaceId=${equipmentFormData.spaceId}&equipmentTypeId=${equipmentFormData.equipmentTypeId}&categoryId=${equipmentFormData.categoryId}`,
+          newEquipment
+        );
+        const createdEquipment = response.data;
+        setSelectedSpace((prev) =>
+          prev
+            ? {
+                ...prev,
+                equipments: [...prev.equipments, createdEquipment],
+              }
+            : null
+        );
       }
-      fetchBlocks();
+      fetchSpaces();
       setIsEquipmentDialogOpen(false);
       setEquipmentFormData({});
       setIsEquipmentEdit(false);
@@ -320,44 +343,19 @@ export function BlockManagement() {
     }
   };
 
-  const handleDeleteFloor = async (floorId: number) => {
-    try {
-      await api.delete(`/floor/${floorId}`);
-      fetchBlocks();
-      toast({
-        title: "Success",
-        description: "Floor deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete floor",
-      });
-    }
-  };
-
-  const handleDeleteRoom = async (roomId: number) => {
-    try {
-      await api.delete(`/room/${roomId}`);
-      fetchBlocks();
-      toast({
-        title: "Success",
-        description: "Room deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete room",
-      });
-    }
-  };
-
   const handleDeleteEquipment = async (equipmentId: number) => {
     try {
       await api.delete(`/equipment/${equipmentId}`);
-      fetchBlocks();
+      setSelectedSpace((prev) =>
+        prev
+          ? {
+              ...prev,
+              equipments: prev.equipments.filter(
+                (eq) => eq.equipmentId !== equipmentId
+              ),
+            }
+          : null
+      );
       toast({
         title: "Success",
         description: "Equipment deleted successfully",
@@ -371,374 +369,478 @@ export function BlockManagement() {
     }
   };
 
-  const toggleBlock = (blockId: number) => {
-    setExpandedBlocks((prev) => ({ ...prev, [blockId]: !prev[blockId] }));
-  };
-
-  const toggleFloor = (floorId: number) => {
-    setExpandedFloors((prev) => ({ ...prev, [floorId]: !prev[floorId] }));
-  };
-
-  const toggleRoom = (roomId: number) => {
-    setExpandedRooms((prev) => ({ ...prev, [roomId]: !prev[roomId] }));
+  const toggleSpace = (spaceId: string) => {
+    setExpandedSpaces((prev) => ({ ...prev, [spaceId]: !prev[spaceId] }));
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
-          Block Management
-        </h2>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button
-              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-              onClick={() => {
-                setIsEdit(false);
-                setFormData({ blockName: "" });
-              }}
-            >
-              Add New Block
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                {isEdit ? "Edit Block" : "Add New Block"}
-              </DialogTitle>
-            </DialogHeader>
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-4 text-xl text-neutral-700"
-            >
-              <div>
-                <Label htmlFor="blockName">Block Name</Label>
-                <Input
-                  id="blockName"
-                  value={formData.blockName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, blockName: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <div className="rounded-md border border-border text-neutral-700">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-[hsl(var(--tech-blue))/5]">
-              <TableHead>Name</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={2} className="text-center py-8">
-                  <Spinner className="mx-auto" />
-                </TableCell>
-              </TableRow>
-            ) : (
-              blocks.map((block) => (
-                <React.Fragment key={block.blockId}>
-                  <TableRow className="hover:bg-[hsl(var(--tech-blue))/5]">
-                    <TableCell>
-                      <ExpandableRow
-                        isOpen={expandedBlocks[block.blockId] || false}
-                        onClick={() => toggleBlock(block.blockId)}
-                        icon={Building2}
-                        name={block.blockName}
-                        count={block.floors.length}
-                        id={block.blockId}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                        onClick={() => handleEdit(block)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleDelete(block.blockId)}
-                      >
-                        Delete
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="ml-2"
-                        onClick={() => {
-                          setFloorFormData({ blockId: block.blockId });
-                          setIsFloorEdit(false);
-                          setIsFloorDialogOpen(true);
+      {viewMode === "blockManagement" && (
+        <>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
+              Block Management
+            </h2>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                  onClick={() => {
+                    setIsEdit(false);
+                    setFormData({ spaceName: "" });
+                  }}
+                >
+                  Add New Space
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                    {isEdit ? "Edit Space" : "Add New Space"}
+                  </DialogTitle>
+                </DialogHeader>
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-4 text-xl text-neutral-700"
+                >
+                  <div>
+                    <Label htmlFor="blockName">Space Name</Label>
+                    <Input
+                      id="blockName"
+                      className="mb-3"
+                      value={formData.spaceName}
+                      onChange={(e) =>
+                        setFormData({ ...formData, spaceName: e.target.value })
+                      }
+                      required
+                    />
+                    <Label htmlFor="selectSpaceType">Space Type</Label>
+                    <div id="selectSpaceType">
+                      <Select
+                        value={formData.spaceTypeId}
+                        onValueChange={(value) => {
+                          const selected = spaceTypes.find(
+                            (type) => type.spaceTypeId === value
+                          );
+                          setFormData({
+                            ...formData,
+                            spaceTypeId: selected?.spaceTypeId || "",
+                            spaceTypeName: selected?.spaceTypeName || "",
+                          });
                         }}
                       >
-                        <CirclePlus />
-                      </Button>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Space Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {spaceTypes.map((type) => (
+                            <SelectItem
+                              key={type.spaceTypeId}
+                              value={type.spaceTypeId}
+                            >
+                              {type.spaceTypeName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="rounded-md border border-border text-neutral-700">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-[hsl(var(--tech-blue))/5]">
+                  <TableHead>Name</TableHead>
+                  <TableHead>Equipment</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={2} className="text-center py-8">
+                      <Spinner className="mx-auto" />
                     </TableCell>
                   </TableRow>
-                  {expandedBlocks[block.blockId] &&
-                    block.floors.map((floor) => (
-                      <React.Fragment key={`${block.blockId}-${floor.floorId}`}>
-                        <TableRow className="bg-muted/50">
-                          <TableCell>
-                            <ExpandableRow
-                              isOpen={expandedFloors[floor.floorId] || false}
-                              onClick={() => toggleFloor(floor.floorId)}
-                              icon={DoorClosed}
-                              name={floor.floorName}
-                              count={floor.rooms.length}
-                              level={1}
-                              id={floor.floorId}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="outline"
-                              className="mr-2"
-                              onClick={() => {
-                                setFloorFormData(floor);
-                                setIsFloorEdit(true);
-                                setIsFloorDialogOpen(true);
-                              }}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              onClick={() => handleDeleteFloor(floor.floorId)}
-                            >
-                              Delete
-                            </Button>
-                            <Button
-                              variant="outline"
-                              className="ml-2"
-                              onClick={() => {
-                                setRoomFormData({ floorId: floor.floorId });
-                                setIsRoomEdit(false);
-                                setIsRoomDialogOpen(true);
-                              }}
-                            >
-                              <CirclePlus />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                        {expandedFloors[floor.floorId] &&
-                          floor.rooms.map((room) => (
-                            <React.Fragment
-                              key={`${block.blockId}-${floor.floorId}-${room.roomId}`}
-                            >
-                              <TableRow className="bg-muted/30">
-                                <TableCell>
-                                  <ExpandableRow
-                                    isOpen={expandedRooms[room.roomId] || false}
-                                    onClick={() => toggleRoom(room.roomId)}
-                                    icon={DoorClosed}
-                                    name={room.roomName}
-                                    count={room.equipments.length}
-                                    level={2}
-                                    id={room.roomId}
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Button
-                                    variant="outline"
-                                    className="mr-2"
-                                    onClick={() => {
-                                      setRoomFormData(room);
-                                      setIsRoomEdit(true);
-                                      setIsRoomDialogOpen(true);
-                                    }}
-                                  >
-                                    Edit
-                                  </Button>
-                                  <Button
-                                    variant="destructive"
-                                    onClick={() =>
-                                      handleDeleteRoom(room.roomId)
-                                    }
-                                  >
-                                    Delete
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    className="ml-2"
-                                    onClick={() => {
-                                      setEquipmentFormData({
-                                        roomId: room.roomId,
-                                      });
-                                      setIsEquipmentEdit(false);
-                                      setIsEquipmentDialogOpen(true);
-                                    }}
-                                  >
-                                    <CirclePlus />
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                              {expandedRooms[room.roomId] &&
-                                room.equipments.map((equipment) => (
-                                  <TableRow
-                                    key={`${block.blockId}-${floor.floorId}-${room.roomId}-${equipment.equipmentId}`}
-                                    className="bg-muted/20"
-                                  >
+                ) : (
+                  spaces.map((space) => (
+                    <React.Fragment key={space.spaceId}>
+                      <TableRow className="hover:bg-[hsl(var(--tech-blue))/5]">
+                        <TableCell>
+                          <ExpandableRow
+                            isOpen={expandedSpaces[space.spaceId] || false}
+                            onClick={() => toggleSpace(space.spaceId)}
+                            icon={Building2}
+                            name={space.spaceName}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                            onClick={() => {
+                              setSelectedSpace(space);
+                              setViewMode("equipmentTable");
+                            }}
+                          >
+                            View Equipment
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                            onClick={() => handleEdit(space)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            className="mr-2"
+                            variant="destructive"
+                            onClick={() => handleDelete(space.spaceId)}
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                      {expandedSpaces[space.spaceId] &&
+                        space.children.map((childSpace) => (
+                          <React.Fragment
+                            key={`${space.spaceId}-${childSpace.spaceId}`}
+                          >
+                            <TableRow className="bg-muted/50">
+                              <TableCell>
+                                <ExpandableRow
+                                  isOpen={
+                                    expandedSpaces[childSpace.spaceId] || false
+                                  }
+                                  onClick={() =>
+                                    toggleSpace(childSpace.spaceId)
+                                  }
+                                  icon={DoorClosed}
+                                  name={childSpace.spaceName}
+                                  level={1}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedSpace(childSpace);
+                                    setViewMode("equipmentTable");
+                                  }}
+                                >
+                                  View Equipment
+                                </Button>
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="outline"
+                                  className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                                  onClick={() => {
+                                    setFormData(childSpace);
+                                    setIsEdit(true);
+                                    setIsOpen(true);
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  className="mr-2"
+                                  variant="destructive"
+                                  onClick={() =>
+                                    handleDelete(childSpace.spaceId)
+                                  }
+                                >
+                                  Delete
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                            {expandedSpaces[childSpace.spaceId] &&
+                              childSpace.children.map((grandchildSpace) => (
+                                <React.Fragment
+                                  key={`${space.spaceId}-${childSpace.spaceId}-${grandchildSpace.spaceId}`}
+                                >
+                                  <TableRow className="bg-muted/30">
                                     <TableCell>
                                       <div
                                         className="flex items-center gap-2"
                                         style={{ paddingLeft: "60px" }}
                                       >
-                                        <Cpu size={16} />
-                                        <span>{equipment.equipmentName}</span>
-                                        <span className="text-sm text-muted-foreground">
-                                          (ID: {equipment.equipmentId}, Device
-                                          ID: {equipment.deviceId})
-                                        </span>
+                                        <DoorClosed size={16} />
+                                        <span>{grandchildSpace.spaceName}</span>
                                       </div>
                                     </TableCell>
                                     <TableCell>
                                       <Button
+                                        className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
                                         variant="outline"
-                                        className="mr-2"
                                         onClick={() => {
-                                          setEquipmentFormData(equipment);
-                                          setIsEquipmentEdit(true);
-                                          setIsEquipmentDialogOpen(true);
+                                          setSelectedSpace(grandchildSpace);
+                                          setViewMode("equipmentTable");
+                                        }}
+                                      >
+                                        View Equipment
+                                      </Button>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Button
+                                        variant="outline"
+                                        className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                                        onClick={() => {
+                                          setFormData(grandchildSpace);
+                                          setIsEdit(true);
+                                          setIsOpen(true);
                                         }}
                                       >
                                         Edit
                                       </Button>
                                       <Button
+                                        className="mr-2"
                                         variant="destructive"
                                         onClick={() =>
-                                          handleDeleteEquipment(
-                                            equipment.equipmentId
-                                          )
+                                          handleDelete(grandchildSpace.spaceId)
                                         }
                                       >
                                         Delete
                                       </Button>
                                     </TableCell>
                                   </TableRow>
-                                ))}
-                            </React.Fragment>
+                                </React.Fragment>
+                              ))}
+                          </React.Fragment>
+                        ))}
+                    </React.Fragment>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </>
+      )}
+      {viewMode === "equipmentTable" && selectedSpace && (
+        <>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
+              List of Equipment in {selectedSpace.spaceTypeName}{" "}
+              {selectedSpace.spaceName}
+            </h2>
+            <Dialog
+              open={isEquipmentDialogOpen}
+              onOpenChange={setIsEquipmentDialogOpen}
+            >
+              <div>
+                <Button
+                  className="mr-2"
+                  variant="outline"
+                  onClick={() => {
+                    setIsEquipmentDialogOpen(false);
+                    setIsEquipmentEdit(false);
+                    setEquipmentFormData({ equipmentName: "", deviceId: "" });
+                    setSelectedSpace(null);
+                    setViewMode("blockManagement");
+                  }}
+                >
+                  ← Back to Block List
+                </Button>
+                <Button
+                  className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                  onClick={() => {
+                    setIsEquipmentEdit(false);
+                    setEquipmentFormData({
+                      equipmentName: "",
+                      deviceId: "",
+                      equipmentTypeId: "",
+                      categoryId: 0,
+                      spaceId: selectedSpace.spaceId,
+                    });
+                    setIsEquipmentDialogOpen(true);
+                  }}
+                >
+                  Add New Equipment
+                </Button>
+              </div>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                    {isEdit ? "Edit Equipment" : "Add New Equipment"}
+                  </DialogTitle>
+                </DialogHeader>
+                <form
+                  onSubmit={handleEquipmentSubmit}
+                  className="space-y-4 text-xl text-neutral-700"
+                >
+                  <div>
+                    <Label htmlFor="equipmentName" className="text-neutral-700">
+                      Equipment Name
+                    </Label>
+                    <Input
+                      id="equipmentName"
+                      value={equipmentFormData.equipmentName || ""}
+                      onChange={(e) =>
+                        setEquipmentFormData({
+                          ...equipmentFormData,
+                          equipmentName: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="deviceId" className="text-neutral-700">
+                      Device ID
+                    </Label>
+                    <Input
+                      className="mb-3"
+                      id="deviceId"
+                      value={equipmentFormData.deviceId || ""}
+                      onChange={(e) =>
+                        setEquipmentFormData({
+                          ...equipmentFormData,
+                          deviceId: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                    <Label htmlFor="selectEquipmentType">Equipment Type</Label>
+                    <div id="selectEquipmentType" className="mb-3">
+                      <Select
+                        value={equipmentFormData.equipmentTypeId}
+                        onValueChange={(value) => {
+                          const selected = equipmentTypes.find(
+                            (type) => type.equipmentTypeId === value
+                          );
+                          setEquipmentFormData({
+                            ...equipmentFormData,
+                            equipmentTypeId: selected?.equipmentTypeId || "",
+                          });
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {equipmentTypes.map((type) => (
+                            <SelectItem
+                              key={type.equipmentTypeId}
+                              value={type.equipmentTypeId}
+                            >
+                              {type.equipmentTypeName}
+                            </SelectItem>
                           ))}
-                      </React.Fragment>
-                    ))}
-                </React.Fragment>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <Dialog open={isFloorDialogOpen} onOpenChange={setIsFloorDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-neutral-700">
-              {isFloorEdit ? "Edit Floor" : "Add New Floor"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleFloorSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="floorName" className="text-neutral-700">
-                Floor Name
-              </Label>
-              <Input
-                id="floorName"
-                value={floorFormData.floorName || ""}
-                onChange={(e) =>
-                  setFloorFormData({
-                    ...floorFormData,
-                    floorName: e.target.value,
-                  })
-                }
-                required
-              />
-            </div>
-            <Button type="submit">{isFloorEdit ? "Update" : "Save"}</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isRoomDialogOpen} onOpenChange={setIsRoomDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-neutral-700">
-              {isRoomEdit ? "Edit Room" : "Add New Room"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleRoomSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="roomName" className="text-neutral-700">
-                Room Name
-              </Label>
-              <Input
-                id="roomName"
-                value={roomFormData.roomName || ""}
-                onChange={(e) =>
-                  setRoomFormData({ ...roomFormData, roomName: e.target.value })
-                }
-                required
-              />
-            </div>
-            <Button type="submit">{isRoomEdit ? "Update" : "Save"}</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={isEquipmentDialogOpen}
-        onOpenChange={setIsEquipmentDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-neutral-700">
-              {isEquipmentEdit ? "Edit Equipment" : "Add New Equipment"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleEquipmentSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="equipmentName" className="text-neutral-700">
-                Equipment Name
-              </Label>
-              <Input
-                id="equipmentName"
-                value={equipmentFormData.equipmentName || ""}
-                onChange={(e) =>
-                  setEquipmentFormData({
-                    ...equipmentFormData,
-                    equipmentName: e.target.value,
-                  })
-                }
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="deviceId" className="text-neutral-700">
-                Device ID
-              </Label>
-              <Input
-                id="deviceId"
-                value={equipmentFormData.deviceId || ""}
-                onChange={(e) =>
-                  setEquipmentFormData({
-                    ...equipmentFormData,
-                    deviceId: e.target.value,
-                  })
-                }
-                required
-              />
-            </div>
-            <Button type="submit">{isEquipmentEdit ? "Update" : "Save"}</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Label htmlFor="selectCategory">Category</Label>
+                    <div id="selectCategory">
+                      <Select
+                        value={
+                          equipmentFormData.categoryId !== null
+                            ? String(equipmentFormData.categoryId)
+                            : ""
+                        }
+                        onValueChange={(value) => {
+                          const selected = categories.find(
+                            (category) =>
+                              category.categoryId.toString() === value
+                          );
+                          setEquipmentFormData({
+                            ...equipmentFormData,
+                            categoryId: selected?.categoryId,
+                          });
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem
+                              key={category.categoryId}
+                              value={String(category.categoryId)}
+                            >
+                              {category.categoryName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <Button type="submit">
+                    {isEquipmentEdit ? "Update" : "Save"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="rounded-md border border-border text-neutral-700">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-[hsl(var(--tech-blue))/5]">
+                  <TableHead>Name</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={2} className="text-center py-8">
+                      <Spinner className="mx-auto" />
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  selectedSpace?.equipments.map((equipment) => (
+                    <React.Fragment key={equipment.equipmentId}>
+                      <TableRow className="bg-muted/20">
+                        <TableCell>
+                          <div
+                            className="flex items-center gap-2"
+                            style={{ paddingLeft: "60px" }}
+                          >
+                            <Cpu size={16} />
+                            <span>{equipment.equipmentName}</span>
+                            <span className="text-sm text-muted-foreground">
+                              (ID: {equipment.equipmentId}, Device ID:{" "}
+                              {equipment.deviceId})
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                            onClick={() => {
+                              setEquipmentFormData(equipment);
+                              setIsEquipmentEdit(true);
+                              setIsEquipmentDialogOpen(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            onClick={() =>
+                              handleDeleteEquipment(equipment.equipmentId)
+                            }
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </>
+      )}
     </div>
   );
 }
