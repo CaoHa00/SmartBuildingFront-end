@@ -51,6 +51,7 @@ interface Space {
 interface SpaceType {
   spaceTypeId: string;
   spaceTypeName: string;
+  parentTypeId: string | null;
 }
 
 interface NewSpaceData {
@@ -246,7 +247,7 @@ export function BlockManagement() {
       setIsEdit(false);
       toast({
         title: "Success",
-        description: `Block ${isEdit ? "updated" : "created"} successfully`,
+        description: `Space ${isEdit ? "updated" : "created"} successfully`,
       });
     } catch (error) {
       toast({
@@ -309,6 +310,7 @@ export function BlockManagement() {
           deviceId: equipmentFormData.deviceId || "",
         };
         const response = await api.post(
+          //will change to using request body
           `/equipment?spaceId=${equipmentFormData.spaceId}&equipmentTypeId=${equipmentFormData.equipmentTypeId}&categoryId=${equipmentFormData.categoryId}`,
           newEquipment
         );
@@ -373,6 +375,14 @@ export function BlockManagement() {
     setExpandedSpaces((prev) => ({ ...prev, [spaceId]: !prev[spaceId] }));
   };
 
+  const isValidChild = (childType: SpaceType, parentTypeId: string | null) => {
+    return (
+      childType.parentTypeId === parentTypeId ||
+      (childType.parentTypeId === null &&
+        childType.spaceTypeId !== "e86e6e24-e15a-4995-ac2b-f18479441a26")
+    );
+  };
+
   return (
     <div className="space-y-4">
       {viewMode === "blockManagement" && (
@@ -387,10 +397,14 @@ export function BlockManagement() {
                   className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
                   onClick={() => {
                     setIsEdit(false);
-                    setFormData({ spaceName: "" });
+                    setFormData({
+                      spaceName: "",
+                      spaceTypeId: "e86e6e24-e15a-4995-ac2b-f18479441a26",
+                      spaceTypeName: "Block",
+                    });
                   }}
                 >
-                  Add New Space
+                  Add New Block
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -404,7 +418,7 @@ export function BlockManagement() {
                   className="space-y-4 text-xl text-neutral-700"
                 >
                   <div>
-                    <Label htmlFor="blockName">Space Name</Label>
+                    <Label htmlFor="blockName">Block Name</Label>
                     <Input
                       id="blockName"
                       className="mb-3"
@@ -414,36 +428,6 @@ export function BlockManagement() {
                       }
                       required
                     />
-                    <Label htmlFor="selectSpaceType">Space Type</Label>
-                    <div id="selectSpaceType">
-                      <Select
-                        value={formData.spaceTypeId}
-                        onValueChange={(value) => {
-                          const selected = spaceTypes.find(
-                            (type) => type.spaceTypeId === value
-                          );
-                          setFormData({
-                            ...formData,
-                            spaceTypeId: selected?.spaceTypeId || "",
-                            spaceTypeName: selected?.spaceTypeName || "",
-                          });
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Space Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {spaceTypes.map((type) => (
-                            <SelectItem
-                              key={type.spaceTypeId}
-                              value={type.spaceTypeId}
-                            >
-                              {type.spaceTypeName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
                   </div>
                   <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
                 </form>
@@ -458,6 +442,7 @@ export function BlockManagement() {
                   <TableHead>Name</TableHead>
                   <TableHead>Equipment</TableHead>
                   <TableHead>Actions</TableHead>
+                  <TableHead>Add</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -506,6 +491,96 @@ export function BlockManagement() {
                           >
                             Delete
                           </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                            <DialogTrigger asChild>
+                              <Button
+                                className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                onClick={() => {
+                                  setIsEdit(false);
+                                  setFormData({
+                                    spaceName: "",
+                                  });
+                                }}
+                              >
+                                Add New Facility
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                                  {isEdit ? "Edit Space" : "Add New Space"}
+                                </DialogTitle>
+                              </DialogHeader>
+                              <form
+                                onSubmit={handleSubmit}
+                                className="space-y-4 text-xl text-neutral-700"
+                              >
+                                <div>
+                                  <Label htmlFor="blockName">
+                                    Facility Name
+                                  </Label>
+                                  <Input
+                                    id="blockName"
+                                    className="mb-3"
+                                    value={formData.spaceName}
+                                    onChange={(e) =>
+                                      setFormData({
+                                        ...formData,
+                                        spaceName: e.target.value,
+                                      })
+                                    }
+                                    required
+                                  />
+                                  <Label htmlFor="selectSpaceType">
+                                    Facility Type
+                                  </Label>
+                                  <div id="selectSpaceType">
+                                    <Select
+                                      value={formData.spaceTypeId}
+                                      onValueChange={(value) => {
+                                        const selected = spaceTypes.find(
+                                          (type) => type.spaceTypeId === value
+                                        );
+                                        setFormData({
+                                          ...formData,
+                                          spaceTypeId:
+                                            selected?.spaceTypeId || "",
+                                          spaceTypeName:
+                                            selected?.spaceTypeName || "",
+                                        });
+                                      }}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select Space Type" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {spaceTypes
+                                          .filter((type) =>
+                                            isValidChild(
+                                              type,
+                                              space.spaceTypeId ?? null
+                                            )
+                                          )
+                                          .map((type) => (
+                                            <SelectItem
+                                              key={type.spaceTypeId}
+                                              value={type.spaceTypeId}
+                                            >
+                                              {type.spaceTypeName}
+                                            </SelectItem>
+                                          ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                                <Button type="submit">
+                                  {isEdit ? "Update" : "Save"}
+                                </Button>
+                              </form>
+                            </DialogContent>
+                          </Dialog>
                         </TableCell>
                       </TableRow>
                       {expandedSpaces[space.spaceId] &&
@@ -561,6 +636,100 @@ export function BlockManagement() {
                                   Delete
                                 </Button>
                               </TableCell>
+                              <TableCell>
+                                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                      onClick={() => {
+                                        setIsEdit(false);
+                                        setFormData({
+                                          spaceName: "",
+                                        });
+                                      }}
+                                    >
+                                      Add New Facility
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                                        {isEdit
+                                          ? "Edit Space"
+                                          : "Add New Space"}
+                                      </DialogTitle>
+                                    </DialogHeader>
+                                    <form
+                                      onSubmit={handleSubmit}
+                                      className="space-y-4 text-xl text-neutral-700"
+                                    >
+                                      <div>
+                                        <Label htmlFor="blockName">
+                                          Facility Name
+                                        </Label>
+                                        <Input
+                                          id="blockName"
+                                          className="mb-3"
+                                          value={formData.spaceName}
+                                          onChange={(e) =>
+                                            setFormData({
+                                              ...formData,
+                                              spaceName: e.target.value,
+                                            })
+                                          }
+                                          required
+                                        />
+                                        <Label htmlFor="selectSpaceType">
+                                          Facility Type
+                                        </Label>
+                                        <div id="selectSpaceType">
+                                          <Select
+                                            value={formData.spaceTypeId}
+                                            onValueChange={(value) => {
+                                              const selected = spaceTypes.find(
+                                                (type) =>
+                                                  type.spaceTypeId === value
+                                              );
+                                              setFormData({
+                                                ...formData,
+                                                spaceTypeId:
+                                                  selected?.spaceTypeId || "",
+                                                spaceTypeName:
+                                                  selected?.spaceTypeName || "",
+                                              });
+                                            }}
+                                          >
+                                            <SelectTrigger>
+                                              <SelectValue placeholder="Select Space Type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              {spaceTypes
+                                                .filter((type) =>
+                                                  isValidChild(
+                                                    type,
+                                                    childSpace.spaceTypeId ??
+                                                      null
+                                                  )
+                                                )
+                                                .map((type) => (
+                                                  <SelectItem
+                                                    key={type.spaceTypeId}
+                                                    value={type.spaceTypeId}
+                                                  >
+                                                    {type.spaceTypeName}
+                                                  </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                      </div>
+                                      <Button type="submit">
+                                        {isEdit ? "Update" : "Save"}
+                                      </Button>
+                                    </form>
+                                  </DialogContent>
+                                </Dialog>
+                              </TableCell>
                             </TableRow>
                             {expandedSpaces[childSpace.spaceId] &&
                               childSpace.children.map((grandchildSpace) => (
@@ -610,6 +779,109 @@ export function BlockManagement() {
                                       >
                                         Delete
                                       </Button>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Dialog
+                                        open={isOpen}
+                                        onOpenChange={setIsOpen}
+                                      >
+                                        <DialogTrigger asChild>
+                                          <Button
+                                            className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                            onClick={() => {
+                                              setIsEdit(false);
+                                              setFormData({
+                                                spaceName: "",
+                                              });
+                                            }}
+                                          >
+                                            Add New Facility
+                                          </Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                          <DialogHeader>
+                                            <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                                              {isEdit
+                                                ? "Edit Space"
+                                                : "Add New Space"}
+                                            </DialogTitle>
+                                          </DialogHeader>
+                                          <form
+                                            onSubmit={handleSubmit}
+                                            className="space-y-4 text-xl text-neutral-700"
+                                          >
+                                            <div>
+                                              <Label htmlFor="blockName">
+                                                Facility Name
+                                              </Label>
+                                              <Input
+                                                id="blockName"
+                                                className="mb-3"
+                                                value={formData.spaceName}
+                                                onChange={(e) =>
+                                                  setFormData({
+                                                    ...formData,
+                                                    spaceName: e.target.value,
+                                                  })
+                                                }
+                                                required
+                                              />
+                                              <Label htmlFor="selectSpaceType">
+                                                Facility Type
+                                              </Label>
+                                              <div id="selectSpaceType">
+                                                <Select
+                                                  value={formData.spaceTypeId}
+                                                  onValueChange={(value) => {
+                                                    const selected =
+                                                      spaceTypes.find(
+                                                        (type) =>
+                                                          type.spaceTypeId ===
+                                                          value
+                                                      );
+                                                    setFormData({
+                                                      ...formData,
+                                                      spaceTypeId:
+                                                        selected?.spaceTypeId ||
+                                                        "",
+                                                      spaceTypeName:
+                                                        selected?.spaceTypeName ||
+                                                        "",
+                                                    });
+                                                  }}
+                                                >
+                                                  <SelectTrigger>
+                                                    <SelectValue placeholder="Select Space Type" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    {spaceTypes
+                                                      .filter((type) =>
+                                                        isValidChild(
+                                                          type,
+                                                          grandchildSpace.spaceTypeId ??
+                                                            null
+                                                        )
+                                                      )
+                                                      .map((type) => (
+                                                        <SelectItem
+                                                          key={type.spaceTypeId}
+                                                          value={
+                                                            type.spaceTypeId
+                                                          }
+                                                        >
+                                                          {type.spaceTypeName}
+                                                        </SelectItem>
+                                                      ))}
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                            </div>
+                                            <Button type="submit">
+                                              {isEdit ? "Update" : "Save"}
+                                            </Button>
+                                          </form>
+                                        </DialogContent>
+                                      </Dialog>
                                     </TableCell>
                                   </TableRow>
                                 </React.Fragment>
