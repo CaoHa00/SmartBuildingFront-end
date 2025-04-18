@@ -22,7 +22,8 @@ export function useElectricityData() {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 30000);
+    // Update every 15 minutes (900000 milliseconds)
+    const interval = setInterval(fetchData, 15 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Area, AreaChart, XAxis } from "recharts";
 import {
   Select,
   SelectContent,
@@ -98,7 +98,7 @@ export function EnergyChart() {
       </CardHeader>
       <CardContent className={isMobile ? 'px-2' : ''}>
         <ChartContainer config={chartConfig} className={`${isMobile ? 'h-[180px]' : 'h-[220px]'} w-full`}>
-          <LineChart
+          <AreaChart
             data={chartData}
             margin={{
               left: 12,
@@ -114,21 +114,25 @@ export function EnergyChart() {
               tick={{ fill: "#1e40af" }}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Line
+            <Area
               dataKey="power"
               type="monotone"
               stroke="#1e40af"
-              strokeWidth={2.5}
-              dot={{ fill: "#1e40af", r: 4 }}
+              strokeWidth={2}
+              fill="#1e40af"
+              fillOpacity={0.2}
+              dot={{ fill: "#1e40af", r: 3 }}
             />
-            <Line
+            <Area
               dataKey="accumulated"
               type="monotone"
               stroke="#60a5fa"
-              strokeWidth={2.5}
-              dot={{ fill: "#60a5fa", r: 4 }}
+              strokeWidth={2}
+              fill="#60a5fa"
+              fillOpacity={0.1}
+              dot={{ fill: "#60a5fa", r: 3 }}
             />
-          </LineChart>
+          </AreaChart>
         </ChartContainer>
       </CardContent>
     </Card>

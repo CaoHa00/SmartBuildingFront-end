@@ -15,12 +15,20 @@ export const api = axios.create({
     return JSON.stringify(data);
   }],
   transformResponse: [(data) => {
-    if (!data) return {};
+    if (!data) {
+      console.warn('Empty response received');
+      return { error: 'Empty response received from server' };
+    }
     try {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (Object.keys(parsed).length === 0) {
+        console.warn('Empty object received in response');
+        return { error: 'Empty data received from server' };
+      }
+      return parsed;
     } catch (e) {
       console.warn('Failed to parse response:', data);
-      return data;
+      return { error: 'Invalid JSON response from server', data };
     }
   }]
 });
@@ -43,13 +51,26 @@ api.interceptors.response.use(
       url: response.config?.url,
       method: response.config?.method
     });
+
+    // Check for empty response data
+    if (!response.data || (typeof response.data === 'object' && Object.keys(response.data).length === 0)) {
+      console.warn('Empty response data received');
+      return Promise.reject({
+        response: {
+          status: response.status,
+          data: { error: 'Empty response received' },
+          config: response.config
+        }
+      });
+    }
+
     return response;
   },
   (error) => {
     if (error.response) {
       console.error("API Response Error:", {
         status: error.response.status,
-        data: error.response.data,
+        data: error.response.data || { error: 'No error details provided' },
         url: error.config?.url,
         method: error.config?.method
       });

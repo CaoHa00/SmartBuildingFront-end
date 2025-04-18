@@ -37,7 +37,7 @@ export function FloorIdPage() {
   const router = useRouter();
   const params = useParams();
   const isMobile = useIsMobile();
-  const { selectedFacility } = useFacility();
+  const { selectedFacility, setSelectedFacility } = useFacility();
   const [rooms, setRooms] = useState<Array<Room>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -68,9 +68,9 @@ export function FloorIdPage() {
     fetchRooms();
   }, [params.floorId]);
 
-  const handleRoomClick = (roomName: string) => {
-    const roomNumber = roomName.replace(/\D/g, "");
-    router.push(`/block/${params.blockId}/floor/${params.floorId}/room/${roomNumber}`);
+  const handleRoomClick = (room: Room) => {
+    setSelectedFacility(room.roomName);
+    router.push(`/block/${params.blockId}/floor/${params.floorId}/room/${room.roomId}`);
   };
 
   // Show loading state during initial render
@@ -136,7 +136,7 @@ export function FloorIdPage() {
                     <div 
                       key={`even-${rowIndex}-${index}`} 
                       className="w-full cursor-pointer"
-                      onClick={() => handleRoomClick(room.roomId.toString())}
+                      onClick={() => handleRoomClick(room)}
                     >
                       <RoomCard
                         roomId={room.roomId.toString()}
@@ -162,7 +162,7 @@ export function FloorIdPage() {
                     <div 
                       key={`odd-${rowIndex}-${index}`} 
                       className="w-full cursor-pointer"
-                      onClick={() => handleRoomClick(room.roomId.toString())}
+                      onClick={() => handleRoomClick(room)}
                     >
                       <RoomCard
                         roomId={room.roomId.toString()}

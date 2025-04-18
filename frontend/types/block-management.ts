@@ -42,4 +42,5 @@ export interface NewEquipmentData {
   roomId: number;
   equipmentName: string;
   deviceId: string;
+  categoryId: number;
 }

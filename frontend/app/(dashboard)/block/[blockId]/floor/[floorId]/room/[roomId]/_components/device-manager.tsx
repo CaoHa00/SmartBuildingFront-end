@@ -24,7 +24,7 @@ export default function DeviceManager() {
             <div className="space-y-2">
               <div className="bg-sky-300 p-2 rounded">
                 <p>Next scheduled maintenance: Tomorrow 10:00 AM</p>
-                <p>Active schedules: 5</p>
+                <p>Active schedules: 2</p>
               </div>
             </div>
           </div>
@@ -36,15 +36,15 @@ export default function DeviceManager() {
             <div className="space-y-2 text-neutral-200">
               <div className="flex justify-between bg-sky-300 p-2 rounded">
                 <span>Total Devices:</span>
-                <span className="font-bold">24</span>
+                <span className="font-bold">4</span>
               </div>
               <div className="flex justify-between bg-sky-300 p-2 rounded">
                 <span>Online:</span>
-                <span className="font-bold text-green-600">20</span>
+                <span className="font-bold text-green-600">4</span>
               </div>
               <div className="flex justify-between bg-sky-300 p-2 rounded">
                 <span>Offline:</span>
-                <span className="font-bold text-red-600">4</span>
+                <span className="font-bold text-red-600">0</span>
               </div>
             </div>
           </div>

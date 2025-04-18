@@ -1,12 +1,13 @@
 "use client";
-
 import { Switch } from "@/components/ui/switch";
 import { LucideIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import Script from "next/script";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { api } from "@/lib/axios";
 import { useParams } from "next/navigation";
-import { Category, getCategoryIcon } from "@/types/category";
+import { Category } from "@/types/category";
+import { Lightbulb, Cctv, Zap, Thermometer, Droplet, Cpu } from "lucide-react";
 
 interface Device {
   id: string;
@@ -28,6 +29,26 @@ interface Equipment {
   categoryId: number;
 }
 
+const getDeviceIcon = (equipmentName: string): LucideIcon => {
+  const name = equipmentName.toLowerCase();
+  if (name.includes("light") || name.includes("switch")) return Lightbulb;
+  if (name.includes("meter") || name.includes("water")) return Zap;
+  if (name.includes("camera") || name.includes("cctv")) return Cctv;
+  if (name.includes("temperature") || name.includes("temp")) return Thermometer;
+  if (name.includes("humidity")) return Droplet;
+  return Cpu; // default icon for sensors
+};
+
+const getCategoryFromIcon = (icon: LucideIcon): string => {
+  if (icon === Lightbulb) return "Lighting";
+  if (icon === Zap) return "Meter";
+  if (icon === Cpu) return "Sensor";
+  if (icon === Cctv) return "Camera";
+  if (icon === Thermometer) return "Sensor";
+  if (icon === Droplet) return "Sensor";
+  return "Sensor"; // default category
+};
+
 export default function ActiveDevice() {
   const isMobile = useIsMobile();
   const params = useParams();
@@ -35,6 +56,9 @@ export default function ActiveDevice() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const swapyInstanceRef = useRef<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,34 +90,24 @@ export default function ActiveDevice() {
         const statusList = statusResponse.data || [];
         const categoryList = categoryResponse.data || [];
 
-        const mappedDevices = equipmentList.map((equipment: Equipment) => {
-          const status = statusList.find(
-            (s: any) =>
-              s.valueName === "light status" ||
-              s.valueName === "temperature" ||
-              s.valueName === "humidity"
-          );
-
-          const category = categoryList.find(
-            (c: Category) => c.categoryId === equipment.categoryId
-          );
-          console.log(
-            "Matching category for equipment:",
-            equipment.categoryId,
-            category
-          ); // Debug log
-
-          return {
-            id: equipment.equipmentId.toString(),
-            name: equipment.equipmentName,
-            icon: getCategoryIcon(category?.categoryName || ""),
-            status: "online",
-            type:
-              equipment.equipmentTypeName ||
-              "Equipment Type " + equipment.equipmentTypeId,
-            categoryName: category?.categoryName || "Sensor",
-          };
-        });
+        const mappedDevices = equipmentList
+          .map((equipment: Equipment) => {
+            const deviceIcon = getDeviceIcon(equipment.equipmentName);
+            return {
+              id: equipment.equipmentId.toString(),
+              name: equipment.equipmentName,
+              icon: deviceIcon,
+              status: "online",
+              type:
+                equipment.equipmentTypeName ||
+                "Equipment Type " + equipment.equipmentTypeId,
+              categoryName: getCategoryFromIcon(deviceIcon),
+            };
+          })
+          .sort((a: Device, b: Device) => {
+            // Sort by categoryName first
+            return (a.categoryName || "").localeCompare(b.categoryName || "");
+          });
 
         setDevices(mappedDevices);
         setCategories(categoryList);
@@ -165,63 +179,69 @@ export default function ActiveDevice() {
   }
 
   return (
-    <div
-      className={`rounded-xl bg-muted/50 w-full h-full ${
-        isMobile ? "col-span-1" : "col-span-2 md:col-span-1"
-      } shadow-xl p-4`}
-    >
-      <div className="ml-3">
-        <h2 className="flex font-bold tracking-wide text-xl text-blue-800 leading-none">
-          Active Devices
-        </h2>
-        <p className="tracking-widest text-blue-700 text-xs font-thin leading-none">
-          Track active devices for connectivity
-        </p>
-      </div>
-      <div className="bg-blue-800 text-white p-4 rounded-xl mt-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 auto-rows-max rounded-xl bg-blue-800 gap-4">
-          {devices.map((device) => (
-            <div
-              key={device.id}
-              className={`bg-neutral-200 text-blue-700 p-4 rounded-xl shadow-lg ${
-                isMobile ? "p-3" : ""
-              }`}
-            >
-              <div className="flex flex-col h-full gap-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">
-                      <device.icon />
-                    </span>
-                    <div>
-                      <h3 className="font-bold text-lg leading-tight">
-                        {device.name}
-                      </h3>
-                      <p className="text-sm font-medium text-blue-600">
-                        {device.categoryName}
-                      </p>
+    <>
+      <div
+        className={`rounded-xl bg-muted/50 w-full h-full ${
+          isMobile ? "col-span-1" : "col-span-2 md:col-span-1"
+        } shadow-xl p-4`}
+      >
+        <div className="ml-3">
+          <h2 className="flex font-bold tracking-wide text-xl text-blue-800 leading-none">
+            Active Devices
+          </h2>
+          <p className="tracking-widest text-blue-700 text-xs font-thin leading-none">
+            Track active devices for connectivity
+          </p>
+        </div>
+        <div className="bg-blue-800 text-white p-4 rounded-xl mt-4">
+          <div
+            ref={containerRef}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            {devices.map((device, index) => (
+              <div
+                key={device.id}
+                data-index={index}
+                className={`device-card bg-neutral-200 text-blue-700 p-4 rounded-xl shadow-lg transition-all ${
+                  isDragging ? "cursor-grabbing" : "cursor-grab"
+                } ${isMobile ? "p-3" : ""}`}
+              >
+                <div className="flex flex-col h-full gap-3">
+                  <div className="flex items-center justify-between device-handle">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">
+                        <device.icon />
+                      </span>
+                      <div>
+                        <h3 className="font-bold text-lg leading-tight">
+                          {device.name}
+                        </h3>
+                        <p className="text-sm font-medium text-blue-600">
+                          {device.categoryName}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-center gap-6">
-                    <span
-                      className={`h-3 w-3 rounded-full ${
-                        device.status === "online"
-                          ? "bg-green-500"
-                          : "bg-red-500"
-                      }`}
-                    />
-                    <Switch
-                      checked={device.status === "online"}
-                      onCheckedChange={() => toggleDeviceStatus(device.id)}
-                      className="data-[state=checked]:bg-green-500"
-                    />
+                    <div className="flex flex-col items-center gap-6">
+                      <span
+                        className={`h-3 w-3 rounded-full ${
+                          device.status === "online"
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      />
+                      <Switch
+                        checked={device.status === "online"}
+                        onCheckedChange={() => toggleDeviceStatus(device.id)}
+                        className="data-[state=checked]:bg-green-500"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -11,8 +11,10 @@ import {
   Settings,
   Cctv,
   Wallpaper,
+  ShieldUser,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
+import { title } from "process";
 
 
 const sidebarItems = [
@@ -25,6 +27,11 @@ const sidebarItems = [
     title: "Facility Control",
     href: "/admin/facility-control",
     icon: Building,
+  },
+  {
+    title:"Operator Site",
+    href: "/",
+    icon: ShieldUser,
   },
   {
     title: "Standee Control",
