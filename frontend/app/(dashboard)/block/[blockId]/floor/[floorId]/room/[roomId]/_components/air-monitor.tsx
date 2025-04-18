@@ -5,6 +5,7 @@ import axios from "axios";
 import { AirQualityResponse } from "@/types/air-quality";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useElectricityData } from "@/hooks/useElectricityData";
+import { useState, useEffect } from "react";
 
 async function fetchAirQuality() {
   
@@ -12,18 +13,6 @@ async function fetchAirQuality() {
     `http://10.60.253.172:9090/api/aqara/currentValue?equipmentId=10018`,
   );
   return data;
-}
-
-function formatTimeUTC7(timestamp: string) {
-  const date = new Date(Number(timestamp));
-  const options: Intl.DateTimeFormatOptions = {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    timeZone: "Asia/Bangkok", // UTC+7
-    hour12: false,
-  };
-  return date.toLocaleTimeString("en-US", options);
 }
 
 export function AirMonitor() {
@@ -35,6 +24,7 @@ export function AirMonitor() {
   });
   
   const { data: electricityData } = useElectricityData();
+  const [formattedTime, setFormattedTime] = useState("--:--:--");
   
   // Calculate CO2 emissions (kg) from forward energy power
   const co2Emissions = electricityData?.forward_energy_power 
@@ -46,8 +36,22 @@ export function AirMonitor() {
     ? (Number(co2Emissions) * 0.001).toFixed(3)
     : null;
 
+  useEffect(() => {
+    if (data?.timeStamp) {
+      const date = new Date(Number(data.timeStamp));
+      const options: Intl.DateTimeFormatOptions = {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        timeZone: "Asia/Bangkok", // UTC+7
+        hour12: false,
+      };
+      setFormattedTime(date.toLocaleTimeString("en-US", options));
+    }
+  }, [data?.timeStamp]);
+
   return (
-    <div className="w-full h-full aspect-video relative rounded-xl bg-muted/50 p-2 mx-auto">
+    <div className="w-full h-full aspect-video relative rounded-xl bg-muted/50 dark:bg-blue-900 p-2 mx-auto">
       <div className="h-1/4 relative rounded-xl bg-gradient-to-r from-blue-600 to-sky-300 mb-2">
         <div className="italic tracking-widest text-[10px] md:text-xs font-bold text-center text-white p-1">
           Humidity
@@ -80,7 +84,7 @@ export function AirMonitor() {
           <p>CO₂</p>
         </div>
         <div className="text-[10px] md:text-[12px] text-center font-bold text-white/80 italic absolute bottom-1 w-full">
-          Last update: {data?.timeStamp ? formatTimeUTC7(data.timeStamp) : "N/A"}
+          Last update: {formattedTime}
         </div>
       </div>
     </div>

@@ -4,12 +4,12 @@ export default function DeviceManager() {
   const isMobile = useIsMobile();
 
   return (
-    <div className="rounded-xl bg-muted/50 shadow-xl p-4">
+    <div className="rounded-xl bg-muted/50 dark:bg-blue-900 shadow-xl p-4">
       <div className="ml-3">
-        <h2 className="flex font-bold tracking-wide text-xl text-blue-800 leading-none">
+        <h2 className="flex font-bold tracking-wide text-xl text-blue-800 dark:text-blue-400 leading-none">
           DEVICE MANAGER
         </h2>
-        <p className="tracking-widest text-blue-700 text-xs font-thin leading-none">
+        <p className="tracking-widest text-blue-700 dark:text-blue-400 text-xs font-thin leading-none">
           Monitor and manage your devices
         </p>
       </div>
@@ -22,7 +22,7 @@ export default function DeviceManager() {
               Scheduler
             </h3>
             <div className="space-y-2">
-              <div className="bg-sky-300 p-2 rounded">
+              <div className="bg-sky-300 dark: p-2 rounded">
                 <p>Next scheduled maintenance: Tomorrow 10:00 AM</p>
                 <p>Active schedules: 2</p>
               </div>

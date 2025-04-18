@@ -13,6 +13,7 @@ import { FloorCard } from "../../_components/floor-card";
 import useCurrentElectricalReading from "@/hooks/useCurrentElectricalReading";
 import useTotalElectricalReading from "@/hooks/useTotalElectricalReading";
 import useCO2Emissions from "@/hooks/useCO2Emissions";
+import { PageHeader } from "../../_components/page-header";
 
 export const BlockIdPage = () => {
   const isMobile = useIsMobile();
@@ -48,58 +49,45 @@ export const BlockIdPage = () => {
         className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
       />
       <SidebarInset className="bg-sky-300">
-        <header
-          className={`flex ${
-            isMobile ? "h-12" : "h-16"
-          } shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 font-bold text-xl text-blue-800`}
-        >
-          <div className="flex items-center gap-2 px-2 md:px-4">
-            <SidebarTrigger className="-ml-1 w-5 h-5" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <h1 className={`${isMobile ? "text-lg" : "text-xl"} font-bold`}>
-              {selectedFacility}
-            </h1>
-          </div>
-        </header>
-
+        <PageHeader title={selectedFacility} />
         <div className="grid grid-cols-4 gap-4 p-4">
-          <div className="bg-white/90 p-4 rounded-xl shadow-sm">
-            <h3 className="text-sm font-medium text-gray-500">Active Rooms</h3>
+          <div className="bg-white/90 dark:bg-blue-800 text-neutral-200 p-4 rounded-xl shadow-sm">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-neutral-200">Active Rooms</h3>
             <div className="mt-2">
-              <span className="text-2xl font-bold text-blue-800">{stats.rooms.active}/{stats.rooms.total}</span>
-              <p className="text-sm text-gray-600 mt-1">Rooms in use</p>
+              <span className="text-2xl font-bold text-blue-800 dark:text-neutral-200">{stats.rooms.active}/{stats.rooms.total}</span>
+              <p className="text-sm text-gray-600 dark:text-neutral-200 mt-1">Rooms in use</p>
             </div>
           </div>
           
-          <div className="bg-white/90 p-4 rounded-xl shadow-sm">
-            <h3 className="text-sm font-medium text-gray-500">Highest Electricity Usage</h3>
+          <div className="bg-white/90 dark:bg-blue-800 p-4 rounded-xl shadow-sm">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-neutral-200">Highest Electricity Usage</h3>
             <div className="mt-2">
-              <span className="text-2xl font-bold text-blue-800">{stats.electricity.value}</span>
-              <p className="text-sm text-gray-600 mt-1">Highest in {stats.electricity.highestFloor}</p>
-              <p className="text-sm text-gray-600 mt-1">Total: {stats.electricity.total}</p>
+              <span className="text-2xl font-bold text-blue-800 dark:text-blue-400">{stats.electricity.value}</span>
+              <p className="text-sm text-gray-600 mt-1 dark:text-neutral-200">Highest in {stats.electricity.highestFloor}</p>
+              <p className="text-sm text-gray-600 mt-1 dark:text-neutral-200">Total: {stats.electricity.total}</p>
             </div>
           </div>
           
-          <div className="bg-white/90 p-4 rounded-xl shadow-sm">
-            <h3 className="text-sm font-medium text-gray-500">Highest CO2 Emissions</h3>
+          <div className="bg-white/90 dark:bg-blue-800 p-4 rounded-xl shadow-sm">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-neutral-200">Highest CO2 Emissions</h3>
             <div className="mt-2">
-              <span className="text-2xl font-bold text-blue-800">{stats.co2.value}</span>
-              <p className="text-sm text-gray-600 mt-1">Highest in {stats.co2.highestFloor}</p>
+              <span className="text-2xl font-bold text-blue-800 dark:text-blue-400">{stats.co2.value}</span>
+              <p className="text-sm text-gray-600 mt-1 dark:text-neutral-200">Highest in {stats.co2.highestFloor}</p>
             </div>
           </div>
           
-          <div className="bg-white/90 p-4 rounded-xl shadow-sm">
-            <h3 className="text-sm font-medium text-gray-500">Highest Water Usage</h3>
+          <div className="bg-white/90 dark:bg-blue-800 p-4 rounded-xl shadow-sm">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-neutral-200">Highest Water Usage</h3>
             <div className="mt-2">
-              <span className="text-2xl font-bold text-blue-800">{stats.water.value}</span>
-              <p className="text-sm text-gray-600 mt-1">Highest in {stats.water.highestFloor}</p>
+              <span className="text-2xl font-bold text-blue-800 dark:text-blue-400">{stats.water.value}</span>
+              <p className="text-sm text-gray-600 dark:text-neutral-200 mt-1">Highest in {stats.water.highestFloor}</p>
             </div>
           </div>
         </div>
 
         <div className="flex gap-4 p-4 h-[calc(100vh-16rem)]">
           {/* Building Image */}
-          <div className="flex-1 bg-white/90 rounded-xl p-4 flex items-center justify-center">
+          <div className="flex-1 bg-white/90 dark:bg-blue-800 rounded-xl p-4 flex items-center justify-center">
             <img 
               src="/img/IIC.png" 
               alt="Building Plan" 

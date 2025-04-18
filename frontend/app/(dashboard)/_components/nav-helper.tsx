@@ -28,7 +28,7 @@ export function NavHelper({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
-                <a href={item.url}>
+                <a href={item.url} className="text-blue-800 hover:text-blue-400 dark:text-neutral-200">
                   <item.icon />
                   <span>{item.title}</span>
                 </a>

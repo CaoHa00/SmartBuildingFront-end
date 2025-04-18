@@ -181,15 +181,15 @@ export default function ActiveDevice() {
   return (
     <>
       <div
-        className={`rounded-xl bg-muted/50 w-full h-full ${
+        className={`rounded-xl bg-muted/50 dark:bg-blue-900 w-full h-full ${
           isMobile ? "col-span-1" : "col-span-2 md:col-span-1"
         } shadow-xl p-4`}
       >
         <div className="ml-3">
-          <h2 className="flex font-bold tracking-wide text-xl text-blue-800 leading-none">
+          <h2 className="flex font-bold tracking-wide text-xl text-blue-800 dark:text-blue-400 leading-none">
             Active Devices
           </h2>
-          <p className="tracking-widest text-blue-700 text-xs font-thin leading-none">
+          <p className="tracking-widest text-blue-700 dark:text-blue-400 text-xs font-thin leading-none">
             Track active devices for connectivity
           </p>
         </div>
@@ -202,7 +202,7 @@ export default function ActiveDevice() {
               <div
                 key={device.id}
                 data-index={index}
-                className={`device-card bg-neutral-200 text-blue-700 p-4 rounded-xl shadow-lg transition-all ${
+                className={`device-card bg-neutral-200 text-blue-700 dark:text-blue-800 p-4 rounded-xl shadow-lg transition-all ${
                   isDragging ? "cursor-grabbing" : "cursor-grab"
                 } ${isMobile ? "p-3" : ""}`}
               >
@@ -216,7 +216,7 @@ export default function ActiveDevice() {
                         <h3 className="font-bold text-lg leading-tight">
                           {device.name}
                         </h3>
-                        <p className="text-sm font-medium text-blue-600">
+                        <p className="text-sm font-medium text-blue-600 dark:text-blue-800">
                           {device.categoryName}
                         </p>
                       </div>

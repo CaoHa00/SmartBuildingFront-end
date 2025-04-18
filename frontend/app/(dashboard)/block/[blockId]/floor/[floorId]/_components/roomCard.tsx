@@ -38,12 +38,12 @@ export function RoomCard({ roomId, roomName }: RoomCardProps) {
   }
 
   // Different colors for occupied vs available rooms
-  const iconClass = status.isAvailable ? "text-green-600" : "text-blue-700";
+  const iconClass = status.isAvailable ? "text-green-600" : "text-yellow-500";
 
   // If room has no equipment, show simplified card
   if (!status.hasEquipment) {
     return (
-      <Card className="w-[200px] h-[250px] flex flex-col items-center justify-center gap-2 p-4">
+      <Card className="w-[200px] h-[250px] flex flex-col items-center justify-center gap-2 p-4 dark:bg-neutral-800">
         <h3 className="font-semibold text-base">{roomName}</h3>
         <Badge className="text-sm bg-neutral-200 text-green-600">
           available
@@ -74,7 +74,7 @@ export function RoomCard({ roomId, roomName }: RoomCardProps) {
   };
 
   return (
-    <Card className="w-[200px] h-[250px] flex flex-col items-center justify-center gap-2 p-4">
+    <Card className="w-[200px] h-[250px] flex flex-col items-center justify-center gap-2 p-4 dark:bg-blue-800 ">
       <h3 className="font-semibold text-base">{roomName}</h3>
       <Badge
         className={`text-sm bg-neutral-200 ${
@@ -104,7 +104,7 @@ export function RoomCard({ roomId, roomName }: RoomCardProps) {
             <span className="text-sm">{status.current.toFixed(2)}A</span>
           </div>
           <p className="text-sm text-gray-500">Lights</p>
-          <div className="flex gap-2">
+          <div className="flex gap-2 dark:text-neutral-300">
             {status.lightStatus.map((isOn, index) => (
               <Lightbulb key={index} className={isOn ? iconClass : "text-gray-300"} />
             ))}

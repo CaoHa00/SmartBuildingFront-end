@@ -28,12 +28,12 @@ export function AirConditionerControl() {
   const rotation = (percentage / 100) * 360;
 
   return (
-    <div className="rounded-xl bg-muted/50 w-full h-full shadow-xl p-4">
+    <div className="rounded-xl bg-muted/50 dark:bg-blue-900 w-full h-full shadow-xl p-4">
       <div className="ml-3">
-        <h2 className="flex font-bold tracking-wide text-xl text-blue-800 leading-none">
+        <h2 className="flex font-bold tracking-wide text-xl text-blue-800 dark:text-blue-400 leading-none">
           AIR CONDITIONERS
         </h2>
-        <p className="tracking-widest text-blue-700 text-xs font-thin leading-none">
+        <p className="tracking-widest text-blue-700 dark:text-blue-400 text-xs font-thin leading-none">
           Auto Cooling
         </p>
       </div>

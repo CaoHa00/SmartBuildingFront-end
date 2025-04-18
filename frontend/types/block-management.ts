@@ -16,12 +16,17 @@ export interface Floor {
   floorId: number;
   floorName: string;
   rooms: Room[];
+  totalRooms?: number;
+  activeRooms?: number;
+  occupancy?: number;
 }
 
 export interface Block {
   blockId: number;
   blockName: string;
   floors: Floor[];
+  status: 'Active' | 'Inactive';
+  totalFloors?: number;
 }
 
 export interface NewBlockData {

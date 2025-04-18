@@ -66,7 +66,6 @@ export function EnergyChart() {
 
       setChartData(prevData => {
         const newData = [...prevData, newDataPoint];
-        // Keep last 24 points for daily view, or last 7 points for weekly view
         const maxPoints = timeRange === "day" ? 24 : 7;
         return newData.slice(-maxPoints);
       });
@@ -74,19 +73,19 @@ export function EnergyChart() {
   }, [liveData, totalReading, timeRange]);
 
   return (
-    <Card className={`bg-sky-200 shadow-lg rounded-xl ${isMobile ? 'p-2' : 'p-4'}`}>
+    <Card className="bg-background dark:bg-blue-900 shadow-lg rounded-xl">
       <CardHeader className={isMobile ? 'px-2 py-3' : ''}>
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
           <div>
-            <CardTitle className={`font-bold uppercase text-blue-800 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
+            <CardTitle className={`font-bold uppercase text-blue-800 dark:text-blue-400 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
               Energy Consumption
             </CardTitle>
-            <CardDescription className="font-medium text-sm text-blue-800">
+            <CardDescription className="font-medium text-sm text-blue-800 dark:text-blue-500">
               Power Usage & Total Energy
             </CardDescription>
           </div>
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-32 bg-white text-blue-800">
+            <SelectTrigger className="w-32 bg-white dark:bg-slate-800 text-blue-800 dark:text-blue-400">
               <SelectValue placeholder="Select range" />
             </SelectTrigger>
             <SelectContent>
@@ -105,32 +104,32 @@ export function EnergyChart() {
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} stroke="#1e40af" opacity={0.1} />
+            <CartesianGrid vertical={false} stroke="hsl(215, 70%, 30%)" opacity={0.2} />
             <XAxis
               dataKey="time"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tick={{ fill: "#1e40af" }}
+              tick={{ fill: "hsl(215, 70%, 50%)" }}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Area
               dataKey="power"
               type="monotone"
-              stroke="#1e40af"
+              stroke="hsl(215, 100%, 50%)"
               strokeWidth={2}
-              fill="#1e40af"
+              fill="hsl(215, 100%, 50%)"
               fillOpacity={0.2}
-              dot={{ fill: "#1e40af", r: 3 }}
+              dot={{ fill: "hsl(215, 100%, 50%)", r: 3 }}
             />
             <Area
               dataKey="accumulated"
               type="monotone"
-              stroke="#60a5fa"
+              stroke="hsl(215, 70%, 70%)"
               strokeWidth={2}
-              fill="#60a5fa"
+              fill="hsl(215, 70%, 70%)"
               fillOpacity={0.1}
-              dot={{ fill: "#60a5fa", r: 3 }}
+              dot={{ fill: "hsl(215, 70%, 70%)", r: 3 }}
             />
           </AreaChart>
         </ChartContainer>
