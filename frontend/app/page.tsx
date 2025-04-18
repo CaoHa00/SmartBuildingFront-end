@@ -1,3 +1,4 @@
+
 "use client";
 import { AppSidebar } from "./(dashboard)/_components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
@@ -61,4 +62,5 @@ export default function Page() {
       <DashboardContent />
     </FacilityProvider>
   );
+
 }

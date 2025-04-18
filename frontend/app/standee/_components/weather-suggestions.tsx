@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import dynamic from "next/dynamic";
+import useMediaQuery from "@/hooks/useMediaQuery";
 const WeatherChart = dynamic(() => import("./weather-chart"), { ssr: false });
 
 interface WeatherComponentProps {
@@ -87,7 +88,9 @@ export default function WeatherComponent({
     weather: getWeatherDescription(weatherCode, isEnglish),
   };
 
-  const weatherIcon = getWeatherIcon(weatherCode, 100);
+  const isMdUp = useMediaQuery("(min-width: 768px)");
+  const iconSize = isMdUp ? 200 : 100;
+  const weatherIcon = getWeatherIcon(weatherCode, iconSize, new Date());
 
   const content = [
     <div key="1">
@@ -124,7 +127,7 @@ export default function WeatherComponent({
       key="2"
       className="h-full flex flex-col relative justify-center item-center text-center"
     >
-      <p className="text-xl md:text-3xl italic mb-16 w-full">
+      <p className="text-xl md:text-3xl italic mb-16 md:mb-40 w-full">
         <span className="not-italic">☀️</span> Hiện tại chỉ số tia UV đang rất
         cao. Hãy hạn chế ra ngoài và nhớ mang theo ô{" "}
         <span className="not-italic">☂️</span> hoặc áo khoác chống nắng{" "}
@@ -142,7 +145,7 @@ export default function WeatherComponent({
       key="2"
       className="h-full flex flex-col justify-center item-center text-center"
     >
-      <p className="text-xl md:text-3xl italic mb-16 w-full">
+      <p className="text-xl md:text-3xl italic mb-16 md:mb-40 w-full">
         <span className="not-italic">🌡️</span> Nhiệt độ bên ngoài và trong phòng
         đang chênh lệch cao. Hãy điều chỉnh nhiệt độ điều hòa để tránh tình
         trạng sốc nhiệt.
@@ -158,7 +161,7 @@ export default function WeatherComponent({
       key="4"
       className="h-full flex flex-col justify-center item-center text-center"
     >
-      <p className="text-xl md:text-3xl italic mb-16 w-full">
+      <p className="text-xl md:text-3xl italic mb-16 md:mb-40 w-full">
         Đừng quên uống đủ 2 lít <span className="not-italic">💧</span> nước mỗi
         ngày. Bạn đã uống nước hôm nay chưa?{" "}
         <span className="not-italic">🥛</span>
@@ -191,7 +194,7 @@ export default function WeatherComponent({
   }, []);
 
   return (
-    <div className="bg-[#5e83ba] relative rounded-xl aspect-auto px-3 h-[483px] md:h-[483px] overflow-hidden">
+    <div className="bg-[#5e83ba] relative rounded-xl aspect-auto px-3 h-[483px] md:h-[767px] overflow-hidden">
       <div className="absolute pt-3 top-0 right-0 font-bold text-2xl md:text-4xl pr-3">
         {formattedTime}
       </div>
@@ -239,8 +242,12 @@ function getWeatherDescription(
     : "Thời tiết không xác định";
 }
 
-export function getWeatherIcon(weatherCode: number, iconSize: number) {
-  const hour = new Date().getHours();
+export function getWeatherIcon(
+  weatherCode: number,
+  iconSize: number,
+  timestamp: Date
+) {
+  const hour = timestamp.getHours();
   const isDaytime = hour >= 6 && hour < 18;
   const icons: {
     [key: number]: { day: React.ReactNode; night: React.ReactNode };

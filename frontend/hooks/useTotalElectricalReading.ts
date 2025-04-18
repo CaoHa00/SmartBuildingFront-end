@@ -31,8 +31,7 @@ export default function useTotalElectricalReading() {
 
     const poll = async () => {
       await fetchTotalElectricalReading();
-      // Update every 15 minutes (900000 milliseconds)
-      timeoutId = setTimeout(poll, 15 * 60 * 1000);
+      timeoutId = setTimeout(poll, 10 * 60 * 1000);
     };
 
     poll();

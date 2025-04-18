@@ -78,15 +78,15 @@ export default function WeatherChart({
         const b = 0; // Constant value
         color = `rgb(${r}, ${g}, ${b})`;
       } else if (temp > 24 && temp <= 32) {
-        // Yellow to Orange (RGB: Yellow = rgb(255, 255, 0), Orange = rgb(255, 165, 0))
+        // Yellow to Orange (RGB: Yellow = rgb(255, 255, 0), Orange = rgb(255, 127, 0))
         const r = 255; // Red stays constant at 255
-        const g = Math.round(255 - (temp - 25) * (128 / 7)); // Green goes from 255 to 165
+        const g = Math.round(255 - (temp - 25) * (128 / 6)); // Green goes from 255 to 165
         const b = 0; // Constant value
         color = `rgb(${r}, ${g}, ${b})`;
       } else if (temp > 32) {
-        // Orange to Red (RGB: Orange = rgb(255, 165, 0), Red = rgb(255, 0, 0))
+        // Orange to Red (RGB: Orange = rgb(255, 127, 0), Red = rgb(255, 0, 0))
         const r = 255; // Red stays constant at 255
-        const g = Math.round(165 - (temp - 32) * (127 / 3)); // Green decreases to 0
+        const g = Math.round(127 - (temp - 32) * (127 / 3)); // Green decreases to 0
         const b = 0; // Constant value
         color = `rgb(${r}, ${g}, ${b})`;
       }
@@ -125,7 +125,7 @@ export default function WeatherChart({
         options={{
           responsive: true,
           layout: {
-            padding: { bottom: 10, left: 15, right: 15 },
+            padding: { top: 20, left: 15, right: 15 },
           },
           plugins: {
             legend: { display: false },
@@ -146,7 +146,7 @@ export default function WeatherChart({
                 const max = Math.max(...values);
                 const min = Math.min(...values);
 
-                const highThreshold = max - (max - min) * 0.2;
+                const highThreshold = max - (max - min) * 0.1;
 
                 if (currentNumber >= highThreshold) return "bottom";
                 return "top";
@@ -177,7 +177,9 @@ export default function WeatherChart({
             key={index}
             className="flex flex-col items-center text-xs relative"
           >
-            <span className="h-7">{getWeatherIcon(d.weatherCode, 24)}</span>
+            <span className="h-7">
+              {getWeatherIcon(d.weatherCode, 24, d.timestamp)}
+            </span>
             <span>{d.time}</span>
           </div>
         ))}

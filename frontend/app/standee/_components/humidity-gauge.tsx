@@ -62,14 +62,14 @@ export default function HumidityGauge({ humidity }: HumidityProps) {
   return (
     <div className="bg-[#5e83ba] rounded-xl aspect-auto md:p-5">
       <div className="font-bold text-base px-3 pt-2 flex justify-between">
-        <p>
+        <p className="md:text-2xl">
           <span className="not-italic text-2xl">💧</span> {text.title}
         </p>
         {/* <p className="font-bold text-2xl text-white">{Math.round(humidity)}%</p> */}
       </div>
       <div
         className="w-full text-center md:h-28"
-        style={{ width: "100%", height: "150px", overflow: "hidden" }}
+        style={{ width: "100%", height: "100%", overflow: "hidden" }}
       >
         <GaugeComponent {...gaugeConfig} value={humidity} />
         {/* <p className="text-4xl font-bold text-white">{Math.round(humidity)}%</p> */}
