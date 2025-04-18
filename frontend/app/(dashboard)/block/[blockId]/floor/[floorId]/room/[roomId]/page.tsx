@@ -66,7 +66,6 @@ function RoomIdPage() {
             <div className="col-1 flex-1 aspect-auto rounded-xl bg-muted/50 md:min-h-min bg-sky-300 shadow-xl">
               <ElectricityCard />
             </div>
-
             <EnergyChart />
             <div className="aspect-video h-full w-full relative rounded-xl bg-blue-200">
               <ActiveDevice />

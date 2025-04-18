@@ -1,5 +1,6 @@
 import React from 'react';
 import { Equipment, NewEquipmentData } from '@/types/block-management';
+import { Category } from '@/types/category';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { api } from "@/lib/axios";
 
 interface EquipmentDialogProps {
   open: boolean;
@@ -28,13 +31,43 @@ export function EquipmentDialog({
   roomId 
 }: EquipmentDialogProps) {
   const [formData, setFormData] = React.useState<NewEquipmentData>({ 
-    equipmentName: initialData?.equipmentName || "",
-    deviceId: initialData?.deviceId || "",
-    roomId: initialData?.roomId || roomId || 0
+    equipmentName: "",
+    deviceId: "",
+    roomId: 0,
+    categoryId: 0
   });
+  const [categories, setCategories] = React.useState<Category[]>([]);
+
+  // Reset form data when dialog opens or initialData changes
+  React.useEffect(() => {
+    if (open) {
+      setFormData({ 
+        equipmentName: initialData?.equipmentName || "",
+        deviceId: initialData?.deviceId || "",
+        roomId: initialData?.roomId || roomId || 0,
+        categoryId: initialData?.categoryId || 0 // Ensure categoryId is set from initial data
+      });
+
+      // Fetch categories when dialog opens
+      fetchCategories();
+    }
+  }, [open, initialData, roomId]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get<Category[]>('/category');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.categoryId) {
+      alert('Please select a category');
+      return;
+    }
     onSubmit(formData);
   };
 
@@ -72,6 +105,32 @@ export function EquipmentDialog({
               }
               required
             />
+          </div>
+          <div>
+            <Label htmlFor="category" className="text-neutral-700">
+              Category
+            </Label>
+            <Select
+              value={formData.categoryId ? formData.categoryId.toString() : ""}
+              onValueChange={(value) =>
+                setFormData({ ...formData, categoryId: parseInt(value, 10) })
+              }
+              required
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem 
+                    key={category.categoryId} 
+                    value={category.categoryId.toString()}
+                  >
+                    {category.categoryName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
         </form>

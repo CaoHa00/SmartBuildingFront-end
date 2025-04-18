@@ -275,8 +275,7 @@ export function BlockManagement() {
                                         <Cpu size={16} />
                                         <span>{equipment.equipmentName}</span>
                                         <span className="text-sm text-muted-foreground">
-                                          (ID: {equipment.equipmentId}, Device
-                                          ID: {equipment.deviceId})
+                                          (ID: {equipment.equipmentId}, Device ID: {equipment.deviceId}, Category ID: {equipment.categoryId})
                                         </span>
                                       </div>
                                     </TableCell>

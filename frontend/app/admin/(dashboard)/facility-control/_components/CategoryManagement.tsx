@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { api } from "@/lib/axios";
 import { Button } from "@/components/ui/button";
@@ -14,11 +15,24 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import { ExpandableRow } from "@/components/dialog/ExpandableRow";
+import { getCategoryIconById } from "@/types/category";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Category {
   categoryId: number;
   categoryName: string;
-  equipments: any[];
+  equipments: Array<{
+    equipmentId: number;
+    equipmentName: string;
+    deviceId: string;
+  }>;
 }
 
 const CategoryManagement = () => {
@@ -27,6 +41,8 @@ const CategoryManagement = () => {
   const [newCategory, setNewCategory] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
+  const [expandedCategories, setExpandedCategories] = useState<Record<number, boolean>>({});
+  const [changingEquipmentId, setChangingEquipmentId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -43,6 +59,13 @@ const CategoryManagement = () => {
         description: "Failed to fetch categories",
       });
     }
+  };
+
+  const toggleCategory = (categoryId: number) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
   };
 
   const handleAdd = async () => {
@@ -119,6 +142,26 @@ const CategoryManagement = () => {
     }
   };
 
+  const handleChangeEquipmentCategory = async (equipmentId: number, newCategoryId: number) => {
+    try {
+      await api.put(`/equipment/${equipmentId}`, {
+        categoryId: newCategoryId
+      });
+      fetchCategories();
+      setChangingEquipmentId(null);
+      toast({
+        title: "Success",
+        description: "Equipment category updated successfully",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update equipment category",
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card>
@@ -148,53 +191,113 @@ const CategoryManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Name</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {categories.map((category) => (
-              <TableRow key={category.categoryId}>
-                <TableCell>{category.categoryId}</TableCell>
-                <TableCell>
-                  {editingId === category.categoryId ? (
-                    <Input
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
+              <React.Fragment key={category.categoryId}>
+                <TableRow>
+                  <TableCell>
+                    <ExpandableRow
+                      isOpen={expandedCategories[category.categoryId] || false}
+                      onClick={() => toggleCategory(category.categoryId)}
+                      icon={getCategoryIconById(category.categoryId)}
+                      name={category.categoryName}
+                      count={category.equipments.length}
+                      id={category.categoryId}
                     />
-                  ) : (
-                    category.categoryName
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingId === category.categoryId ? (
+                  </TableCell>
+                  <TableCell>
+                    {editingId === category.categoryId ? (
+                      <>
+                        <Input
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          className="w-48 mr-2"
+                        />
+                        <Button
+                          className="mr-2 bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                          onClick={() => handleUpdate(category.categoryId)}
+                        >
+                          Save
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                        onClick={() => {
+                          setEditingId(category.categoryId);
+                          setEditName(category.categoryName);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    )}
                     <Button
-                      className="mr-2 bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                      onClick={() => handleUpdate(category.categoryId)}
+                      variant="destructive"
+                      onClick={() => handleDelete(category.categoryId)}
                     >
-                      Save
+                      Delete
                     </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                      onClick={() => {
-                        setEditingId(category.categoryId);
-                        setEditName(category.categoryName);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                  )}
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleDelete(category.categoryId)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
+                  </TableCell>
+                </TableRow>
+                {expandedCategories[category.categoryId] && category.equipments.map(equipment => (
+                  <TableRow key={equipment.equipmentId} className="bg-muted/20">
+                    <TableCell>
+                      <div
+                        className="flex items-center gap-2"
+                        style={{ paddingLeft: "40px" }}
+                      >
+                        {React.createElement(getCategoryIconById(category.categoryId), { size: 16 })}
+                        <span>{equipment.equipmentName}</span>
+                        <span className="text-sm text-muted-foreground">
+                          (ID: {equipment.equipmentId}, Device ID: {equipment.deviceId})
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {changingEquipmentId === equipment.equipmentId ? (
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={category.categoryId.toString()}
+                            onValueChange={(value) => {
+                              handleChangeEquipmentCategory(equipment.equipmentId, parseInt(value, 10));
+                            }}
+                          >
+                            <SelectTrigger className="w-[200px]">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categories.map((cat) => (
+                                <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
+                                  {cat.categoryName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            variant="ghost"
+                            onClick={() => setChangingEquipmentId(null)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                          onClick={() => setChangingEquipmentId(equipment.equipmentId)}
+                        >
+                          Change Category
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>

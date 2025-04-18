@@ -198,6 +198,9 @@ export function useBlockManagement() {
 
   const handleAddEquipment = async (equipmentData: NewEquipmentData) => {
     try {
+      if (!equipmentData.categoryId) {
+        throw new Error('Category is required');
+      }
       await api.post("/equipment", equipmentData);
       await fetchBlocks();
       return true;
@@ -213,14 +216,42 @@ export function useBlockManagement() {
 
   const handleUpdateEquipment = async (equipmentId: number, equipmentData: NewEquipmentData) => {
     try {
-      await api.put(`/equipment/${equipmentId}`, equipmentData);
-      await fetchBlocks();
-      return true;
-    } catch (error) {
+      if (!equipmentId) {
+        throw new Error('Equipment ID is required');
+      }
+      if (!equipmentData.categoryId) {
+        throw new Error('Category is required');
+      }
+
+      const response = await api.put(`/equipment/${equipmentId}`, equipmentData);
+      
+      if (response.status === 200) {
+        await fetchBlocks();
+        toast({
+          title: "Success",
+          description: "Equipment updated successfully"
+        });
+        return true;
+      }
+
+      throw new Error(response.data?.message || 'Failed to update equipment');
+    } catch (error: any) {
+      console.error('Equipment update error:', {
+        error,
+        equipmentId,
+        equipmentData,
+        response: error.response,
+        status: error.response?.status
+      });
+      
+      const errorMessage = error.response?.data?.message 
+        || error.message 
+        || 'Failed to update equipment';
+        
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update equipment",
+        description: errorMessage
       });
       return false;
     }
