@@ -1,35 +1,38 @@
 "use client";
 
-import { SuggestionRunner } from "./components/suggestions";
-import TopBar from "./components/top-bar";
-import WeatherComponent from "./components/weather";
-import GaugesComponents from "./components/gauges";
-import NoiseDetect from "./components/noise-detect";
-import AirQuality from "./components/air-quality";
-import ElectricityUsage from "./components/electricity-usage";
-import WaterUsage from "./components/water-usage";
-import EnergyComponent from "./components/energy-component";
+import TopBar from "./_components/top-bar";
+import NoiseDetect from "./_components/noise-detect";
+import AirQuality from "./_components/air-quality";
+import ElectricityUsage from "./_components/electricity-usage";
+import EnergyComponent from "./_components/energy-component";
+import CarbonEmission from "./_components/carbon-emission";
+import BorderLines from "./_components/border-lines";
+import GetRealWeather from "./_components/get-real-weather";
+import BackgroundLayer from "./_components/background-image";
 
-export default function Home() {
+export default function StandeeDashboard() {
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen">
+      <BorderLines />
       <TopBar />
-      <section className="relative h-full flex justify-center bg-gradient-to-b from-blue-900 via-blue-400 to-violet-700">
-        <div className="container mx-auto px-6 text-white">
-          <SuggestionRunner />
-          <div className="grid grid-cols-2 gap-2">
-            <WeatherComponent />
-            <GaugesComponents temperature={0} uvIndex={0} humidity={0} />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
+      <section className="relative h-full flex justify-center ">
+        <BackgroundLayer />
+      {/* <section className="relative h-full flex justify-center bg-[url(/img/BGSpring.svg)]"> */}
+      {/* <section className="relative h-full flex justify-center bg-gradient-to-b from-[#080077] via-[#65aff1] to-[#650bf7]"> */}
+        <div className="container mx-auto px-6 pb-3 text-white">
+          <GetRealWeather />
+          <div className="grid bg-[#0f4da8] p-2 rounded-xl grid-cols-2 gap-2 mb-2">
             <NoiseDetect />
             <AirQuality />
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid bg-[#0f4da8] p-2 rounded-xl grid-cols-2 gap-2 mb-2">
             <ElectricityUsage />
-            <WaterUsage />
+            <CarbonEmission />
           </div>
-          <EnergyComponent />
+          <div className="bg-[#0f4da8] p-2 rounded-xl mb-1">
+            <EnergyComponent />
+          </div>
+
         </div>
       </section>
     </div>

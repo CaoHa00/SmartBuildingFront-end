@@ -1,3 +1,5 @@
+"use client";
+
 import HumidityGauge from "./humidity-gauge";
 import CO2Gauge from "./co2-gauge";
 import TempGauge from "./temp-gauge";

@@ -1,3 +1,4 @@
+
 "use client";
 import { AppSidebar } from "./(dashboard)/_components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -42,4 +43,5 @@ export default function Page() {
       <DashboardContent />
     </FacilityProvider>
   );
+
 }

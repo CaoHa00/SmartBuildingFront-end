@@ -25,7 +25,7 @@ interface CO2BarChartProps {
 }
 
 const CO2BarChart = ({ co2Emission }: CO2BarChartProps) => {
-  const maxCO2 = 1;
+  const maxCO2 = 30;
   const chartRef = useRef<Chart<"bar"> | null>(null);
   const [gradient, setGradient] = useState<string | CanvasGradient>(
     "rgba(0, 200, 0, 1)"
@@ -44,6 +44,7 @@ const CO2BarChart = ({ co2Emission }: CO2BarChartProps) => {
       0,
       chartArea.top
     );
+
     gradientFill.addColorStop(0, "rgba(0, 200, 0, 1)");
     gradientFill.addColorStop(0.3, "rgba(255, 255, 0, 1)");
     gradientFill.addColorStop(0.6, "rgba(255, 165, 0, 1)");
@@ -80,7 +81,7 @@ const CO2BarChart = ({ co2Emission }: CO2BarChartProps) => {
     maintainAspectRatio: false,
     layout: {
       padding: {
-        top: 14, // increase to reveal the label
+        bottom: 14,
       },
     },
     plugins: {
@@ -88,14 +89,15 @@ const CO2BarChart = ({ co2Emission }: CO2BarChartProps) => {
       legend: { display: false },
       datalabels: {
         display: true,
-        align: "end" as const,
-        anchor: "end" as const,
-        offset: -4,
+        align: "start" as const,
+        anchor: "start" as const,
+        offset: 2,
         color: "white",
         font: {
           family: "Montserrat, sans-serif",
-          size: 14,
+          size: 11,
         },
+        padding: 1,
         formatter: (value: number) => `${value.toFixed(1)}tCO₂`,
       },
     },
@@ -111,7 +113,7 @@ const CO2BarChart = ({ co2Emission }: CO2BarChartProps) => {
   };
 
   return (
-    <div className="h-[70px] w-12 mx-auto">
+    <div className="h-[53px] md:h-[65px] w-14 md:w-16 mx-auto">
       <Bar
         data={data}
         options={options}
