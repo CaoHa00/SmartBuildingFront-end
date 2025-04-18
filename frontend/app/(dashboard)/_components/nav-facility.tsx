@@ -68,11 +68,11 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:px-2">
-      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400 group-data-[collapsible=icon]:justify-center">
+      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 dark:text-neutral-200 group-data-[collapsible=icon]:justify-center">
         <Building2 className="group-data-[collapsible=icon]:w-5 group-data-[collapsible=icon]:h-5" />
         <span className="group-data-[collapsible=icon]:hidden">Facility</span>
       </SidebarGroupLabel>
-      <SidebarMenu className="text-xl font-bold text-blue-800 hover:text-blue-400">
+      <SidebarMenu className="text-xl font-bold text-blue-800 dark:text-neutral-200 ">
         {items.map((item) => (
           <Collapsible
             key={item.key}
@@ -84,7 +84,10 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton tooltip={item.name}>
                   {item.icon && <item.icon />}
-                  <span onClick={(e) => handleItemClick(item.name, item.url, e)}>
+                  <span
+                    onClick={(e) => handleItemClick(item.name, item.url, e)}
+                    className="text-blue-800 dark:text-neutral-200"
+                  >
                     {item.name}
                   </span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -107,6 +110,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                               onClick={(e) =>
                                 handleItemClick(subItem.name, subItem.url, e)
                               }
+                              className="text-white"
                             >
                               {subItem.name}
                             </span>
@@ -136,6 +140,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                             e
                                           )
                                         }
+                                        className="text-white"
                                       >
                                         {subSubItem.name}
                                       </span>
@@ -147,9 +152,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                   <CollapsibleContent>
                                     <SidebarMenuSub>
                                       {subSubItem.items?.map((finalItem) => (
-                                        <SidebarMenuSubItem
-                                          key={finalItem.key}
-                                        >
+                                        <SidebarMenuSubItem key={finalItem.key}>
                                           <SidebarMenuSubButton>
                                             {finalItem.icon && (
                                               <finalItem.icon />
@@ -162,6 +165,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                                   e
                                                 )
                                               }
+                                              className="text-white"
                                             >
                                               {finalItem.name}
                                             </span>

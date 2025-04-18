@@ -24,6 +24,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
+  SidebarProvider,
 } from "@/components/ui/sidebar";
 
 export function NavScheduler({
@@ -39,60 +40,56 @@ export function NavScheduler({
   const { isMobile } = useSidebar();
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:px-2">
-      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400 group-data-[collapsible=icon]:justify-center">
-        <Calendar className="group-data-[collapsible=icon]:w-5 group-data-[collapsible=icon]:h-5"/>
-        <span className="group-data-[collapsible=icon]:hidden">Scheduler</span>
-      </SidebarGroupLabel>
-      <SidebarMenu className="text-xl font-bold text-blue-800 hover:text-blue-400">
-        {scheduler.map((item) => (
-          <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton asChild>
-              <div className="flex gap-2 w-full h-[40px] mb-4">
-                <item.icon />
-                <div className="flex w-full flex-col justify-center">
-                  <span className="font-bold text-sm">
-                    {item.time} - {item.location}
-                  </span>
-                  <span className="font-medium">{item.title}</span>
+    <SidebarProvider>
+      <SidebarGroup className="group-data-[collapsible=icon]:px-2">
+        <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 dark:text-neutral-200 hover:text-blue-400 group-data-[collapsible=icon]:justify-center">
+          <Calendar className="group-data-[collapsible=icon]:w-5 group-data-[collapsible=icon]:h-5"/>
+          <span className="group-data-[collapsible=icon]:hidden">Scheduler</span>
+        </SidebarGroupLabel>
+        <SidebarMenu className="text-xl font-bold text-blue-800 hover:text-blue-400 dark:text-neutral-200">
+          {scheduler.map((item) => (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild>
+                <div className="flex gap-2 w-full h-[40px] mb-4">
+                  <item.icon />
+                  <div className="flex w-full flex-col justify-center">
+                    <span className="font-bold text-sm">
+                      {item.time} - {item.location}
+                    </span>
+                    <span className="font-medium">{item.title}</span>
+                  </div>
                 </div>
-              </div>
-            </SidebarMenuButton>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuAction showOnHover>
-                  <MoreHorizontal />
-                </SidebarMenuAction>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-48 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
-              >
-                <DropdownMenuItem>
-                  <Eye className="text-muted-foreground" />
-                  <span>View</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Files className="text-muted-foreground" />
-                  <span>Copy</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Trash2 className="text-muted-foreground" />
-                  <span>Delete</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        ))}
-        {/* <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontal className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem> */}
-      </SidebarMenu>
-    </SidebarGroup>
+              </SidebarMenuButton>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuAction showOnHover>
+                    <MoreHorizontal />
+                  </SidebarMenuAction>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-48 rounded-lg"
+                  side={isMobile ? "bottom" : "right"}
+                  align={isMobile ? "end" : "start"}
+                >
+                  <DropdownMenuItem>
+                    <Eye className="text-muted-foreground" />
+                    <span>View</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Files className="text-muted-foreground" />
+                    <span>Copy</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Trash2 className="text-muted-foreground" />
+                    <span>Delete</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+    </SidebarProvider>
   );
 }

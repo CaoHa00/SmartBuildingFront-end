@@ -5,10 +5,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface BlockDialogProps {
   open: boolean;
@@ -36,26 +39,44 @@ export function BlockDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-            {isEdit ? "Edit Block" : "Add New Block"}
-          </DialogTitle>
+          <DialogTitle className="text-xl font-bold text-white">Block Information</DialogTitle>
+          <DialogDescription className="text-gray-300">
+            View and manage block details
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 text-xl text-neutral-700">
-          <div>
-            <Label htmlFor="blockName">Block Name</Label>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-white">Name</Label>
             <Input
-              id="blockName"
-              value={formData.blockName}
-              onChange={(e) =>
-                setFormData({ ...formData, blockName: e.target.value })
-              }
-              required
+              id="name"
+              defaultValue={initialData?.blockName}
+              className="col-span-3 text-white"
+              readOnly
             />
           </div>
-          <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
-        </form>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="status" className="text-white">Status</Label>
+            <div className="col-span-3">
+              <Badge variant={initialData?.status === 'Active' ? 'default' : 'destructive'}>
+                {initialData?.status}
+              </Badge>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="floors" className="text-white">Total Floors</Label>
+            <Input
+              id="floors"
+              defaultValue={initialData?.totalFloors}
+              className="col-span-3 text-white"
+              readOnly
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" className="text-white hover:text-blue-200">Close</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

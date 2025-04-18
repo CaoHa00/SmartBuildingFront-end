@@ -1,3 +1,5 @@
+"use client";
+
 import { SuggestionRunner } from "./components/suggestions";
 import TopBar from "./components/top-bar";
 import WeatherComponent from "./components/weather";

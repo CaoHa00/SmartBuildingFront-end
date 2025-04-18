@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import { Check, ChevronsUpDown, Plus, PlusCircle } from "lucide-react"
 
 import {
   DropdownMenu,
@@ -18,6 +18,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "./ui/command"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { DialogTrigger } from "./ui/dialog"
+import { cn } from "@/lib/utils"
 
 export function TeamSwitcher({
   teams,
@@ -30,6 +35,9 @@ export function TeamSwitcher({
 }) {
   const { isMobile } = useSidebar()
   const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const [selectedTeam, setSelectedTeam] = React.useState<{ value: string; label: string; avatar: string } | null>(null)
+  const [open, setOpen] = React.useState(false)
+  const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false)
 
   if (!activeTeam) {
     return null

@@ -363,6 +363,20 @@ function getPayloadConfigFromPayload(
     : config[key as keyof typeof config];
 }
 
+const Chart = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "w-full overflow-hidden rounded-lg bg-blue-900/90 p-4 text-white dark:bg-blue-950 dark:ring-1 dark:ring-slate-800",
+      className
+    )}
+    {...props}
+  />
+));
+
 export {
   ChartContainer,
   ChartTooltip,
@@ -370,4 +384,5 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
+  Chart,
 };

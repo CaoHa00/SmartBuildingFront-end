@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { getWeatherIcon } from "./weather-suggestions";
+import { useState, useEffect, useCallback } from "react";
 
 ChartJS.register(
   CategoryScale,
@@ -35,25 +36,37 @@ export default function WeatherChart({
   hourlyWeatherCodes,
   hourlyTime,
 }: WeatherChartProps) {
-  const now = new Date();
-  const futureTime = new Date(now.getTime() + 6 * 60 * 60 * 1000);
-  const data = hourlyTemp2m
-    .map((temp, index) => {
-      const time = hourlyTime[index];
-      return {
-        time: time.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        }),
-        temperature: temp,
-        weatherCode: hourlyWeatherCodes[index],
-        timestamp: time,
-      };
-    })
-    .filter((d) => d.timestamp >= now && d.timestamp <= futureTime);
+  const [chartData, setChartData] = useState<{
+    time: string;
+    temperature: number;
+    weatherCode: number;
+    timestamp: Date;
+  }[]>([]);
 
-  const getGradient = (
+  useEffect(() => {
+    const now = new Date();
+    const futureTime = new Date(now.getTime() + 6 * 60 * 60 * 1000);
+    
+    const data = hourlyTemp2m
+      .map((temp, index) => {
+        const time = hourlyTime[index];
+        return {
+          time: time.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }),
+          temperature: temp,
+          weatherCode: hourlyWeatherCodes[index],
+          timestamp: time,
+        };
+      })
+      .filter((d) => d.timestamp >= now && d.timestamp <= futureTime);
+      
+    setChartData(data);
+  }, [hourlyTemp2m, hourlyWeatherCodes, hourlyTime]);
+
+  const getGradient = useCallback((
     ctx: CanvasRenderingContext2D,
     chartArea: any,
     data: { temperature: number }[]
@@ -72,22 +85,19 @@ export default function WeatherChart({
 
       let color = "";
       if (temp >= 20 && temp <= 24) {
-        // Green to Yellow (RGB: Green = rgb(0, 255, 0), Yellow = rgb(255, 255, 0))
-        const r = Math.round((temp - 20) * (255 / 4)); // Gradient from 0 (green) to 255 (yellow)
-        const g = 255; // Green goes from 255 to 0
-        const b = 0; // Constant value
+        const r = Math.round((temp - 20) * (255 / 4));
+        const g = 255;
+        const b = 0;
         color = `rgb(${r}, ${g}, ${b})`;
       } else if (temp > 24 && temp <= 32) {
-        // Yellow to Orange (RGB: Yellow = rgb(255, 255, 0), Orange = rgb(255, 165, 0))
-        const r = 255; // Red stays constant at 255
-        const g = Math.round(255 - (temp - 25) * (128 / 7)); // Green goes from 255 to 165
-        const b = 0; // Constant value
+        const r = 255;
+        const g = Math.round(255 - (temp - 25) * (128 / 7));
+        const b = 0;
         color = `rgb(${r}, ${g}, ${b})`;
       } else if (temp > 32) {
-        // Orange to Red (RGB: Orange = rgb(255, 165, 0), Red = rgb(255, 0, 0))
-        const r = 255; // Red stays constant at 255
-        const g = Math.round(165 - (temp - 32) * (127 / 3)); // Green decreases to 0
-        const b = 0; // Constant value
+        const r = 255;
+        const g = Math.round(165 - (temp - 32) * (127 / 3));
+        const b = 0;
         color = `rgb(${r}, ${g}, ${b})`;
       }
 
@@ -99,20 +109,20 @@ export default function WeatherChart({
     });
 
     return gradient;
-  };
+  }, []);
 
   return (
     <div className="w-full h-full rounded-xl p-3 pt-0 mb-3 bg-muted/30">
       <Line
         data={{
-          labels: data.map((d) => d.time),
+          labels: chartData.map((d) => d.time),
           datasets: [
             {
-              data: data.map((d) => d.temperature),
+              data: chartData.map((d) => d.temperature),
               borderColor: (context) => {
                 const chart = context.chart;
                 if (!chart?.ctx || !chart?.chartArea) return "#FFFFFF";
-                return getGradient(chart.ctx, chart.chartArea, data);
+                return getGradient(chart.ctx, chart.chartArea, chartData);
               },
               backgroundColor: "transparent",
               pointBackgroundColor: "#FFFFFF",
@@ -171,13 +181,13 @@ export default function WeatherChart({
         }}
         plugins={[ChartDataLabels]}
       />
-      <div className="flex justify-between mt-2">
-        {data.map((d, index) => (
+      <div className="flex justify-between mt-2" suppressHydrationWarning>
+        {chartData.map((d, index) => (
           <div
             key={index}
             className="flex flex-col items-center text-xs relative"
           >
-            <span className="h-7">{getWeatherIcon(d.weatherCode, 24)}</span>
+            <span className="h-7">{getWeatherIcon(d.weatherCode, 24, true)}</span>
             <span>{d.time}</span>
           </div>
         ))}
