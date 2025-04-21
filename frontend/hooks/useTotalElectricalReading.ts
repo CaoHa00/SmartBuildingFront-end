@@ -20,7 +20,7 @@ export default function useTotalElectricalReading() {
       );
 
       if (Array.isArray(response.data)) {
-        const today = new Date().toISOString().split("T")[0]; // e.g., '2025-04-21'
+        const today = new Date().toISOString().split("T")[0];
         const todayData = response.data.filter((item) =>
           item.timestamp.startsWith(today)
         );
