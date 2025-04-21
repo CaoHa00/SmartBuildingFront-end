@@ -25,7 +25,7 @@ interface CO2BarChartProps {
 }
 
 const CO2BarChart = ({ co2Emission }: CO2BarChartProps) => {
-  const maxCO2 = 30;
+  const maxCO2 = 1;
   const chartRef = useRef<Chart<"bar"> | null>(null);
   const [gradient, setGradient] = useState<string | CanvasGradient>(
     "rgba(0, 200, 0, 1)"

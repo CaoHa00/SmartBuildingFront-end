@@ -125,7 +125,7 @@ export default function WeatherChart({
         options={{
           responsive: true,
           layout: {
-            padding: { top: 20, left: 15, right: 15 },
+            padding: { top: 10, left: 15, right: 15 },
           },
           plugins: {
             legend: { display: false },
@@ -146,7 +146,7 @@ export default function WeatherChart({
                 const max = Math.max(...values);
                 const min = Math.min(...values);
 
-                const highThreshold = max - (max - min) * 0.1;
+                const highThreshold = max - (max - min) * 0.2;
 
                 if (currentNumber >= highThreshold) return "bottom";
                 return "top";

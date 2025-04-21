@@ -9,11 +9,11 @@ export default function ElectricityUsageAnalytics() {
 
   const text = isEnglish
     ? {
-        title: "This Week Usage",
+        title: "This Month Usage",
         efficiency: "Efficiency",
       }
     : {
-        title: "Mức tiêu thụ tuần",
+        title: "Mức tiêu thụ tháng",
         efficiency: "Hiệu năng sử dụng",
       };
 
@@ -32,7 +32,7 @@ export default function ElectricityUsageAnalytics() {
             className={
               isEnglish
                 ? "text-[12px] md:text-xl"
-                : "text-[13px] h-[20px] md:h-[28px] md:text-xl"
+                : "text-[12px] h-[20px] md:h-[28px] md:text-xl"
             }
           >
             {text.title}
@@ -61,7 +61,7 @@ export default function ElectricityUsageAnalytics() {
             className={
               isEnglish
                 ? "text-sm md:text-xl"
-                : "text-[9px] h-[20px] md:h-[28px] md:text-xl pt-1 md:pt-0"
+                : "text-[10px] md:h-[28px] md:text-xl pt-1 md:pt-0"
             }
           >
             {text.efficiency}
