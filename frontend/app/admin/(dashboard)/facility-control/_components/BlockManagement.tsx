@@ -37,58 +37,9 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
-
-interface Space {
-  spaceId: string;
-  spaceName: string;
-  parentId: string;
-  spaceTypeId: string;
-  spaceTypeName: string;
-  children: Space[];
-  equipments: Equipment[];
-}
-
-interface SpaceType {
-  spaceTypeId: string;
-  spaceTypeName: string;
-  parentTypeId: string | null;
-}
-
-interface NewSpaceData {
-  spaceName: string;
-  spaceTypeId: string;
-  spaceTypeName: string;
-  parentId: string;
-  children: Space[];
-  equipment: Equipment[];
-}
-
-interface Equipment {
-  equipmentId: number;
-  equipmentName: string;
-  deviceId: string;
-  equipmentTypeId: string;
-  categoryId: number;
-  spaceId: string;
-  logValue: number | null;
-}
-
-interface NewEquipmentData {
-  equipmentName: string;
-  deviceId: string;
-}
-
-interface EquipmentType {
-  equipmentTypeId: string;
-  equipmentTypeName: string;
-  equipments: any[];
-}
-
-interface Category {
-  categoryId: number;
-  categoryName: string;
-  equipments: any[];
-}
+import { Equipment, EquipmentType, NewEquipmentData } from "@/types/equipment";
+import { Space, SpaceType, NewSpaceData } from "@/types/space";
+import { Category } from "@/types/category";
 
 function ExpandableRow({
   isOpen,

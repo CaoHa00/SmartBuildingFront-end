@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { api } from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,19 +14,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-
-interface Category {
-  categoryId: number;
-  categoryName: string;
-  equipments: any[];
-}
+import { Category } from "@/types/category";
 
 const CategoryManagement = () => {
   const { toast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [newCategory, setNewCategory] = useState('');
+  const [newCategory, setNewCategory] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editName, setEditName] = useState('');
+  const [editName, setEditName] = useState("");
 
   useEffect(() => {
     fetchCategories();
@@ -34,7 +29,7 @@ const CategoryManagement = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get<Category[]>('/category');
+      const response = await api.get<Category[]>("/category");
       setCategories(response.data);
     } catch (error) {
       toast({
@@ -55,10 +50,10 @@ const CategoryManagement = () => {
       return;
     }
     try {
-      await api.post('/category', {
-        categoryName: newCategory
+      await api.post("/category", {
+        categoryName: newCategory,
       });
-      setNewCategory('');
+      setNewCategory("");
       fetchCategories();
       toast({
         title: "Success",
@@ -84,10 +79,10 @@ const CategoryManagement = () => {
     }
     try {
       await api.put(`/category/${id}`, {
-        categoryName: editName
+        categoryName: editName,
       });
       setEditingId(null);
-      setEditName('');
+      setEditName("");
       fetchCategories();
       toast({
         title: "Success",
