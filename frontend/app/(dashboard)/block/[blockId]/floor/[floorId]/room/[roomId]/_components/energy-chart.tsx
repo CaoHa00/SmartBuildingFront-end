@@ -61,7 +61,7 @@ export function EnergyChart() {
       const newDataPoint = {
         time: now.toLocaleTimeString(),
         power: liveData.active_power,
-        accumulated: totalReading?.electricalReading || 0,
+        accumulated: totalReading?.cumulativeEnergy || 0,
       };
 
       setChartData(prevData => {
