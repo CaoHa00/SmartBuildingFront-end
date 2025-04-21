@@ -25,7 +25,9 @@ export default function NoiseDetect() {
         <Ear />
         {text.title}
       </div>
-      <div className="w-full text-center mt-3 h-24 md:h-40">Gauge</div>
+      <div className="w-full text-center my-[43px] md:h-40 italic">
+        Currently under development
+      </div>
       <div className="flex justify-center w-full">
         <div className="w-1/3 flex border-r border-white">
           <div className="w-full">

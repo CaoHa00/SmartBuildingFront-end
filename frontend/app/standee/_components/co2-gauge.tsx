@@ -21,10 +21,10 @@ export default function CO2Gauge({ electricity }: CO2Props) {
 
   const text = isEnglish
     ? {
-        title: "CO2 Emission",
+        title: "CO₂ Emission",
       }
     : {
-        title: "Lượng thải CO2",
+        title: "Lượng thải CO₂",
       };
 
   const gaugeConfig = useMemo(
@@ -70,7 +70,7 @@ export default function CO2Gauge({ electricity }: CO2Props) {
           <span className="text-2xl not-italic">🌤️</span>{" "}
           <span
             className={
-              isEnglish ? "text-[13px] md:text-2xl" : "text-[10px] md:text-xl"
+              isEnglish ? "text-[13px] md:text-2xl" : "text-[10.5px] md:text-xl"
             }
           >
             {text.title}
@@ -83,7 +83,7 @@ export default function CO2Gauge({ electricity }: CO2Props) {
       >
         <GaugeComponent
           {...gaugeConfig}
-          value={CalculateCarbonFootprint(electricity!)}
+          value={CalculateCarbonFootprint(electricity ? electricity : 0)}
         />
       </div>
     </div>
