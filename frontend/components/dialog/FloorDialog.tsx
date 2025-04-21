@@ -5,6 +5,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,28 +41,61 @@ export function FloorDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-neutral-700">
-            {isEdit ? "Edit Floor" : "Add New Floor"}
-          </DialogTitle>
+          <DialogTitle className="text-xl font-bold text-white">Floor Information</DialogTitle>
+          <DialogDescription className="text-gray-300">
+            View and manage floor details
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 text-neutral-700">
-          <div>
-            <Label htmlFor="floorName">
-              Floor Name
-            </Label>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-white">Name</Label>
             <Input
-              id="floorName"
-              value={formData.floorName}
-              onChange={(e) =>
-                setFormData({ ...formData, floorName: e.target.value })
-              }
-              required
+              id="name"
+              defaultValue={formData.floorName}
+              className="col-span-3 text-white"
+              readOnly={!isEdit}
+              onChange={(e) => setFormData({ ...formData, floorName: e.target.value })}
             />
           </div>
-          <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
-        </form>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="rooms" className="text-white">Total Rooms</Label>
+            <Input
+              id="rooms"
+              defaultValue={initialData?.totalRooms?.toString() || "N/A"}
+              className="col-span-3 text-white"
+              readOnly
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="occupancy" className="text-white">Occupancy</Label>
+            <Input
+              id="occupancy"
+              defaultValue={initialData?.occupancy ? `${initialData.occupancy}%` : 'N/A'}
+              className="col-span-3 text-white"
+              readOnly
+            />
+          </div>
+        </div>
+        <DialogFooter className="flex justify-between">
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            className="text-white hover:text-blue-200"
+          >
+            Cancel
+          </Button>
+          {isEdit && (
+            <Button 
+              type="submit"
+              className="text-white bg-blue-600 hover:bg-blue-700"
+              onClick={handleSubmit}
+            >
+              Save Changes
+            </Button>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

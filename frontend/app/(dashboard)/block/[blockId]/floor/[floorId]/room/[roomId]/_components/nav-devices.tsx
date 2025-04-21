@@ -6,7 +6,6 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { MusicPlayerCard } from "@/components/ui/music-player-card";
 
@@ -19,7 +18,7 @@ export function NavDevices({
     icon: LucideIcon;
   }[];
 }) {
-  const { isMobile } = useSidebar();
+
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden ">

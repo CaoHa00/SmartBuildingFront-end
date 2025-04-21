@@ -6,7 +6,6 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { MusicPlayerCard } from "../../../components/ui/music-player-card";
 
@@ -19,15 +18,14 @@ export function NavDevices({
     icon: LucideIcon;
   }[];
 }) {
-  const { isMobile } = useSidebar();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden ">
-      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400">
+      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 dark:text-neutral-200">
         <Cpu />
         Active Devices
       </SidebarGroupLabel>
-      <SidebarMenu className="text-xl font-bold text-blue-800 hover:text-blue-400">
+      <SidebarMenu className="text-xl font-bold text-white">
         <MusicPlayerCard />
         {devices.map((item) => (
           <SidebarMenuItem key={item.name}>

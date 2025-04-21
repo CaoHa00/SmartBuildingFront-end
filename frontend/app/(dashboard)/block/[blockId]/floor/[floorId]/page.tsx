@@ -3,16 +3,15 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { FacilityProvider, useFacility } from "@/app/context/facility-context";
 import { AppSidebar } from "../../../../_components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { RoomCard } from "./_components/roomCard";
 import { api } from "@/lib/axios";
 import { useToast } from "@/hooks/use-toast";
+import { PageHeader } from "../../../../_components/page-header";
 
 interface Equipment {
   equipmentId: number;
@@ -79,6 +78,7 @@ export function FloorIdPage() {
       <SidebarProvider>
         <AppSidebar className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`} />
         <SidebarInset className="bg-sky-300">
+          <PageHeader title={selectedFacility} />
           <div className="text-center py-4">Loading rooms...</div>
         </SidebarInset>
       </SidebarProvider>
@@ -109,19 +109,7 @@ export function FloorIdPage() {
         className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
       />
       <SidebarInset className="bg-sky-300">
-        <header
-          className={`flex ${
-            isMobile ? "h-12" : "h-16"
-          } shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 font-bold text-xl text-blue-800`}
-        >
-          <div className="flex items-center gap-2 px-2 md:px-4">
-            <SidebarTrigger className="-ml-1 w-5 h-5" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <h1 className={`${isMobile ? "text-lg" : "text-xl"} font-bold`}>
-              {selectedFacility}
-            </h1>
-          </div>
-        </header>
+        <PageHeader title={selectedFacility} />
         <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 pt-0">
           <div className="space-y-8">
             <h1 className="text-base font-bold text-blue-800">Left Side</h1>

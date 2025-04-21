@@ -26,7 +26,7 @@ export function ElectricityCard() {
   return (
     <Card
       className={`w-full h-full relative rounded-xl mx-auto text-blue-800 shadow-xl 
-      bg-gradient-to-br from-white/100 to-blue-300/90 hover:shadow-blue-100/50 
+      bg-gradient-to-br dark:dark:bg-blue-900 hover:shadow-blue-100/50 
       transition-all duration-300 backdrop-blur-sm border border-blue-100/50 ${
         isMobile ? "p-2" : "p-4"
       }`}

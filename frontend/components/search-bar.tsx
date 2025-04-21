@@ -1,44 +1,75 @@
-import { Input } from "@/components/ui/input";
-import { Mic, Search, ChevronDown } from "lucide-react";
-import { useState } from "react";
-import { useSidebar } from "./ui/sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+"use client" ;
+import {  Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
+import { Button } from "./ui/button";
+import React from "react";
 
 export default function SearchBar() {
-  const [searchType, setSearchType] = useState("all");
+  return (
+    <div className="w-full flex-1 md:w-auto md:flex-none">
+      <CommandMenu>
+        <Button
+          variant="outline"
+          size="sm"
+          role="combobox"
+          className="w-full justify-between md:w-40 lg:w-64 text-white bg-blue-900/75 hover:bg-blue-900"
+        >
+          <Search className="w-4 h-4 mr-2" />
+          Search...
+          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex text-white">
+            <span className="text-xs">⌘</span>K
+          </kbd>
+        </Button>
+      </CommandMenu>
+    </div>
+  )
+}
+
+// Command Menu Content
+export function CommandMenu({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setOpen((open) => !open)
+      }
+    }
+
+    document.addEventListener("keydown", down)
+    return () => document.removeEventListener("keydown", down)
+  }, [])
+
+  const suggestions = [
+    { value: "profile", label: "Profile", icon: null },
+    { value: "settings", label: "Settings", icon: null },
+    { value: "logout", label: "Logout", icon: null },
+  ];
 
   return (
-    <div className="relative flex items-center gap-2 transition-all duration-200 w-full">
-      <div
-        className="relative flex
-         w-full text-blue-800 bg-white border border-blue-300 rounded-lg"
-      >
-        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-5 h-5" />
-        <Input
-          placeholder={`Search ${
-            searchType === "all" ? "everything" : searchType
-          }`}
-          className="pl-12 pr-4 bg-sky-100"
-        />
-      </div>
-
-      <Select value={searchType} onValueChange={setSearchType}>
-        <SelectTrigger className="w-[120px]">
-          <SelectValue placeholder="Search in..." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All</SelectItem>
-          <SelectItem value="blocks">Blocks</SelectItem>
-          <SelectItem value="floors">Floors</SelectItem>
-          <SelectItem value="rooms">Rooms</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  );
+    <Command>
+      {children}
+      <CommandInput 
+        placeholder="Type a command or search..."
+        className="text-white placeholder:text-gray-400"
+      />
+      <CommandList className="text-white">
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Suggestions" className="text-white">
+          {suggestions.map((suggestion) => (
+            <CommandItem
+              key={suggestion.value}
+              value={suggestion.value}
+              className="text-white hover:bg-blue-900"
+            >
+              {suggestion.icon && React.createElement(suggestion.icon, { className: "mr-2 h-4 w-4 text-white" })}
+              <span>{suggestion.label}</span>
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  )
 }

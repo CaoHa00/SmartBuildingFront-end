@@ -1,12 +1,6 @@
 "use client";
 import { AppSidebar } from "../../../../../../_components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { EnergyChart } from "./_components/energy-chart";
 import ActiveDevice from "./_components/active-device";
 import DeviceManager from "./_components/device-manager";
@@ -18,6 +12,8 @@ import { ElectricityCard } from "./_components/electricity-card";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/axios";
+import { PageHeader } from "../../../../../../_components/page-header";
+import HumidTempChart from "@/components/HumidTempChart";
 
 function RoomIdPage() {
   const isMobile = useIsMobile();
@@ -32,7 +28,7 @@ function RoomIdPage() {
         const response = await api.get(`/room/${params.roomId}`);
         setSelectedFacility(response.data.roomName);
       } catch (error) {
-        console.error('Failed to fetch room details:', error);
+        console.error("Failed to fetch room details:", error);
       } finally {
         setIsLoading(false);
       }
@@ -47,26 +43,15 @@ function RoomIdPage() {
         className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
       />
       <SidebarInset className="bg-sky-300">
-        <header
-          className={`flex ${
-            isMobile ? "h-12" : "h-16"
-          } shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 font-bold text-xl text-blue-800`}
-        >
-          <div className="flex items-center gap-2 px-2 md:px-4">
-            <SidebarTrigger className="-ml-1 w-5 h-5" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <h1 className={`${isMobile ? "text-lg" : "text-xl"} font-bold`}>
-              {selectedFacility}
-            </h1>
-          </div>
-        </header>
+        <PageHeader title={selectedFacility} />
         <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 pt-0">
           <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-3">
             <AirMonitor />
             <div className="col-1 flex-1 aspect-auto rounded-xl bg-muted/50 md:min-h-min bg-sky-300 shadow-xl">
               <ElectricityCard />
             </div>
-            <EnergyChart />
+            <EnergyChart/>
+            {/* <HumidTempChart /> */}
             <div className="aspect-video h-full w-full relative rounded-xl bg-blue-200">
               <ActiveDevice />
             </div>

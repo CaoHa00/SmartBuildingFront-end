@@ -1,10 +1,11 @@
+"use client";
 
 import TopBar from "./_components/top-bar";
 import NoiseDetect from "./_components/noise-detect";
 import AirQuality from "./_components/air-quality";
 import ElectricityUsage from "./_components/electricity-usage";
-import CarbonEmission from "./_components/carbon-emission";
 import EnergyComponent from "./_components/energy-component";
+import CarbonEmission from "./_components/carbon-emission";
 import BorderLines from "./_components/border-lines";
 import GetRealWeather from "./_components/get-real-weather";
 import BackgroundLayer from "./_components/background-image";
