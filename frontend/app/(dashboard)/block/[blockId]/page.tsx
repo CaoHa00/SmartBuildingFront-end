@@ -32,7 +32,7 @@ export const BlockIdPage = () => {
     electricity: { 
       value: `Current: ${currentReading?.electricalReading?.toFixed(2) ?? '0'} kW`, 
       highestFloor: 'Floor 3',
-      total: `${totalReading?.electricalReading?.toFixed(2) ?? '0'} kWh`
+      total: `${totalReading?.cumulativeEnergy?.toFixed(2) ?? '0'} kWh`
     },
     co2: { 
       value: `${co2Reading?.co2Emissions?.toFixed(2) ?? '0'} kg/h`, 

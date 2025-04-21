@@ -23,7 +23,7 @@ export default function GaugesComponents({
       <UVGauge uvIndex={uvIndex} />
       <HumidityGauge humidity={humidity} />
       <TempGauge temperature={temperature} />
-      <CO2Gauge electricity={reading?.electricalReading} />
+      <CO2Gauge electricity={reading?.cumulativeEnergy} />
     </div>
   );
 }

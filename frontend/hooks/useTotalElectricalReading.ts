@@ -3,24 +3,34 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 interface ElectricalValue {
-  electricalReading: number;
+  id : number;
+  timestamp: string;
+  cumulativeEnergy: number;
 }
 
-interface ApiResponse {
-  total_consumption: number;
-}
+
 
 export default function useTotalElectricalReading() {
   const [reading, setReading] = useState<ElectricalValue | null>(null);
 
   const fetchTotalElectricalReading = async () => {
     try {
-      const response = await axios.get<ApiResponse>(
-        "http://10.60.253.172:9090/api/qenergy/cost_consumption_summary"
+      const response = await axios.get<ElectricalValue[]>(
+        "http://10.60.253.172:9090/api/qenergy/daily_consumption"
       );
-      if (response.data) {
-        const totalPower = response.data["total_consumption"];
-        setReading({ electricalReading: totalPower });
+
+      if (Array.isArray(response.data)) {
+        const today = new Date().toISOString().split("T")[0]; // e.g., '2025-04-21'
+        const todayData = response.data.filter((item) =>
+          item.timestamp.startsWith(today)
+        );
+
+        if (todayData.length > 0) {
+          const maxItem = todayData.reduce((max, item) =>
+            item.cumulativeEnergy > max.cumulativeEnergy ? item : max
+          );
+          setReading(maxItem); 
+        }
       }
     } catch (e) {
       console.error("Error fetching electrical reading:", e);
@@ -32,7 +42,7 @@ export default function useTotalElectricalReading() {
 
     const poll = async () => {
       await fetchTotalElectricalReading();
-      timeoutId = setTimeout(poll, 10 * 60 * 1000);
+      timeoutId = setTimeout(poll, 10 * 60 * 1000); // 10 minutes
     };
 
     poll();
