@@ -12,8 +12,12 @@ export default function ElectricityUsage() {
   return (
     <div className="grid grid-flow-col md:row-span-2 grid-rows-3">
       <ElectricityUsageChart
-        currentElectricalReading={currentReading?.electricalReading}
-        totalElectricalReading={totalReading?.electricalReading}
+        currentElectricalReading={
+          currentReading ? currentReading.electricalReading : 0
+        }
+        totalElectricalReading={
+          totalReading ? totalReading.electricalReading : 0
+        }
       />
       <ElectricityUsageAnalytics />
     </div>

@@ -13,7 +13,7 @@ export interface Space {
 export interface SpaceType {
   spaceTypeId: string;
   spaceTypeName: string;
-  parentTypeId: string | null;
+  spaceLevel: number;
 }
 
 export interface NewSpaceData {
@@ -23,4 +23,9 @@ export interface NewSpaceData {
   parentId: string;
   children: Space[];
   equipment: Equipment[];
+}
+
+export interface NewSpaceTypeData {
+  spaceTypeName: string;
+  spaceLevel: number;
 }

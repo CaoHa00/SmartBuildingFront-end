@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { api } from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,19 +14,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import { DeleteConfirmModal } from "@/components/delete-confirmation";
 
 interface EquipmentType {
-  equipmentId: number;  // Matches the DTO
-  equipmentTypeName: string;  // Matches the DTO
-  equipments: any[];  // Matches the DTO
+  equipmentTypeId: string; // Matches the DTO
+  equipmentTypeName: string; // Matches the DTO
+  equipments: any[]; // Matches the DTO
 }
 
 const EquipmentTypeManagement = () => {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
-  const [newType, setNewType] = useState('');
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editName, setEditName] = useState('');
+  const [newType, setNewType] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchEquipmentTypes();
@@ -34,7 +38,8 @@ const EquipmentTypeManagement = () => {
 
   const fetchEquipmentTypes = async () => {
     try {
-      const response = await api.get<EquipmentType[]>('/equipmentType');
+      setIsLoading(true);
+      const response = await api.get<EquipmentType[]>("/equipmentType");
       setEquipmentTypes(response.data);
     } catch (error) {
       toast({
@@ -42,6 +47,8 @@ const EquipmentTypeManagement = () => {
         title: "Error",
         description: "Failed to fetch equipment types",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -55,10 +62,10 @@ const EquipmentTypeManagement = () => {
       return;
     }
     try {
-      await api.post('/equipmentType', {
-        equipmentTypeName: newType
+      await api.post("/equipmentType", {
+        equipmentTypeName: newType,
       });
-      setNewType('');
+      setNewType("");
       fetchEquipmentTypes();
       toast({
         title: "Success",
@@ -73,14 +80,13 @@ const EquipmentTypeManagement = () => {
     }
   };
 
-  const handleUpdate = async (id: number) => {
-
+  const handleUpdate = async (id: string) => {
     try {
       await api.put(`/equipmentType/${id}`, {
-        equipmentTypeName: editName
+        equipmentTypeName: editName,
       });
       setEditingId(null);
-      setEditName('');
+      setEditName("");
       fetchEquipmentTypes();
       toast({
         title: "Success",
@@ -95,9 +101,11 @@ const EquipmentTypeManagement = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
     try {
-      await api.delete(`/equipmentType/${id}`);
+      setIsDeleting(true);
+      await api.delete(`/equipmentType/${deleteTargetId}`);
       fetchEquipmentTypes();
       toast({
         title: "Success",
@@ -109,92 +117,118 @@ const EquipmentTypeManagement = () => {
         title: "Error",
         description: "Failed to delete equipment type",
       });
+    } finally {
+      setDeleteTargetId(null);
+      setIsDeleting(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
-            Equipment Type Management
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-4">
-            <Input
-              placeholder="New equipment type"
-              value={newType}
-              onChange={(e) => setNewType(e.target.value)}
-            />
-            <Button
-              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-              onClick={handleAdd}
-            >
-              Add
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    <>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
+              Equipment Type Management
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-4">
+              <Input
+                placeholder="New equipment type"
+                value={newType}
+                onChange={(e) => setNewType(e.target.value)}
+              />
+              <Button
+                className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                onClick={handleAdd}
+              >
+                Add
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-      <div className="rounded-md border border-border text-neutral-700">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {equipmentTypes.map((type) => (
-              <TableRow key={type.equipmentId}>
-                <TableCell>
-                  {type.equipmentId}
-                </TableCell>
-                <TableCell>
-                  {editingId === type.equipmentId ? (
-                    <Input
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                    />
-                  ) : (
-                    type.equipmentTypeName
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingId === type.equipmentId ? (
-                    <Button
-                      className="mr-2 bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                      onClick={() => handleUpdate(type.equipmentId)}
-                    >
-                      Save
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                      onClick={() => {
-                        setEditingId(type.equipmentId);
-                        setEditName(type.equipmentTypeName);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                  )}
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleDelete(type.equipmentId)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
+        <div className="rounded-md border border-border text-neutral-700">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              ) : equipmentTypes.length > 0 ? (
+                equipmentTypes.map((type) => (
+                  <TableRow key={type.equipmentTypeId}>
+                    <TableCell>{type.equipmentTypeId}</TableCell>
+                    <TableCell>
+                      {editingId === type.equipmentTypeId ? (
+                        <Input
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                        />
+                      ) : (
+                        type.equipmentTypeName
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {editingId === type.equipmentTypeId ? (
+                        <Button
+                          className="mr-2 bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                          onClick={() => handleUpdate(type.equipmentTypeId)}
+                        >
+                          Save
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                          onClick={() => {
+                            setEditingId(type.equipmentTypeId);
+                            setEditName(type.equipmentTypeName);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      )}
+                      <Button
+                        variant="destructive"
+                        onClick={() => setDeleteTargetId(type.equipmentTypeId)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center">
+                    No equipment types found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
+      <DeleteConfirmModal
+        isOpen={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={confirmDelete}
+        loading={isDeleting}
+        title="Delete Equipment Type"
+        description="Are you sure you want to delete this equipment type? This action cannot be undone."
+        confirmText="Delete"
+      />
+    </>
   );
 };
 
