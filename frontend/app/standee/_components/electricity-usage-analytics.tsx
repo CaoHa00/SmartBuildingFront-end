@@ -31,8 +31,8 @@ export default function ElectricityUsageAnalytics() {
           <p
             className={
               isEnglish
-                ? "text-[12px] md:text-xl"
-                : "text-[12px] h-[20px] md:h-[28px] md:text-xl"
+                ? "text-[11px] md:text-xl"
+                : "text-[11px] h-[20px] md:h-[28px] md:text-xl"
             }
           >
             {text.title}
@@ -60,8 +60,8 @@ export default function ElectricityUsageAnalytics() {
           <p
             className={
               isEnglish
-                ? "text-sm md:text-xl"
-                : "text-[10px] md:h-[28px] md:text-xl pt-1 md:pt-0"
+                ? "text-[11px] md:text-xl"
+                : "text-[9px] md:h-[28px] md:text-xl pt-1 md:pt-0"
             }
           >
             {text.efficiency}
