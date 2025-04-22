@@ -79,7 +79,7 @@ function ExpandableRow({
   );
 }
 
-export function BlockManagement() {
+export function SpaceManagement() {
   const { toast } = useToast();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [spaceTypes, setSpaceType] = useState<SpaceType[]>([]);
@@ -96,8 +96,8 @@ export function BlockManagement() {
   );
   const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
   const [viewMode, setViewMode] = useState<
-    "blockManagement" | "equipmentTable"
-  >("blockManagement");
+    "spaceManagement" | "equipmentTable"
+  >("spaceManagement");
   const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
   const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false);
   const [equipmentFormData, setEquipmentFormData] = useState<
@@ -326,32 +326,28 @@ export function BlockManagement() {
     setExpandedSpaces((prev) => ({ ...prev, [spaceId]: !prev[spaceId] }));
   };
 
-  const isValidChild = (childType: SpaceType, parentTypeId: string | null) => {
-    return (
-      childType.parentTypeId === parentTypeId ||
-      (childType.parentTypeId === null &&
-        childType.spaceTypeId !== "e86e6e24-e15a-4995-ac2b-f18479441a26")
-    );
-  };
-
   return (
     <div className="space-y-4">
-      {viewMode === "blockManagement" && (
+      {viewMode === "spaceManagement" && (
         <>
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
-              Block Management
+              Facility Management
             </h2>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
                 <Button
                   className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
                   onClick={() => {
+                    const rootSpaceType = spaceTypes.find(
+                      (type) => type.spaceLevel === 1
+                    );
+                    if (!rootSpaceType) return;
                     setIsEdit(false);
                     setFormData({
                       spaceName: "",
-                      spaceTypeId: "e86e6e24-e15a-4995-ac2b-f18479441a26",
-                      spaceTypeName: "Block",
+                      spaceTypeId: rootSpaceType.spaceTypeId,
+                      spaceTypeName: rootSpaceType.spaceTypeName,
                     });
                   }}
                 >
@@ -507,21 +503,30 @@ export function BlockManagement() {
                                         <SelectValue placeholder="Select Space Type" />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        {spaceTypes
-                                          .filter((type) =>
-                                            isValidChild(
-                                              type,
-                                              space.spaceTypeId ?? null
+                                        {(() => {
+                                          const parentType = spaceTypes.find(
+                                            (type) =>
+                                              type.spaceTypeId ===
+                                              space.spaceTypeId
+                                          );
+                                          const nextLevel = parentType
+                                            ? parentType.spaceLevel + 1
+                                            : null;
+
+                                          return spaceTypes
+                                            .filter(
+                                              (type) =>
+                                                type.spaceLevel === nextLevel
                                             )
-                                          )
-                                          .map((type) => (
-                                            <SelectItem
-                                              key={type.spaceTypeId}
-                                              value={type.spaceTypeId}
-                                            >
-                                              {type.spaceTypeName}
-                                            </SelectItem>
-                                          ))}
+                                            .map((type) => (
+                                              <SelectItem
+                                                key={type.spaceTypeId}
+                                                value={type.spaceTypeId}
+                                              >
+                                                {type.spaceTypeName}
+                                              </SelectItem>
+                                            ));
+                                        })()}
                                       </SelectContent>
                                     </Select>
                                   </div>
@@ -654,22 +659,32 @@ export function BlockManagement() {
                                               <SelectValue placeholder="Select Space Type" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              {spaceTypes
-                                                .filter((type) =>
-                                                  isValidChild(
-                                                    type,
-                                                    childSpace.spaceTypeId ??
-                                                      null
+                                              {(() => {
+                                                const parentType =
+                                                  spaceTypes.find(
+                                                    (type) =>
+                                                      type.spaceTypeId ===
+                                                      childSpace.spaceTypeId
+                                                  );
+                                                const nextLevel = parentType
+                                                  ? parentType.spaceLevel + 1
+                                                  : null;
+
+                                                return spaceTypes
+                                                  .filter(
+                                                    (type) =>
+                                                      type.spaceLevel ===
+                                                      nextLevel
                                                   )
-                                                )
-                                                .map((type) => (
-                                                  <SelectItem
-                                                    key={type.spaceTypeId}
-                                                    value={type.spaceTypeId}
-                                                  >
-                                                    {type.spaceTypeName}
-                                                  </SelectItem>
-                                                ))}
+                                                  .map((type) => (
+                                                    <SelectItem
+                                                      key={type.spaceTypeId}
+                                                      value={type.spaceTypeId}
+                                                    >
+                                                      {type.spaceTypeName}
+                                                    </SelectItem>
+                                                  ));
+                                              })()}
                                             </SelectContent>
                                           </Select>
                                         </div>
@@ -805,24 +820,38 @@ export function BlockManagement() {
                                                     <SelectValue placeholder="Select Space Type" />
                                                   </SelectTrigger>
                                                   <SelectContent>
-                                                    {spaceTypes
-                                                      .filter((type) =>
-                                                        isValidChild(
-                                                          type,
-                                                          grandchildSpace.spaceTypeId ??
-                                                            null
+                                                    {(() => {
+                                                      const parentType =
+                                                        spaceTypes.find(
+                                                          (type) =>
+                                                            type.spaceTypeId ===
+                                                            grandchildSpace.spaceTypeId
+                                                        );
+                                                      const nextLevel =
+                                                        parentType
+                                                          ? parentType.spaceLevel +
+                                                            1
+                                                          : null;
+
+                                                      return spaceTypes
+                                                        .filter(
+                                                          (type) =>
+                                                            type.spaceLevel ===
+                                                            nextLevel
                                                         )
-                                                      )
-                                                      .map((type) => (
-                                                        <SelectItem
-                                                          key={type.spaceTypeId}
-                                                          value={
-                                                            type.spaceTypeId
-                                                          }
-                                                        >
-                                                          {type.spaceTypeName}
-                                                        </SelectItem>
-                                                      ))}
+                                                        .map((type) => (
+                                                          <SelectItem
+                                                            key={
+                                                              type.spaceTypeId
+                                                            }
+                                                            value={
+                                                              type.spaceTypeId
+                                                            }
+                                                          >
+                                                            {type.spaceTypeName}
+                                                          </SelectItem>
+                                                        ));
+                                                    })()}
                                                   </SelectContent>
                                                 </Select>
                                               </div>
@@ -867,7 +896,7 @@ export function BlockManagement() {
                     setIsEquipmentEdit(false);
                     setEquipmentFormData({ equipmentName: "", deviceId: "" });
                     setSelectedSpace(null);
-                    setViewMode("blockManagement");
+                    setViewMode("spaceManagement");
                   }}
                 >
                   ← Back to Block List
@@ -1065,5 +1094,7 @@ export function BlockManagement() {
         </>
       )}
     </div>
+
+    //modal for delete confirmation
   );
 }
