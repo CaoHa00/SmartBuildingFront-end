@@ -9,7 +9,10 @@ export interface Equipment {
 }
 
 export interface NewEquipmentData {
+  spaceId: string;
   equipmentName: string;
+  equipmentTypeId: string;
+  categoryId: number;
   deviceId: string;
 }
 

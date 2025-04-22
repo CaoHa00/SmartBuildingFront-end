@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Category } from "@/types/category";
+import { DeleteConfirmModal } from "@/components/delete-confirmation";
 
 const CategoryManagement = () => {
   const { toast } = useToast();
@@ -22,6 +23,8 @@ const CategoryManagement = () => {
   const [newCategory, setNewCategory] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -97,9 +100,11 @@ const CategoryManagement = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
     try {
-      await api.delete(`/category/${id}`);
+      setIsDeleting(true);
+      await api.delete(`/category/${deleteTargetId}`);
       fetchCategories();
       toast({
         title: "Success",
@@ -111,90 +116,104 @@ const CategoryManagement = () => {
         title: "Error",
         description: "Failed to delete category",
       });
+    } finally {
+      setDeleteTargetId(null);
+      setIsDeleting(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
-            Category Management
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-4">
-            <Input
-              placeholder="New category"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-            />
-            <Button
-              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-              onClick={handleAdd}
-            >
-              Add
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    <>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
+              Category Management
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-4">
+              <Input
+                placeholder="New category"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+              <Button
+                className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                onClick={handleAdd}
+              >
+                Add
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-      <div className="rounded-md border border-border text-neutral-700">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {categories.map((category) => (
-              <TableRow key={category.categoryId}>
-                <TableCell>{category.categoryId}</TableCell>
-                <TableCell>
-                  {editingId === category.categoryId ? (
-                    <Input
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                    />
-                  ) : (
-                    category.categoryName
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingId === category.categoryId ? (
-                    <Button
-                      className="mr-2 bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                      onClick={() => handleUpdate(category.categoryId)}
-                    >
-                      Save
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                      onClick={() => {
-                        setEditingId(category.categoryId);
-                        setEditName(category.categoryName);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                  )}
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleDelete(category.categoryId)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
+        <div className="rounded-md border border-border text-neutral-700">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {categories.map((category) => (
+                <TableRow key={category.categoryId}>
+                  <TableCell>{category.categoryId}</TableCell>
+                  <TableCell>
+                    {editingId === category.categoryId ? (
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                      />
+                    ) : (
+                      category.categoryName
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingId === category.categoryId ? (
+                      <Button
+                        className="mr-2 bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                        onClick={() => handleUpdate(category.categoryId)}
+                      >
+                        Save
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                        onClick={() => {
+                          setEditingId(category.categoryId);
+                          setEditName(category.categoryName);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                    <Button
+                      variant="destructive"
+                      onClick={() => setDeleteTargetId(category.categoryId)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
+      <DeleteConfirmModal
+        isOpen={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={confirmDelete}
+        loading={isDeleting}
+        title="Delete Category"
+        description="Are you sure you want to delete this Category? This action cannot be undone."
+        confirmText="Delete"
+      />
+    </>
   );
 };
 

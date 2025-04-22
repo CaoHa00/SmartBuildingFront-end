@@ -40,6 +40,7 @@ import {
 import { Equipment, EquipmentType, NewEquipmentData } from "@/types/equipment";
 import { Space, SpaceType, NewSpaceData } from "@/types/space";
 import { Category } from "@/types/category";
+import { DeleteConfirmModal } from "@/components/delete-confirmation";
 
 function ExpandableRow({
   isOpen,
@@ -105,6 +106,11 @@ export function SpaceManagement() {
   >({});
   const [isEquipmentEdit, setIsEquipmentEdit] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [deleteSpaceId, setDeleteSpaceId] = useState<string | null>(null);
+  const [deleteEquipmentId, setDeleteEquipmentId] = useState<number | null>(
+    null
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchSpaces();
@@ -209,9 +215,11 @@ export function SpaceManagement() {
     }
   };
 
-  const handleDelete = async (spaceId: string) => {
+  const confirmDelete = async () => {
+    if (!deleteSpaceId) return;
     try {
-      await api.delete(`/spaces/${spaceId}`);
+      setIsDeleting(true);
+      await api.delete(`/spaces/${deleteSpaceId}`);
       fetchSpaces();
       toast({
         title: "Success",
@@ -223,6 +231,9 @@ export function SpaceManagement() {
         title: "Error",
         description: "Failed to delete space",
       });
+    } finally {
+      setDeleteSpaceId(null);
+      setIsDeleting(false);
     }
   };
 
@@ -259,12 +270,11 @@ export function SpaceManagement() {
         const newEquipment: NewEquipmentData = {
           equipmentName: equipmentFormData.equipmentName || "",
           deviceId: equipmentFormData.deviceId || "",
+          equipmentTypeId: equipmentFormData.equipmentTypeId || "",
+          categoryId: equipmentFormData.categoryId || 0,
+          spaceId: equipmentFormData.spaceId || "",
         };
-        const response = await api.post(
-          //will change to using request body
-          `/equipment?spaceId=${equipmentFormData.spaceId}&equipmentTypeId=${equipmentFormData.equipmentTypeId}&categoryId=${equipmentFormData.categoryId}`,
-          newEquipment
-        );
+        const response = await api.post(`/equipment`, newEquipment);
         const createdEquipment = response.data;
         setSelectedSpace((prev) =>
           prev
@@ -296,15 +306,43 @@ export function SpaceManagement() {
     }
   };
 
-  const handleDeleteEquipment = async (equipmentId: number) => {
+  // const handleDeleteEquipment = async (equipmentId: number) => {
+  //   try {
+  //     await api.delete(`/equipment/${equipmentId}`);
+  //     setSelectedSpace((prev) =>
+  //       prev
+  //         ? {
+  //             ...prev,
+  //             equipments: prev.equipments.filter(
+  //               (eq) => eq.equipmentId !== equipmentId
+  //             ),
+  //           }
+  //         : null
+  //     );
+  //     toast({
+  //       title: "Success",
+  //       description: "Equipment deleted successfully",
+  //     });
+  //   } catch (error) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Error",
+  //       description: "Failed to delete equipment",
+  //     });
+  //   }
+  // };
+
+  const confirmDeleteEquipment = async () => {
+    if (!deleteEquipmentId) return;
     try {
-      await api.delete(`/equipment/${equipmentId}`);
+      setIsDeleting(true);
+      await api.delete(`/equipment/${deleteEquipmentId}`);
       setSelectedSpace((prev) =>
         prev
           ? {
               ...prev,
               equipments: prev.equipments.filter(
-                (eq) => eq.equipmentId !== equipmentId
+                (eq) => eq.equipmentId !== deleteEquipmentId
               ),
             }
           : null
@@ -319,6 +357,9 @@ export function SpaceManagement() {
         title: "Error",
         description: "Failed to delete equipment",
       });
+    } finally {
+      setDeleteSpaceId(null);
+      setIsDeleting(false);
     }
   };
 
@@ -327,774 +368,814 @@ export function SpaceManagement() {
   };
 
   return (
-    <div className="space-y-4">
-      {viewMode === "spaceManagement" && (
-        <>
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
-              Facility Management
-            </h2>
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                  onClick={() => {
-                    const rootSpaceType = spaceTypes.find(
-                      (type) => type.spaceLevel === 1
-                    );
-                    if (!rootSpaceType) return;
-                    setIsEdit(false);
-                    setFormData({
-                      spaceName: "",
-                      spaceTypeId: rootSpaceType.spaceTypeId,
-                      spaceTypeName: rootSpaceType.spaceTypeName,
-                    });
-                  }}
-                >
-                  Add New Block
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                    {isEdit ? "Edit Space" : "Add New Space"}
-                  </DialogTitle>
-                </DialogHeader>
-                <form
-                  onSubmit={handleSubmit}
-                  className="space-y-4 text-xl text-neutral-700"
-                >
-                  <div>
-                    <Label htmlFor="blockName">Block Name</Label>
-                    <Input
-                      id="blockName"
-                      className="mb-3"
-                      value={formData.spaceName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, spaceName: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-                  <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
+    <>
+      <div className="space-y-4">
+        {viewMode === "spaceManagement" && (
+          <>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
+                Facility Management
+              </h2>
+              <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                    onClick={() => {
+                      const rootSpaceType = spaceTypes.find(
+                        (type) => type.spaceLevel === 1
+                      );
+                      if (!rootSpaceType) return;
+                      setIsEdit(false);
+                      setFormData({
+                        spaceName: "",
+                        spaceTypeId: rootSpaceType.spaceTypeId,
+                        spaceTypeName: rootSpaceType.spaceTypeName,
+                      });
+                    }}
+                  >
+                    Add New Block
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                      {isEdit ? "Edit Space" : "Add New Space"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <form
+                    onSubmit={handleSubmit}
+                    className="space-y-4 text-xl text-neutral-700"
+                  >
+                    <div>
+                      <Label htmlFor="blockName">Block Name</Label>
+                      <Input
+                        id="blockName"
+                        className="mb-3"
+                        value={formData.spaceName}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            spaceName: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </div>
+                    <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
 
-          <div className="rounded-md border border-border text-neutral-700">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-[hsl(var(--tech-blue))/5]">
-                  <TableHead>Name</TableHead>
-                  <TableHead>Equipment</TableHead>
-                  <TableHead>Actions</TableHead>
-                  <TableHead>Add</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={2} className="text-center py-8">
-                      <Spinner className="mx-auto" />
-                    </TableCell>
+            <div className="rounded-md border border-border text-neutral-700">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-[hsl(var(--tech-blue))/5]">
+                    <TableHead>Name</TableHead>
+                    <TableHead>Equipment</TableHead>
+                    <TableHead>Actions</TableHead>
+                    <TableHead>Add</TableHead>
                   </TableRow>
-                ) : (
-                  spaces.map((space) => (
-                    <React.Fragment key={space.spaceId}>
-                      <TableRow className="hover:bg-[hsl(var(--tech-blue))/5]">
-                        <TableCell>
-                          <ExpandableRow
-                            isOpen={expandedSpaces[space.spaceId] || false}
-                            onClick={() => toggleSpace(space.spaceId)}
-                            icon={Building2}
-                            name={space.spaceName}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                            onClick={() => {
-                              setSelectedSpace(space);
-                              setViewMode("equipmentTable");
-                            }}
-                          >
-                            View Equipment
-                          </Button>
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                            onClick={() => handleEdit(space)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            className="mr-2"
-                            variant="destructive"
-                            onClick={() => handleDelete(space.spaceId)}
-                          >
-                            Delete
-                          </Button>
-                        </TableCell>
-                        <TableCell>
-                          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                            <DialogTrigger asChild>
-                              <Button
-                                className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                                onClick={() => {
-                                  setIsEdit(false);
-                                  setFormData({
-                                    spaceName: "",
-                                  });
-                                }}
-                              >
-                                Add New Facility
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                                  {isEdit ? "Edit Space" : "Add New Space"}
-                                </DialogTitle>
-                              </DialogHeader>
-                              <form
-                                onSubmit={handleSubmit}
-                                className="space-y-4 text-xl text-neutral-700"
-                              >
-                                <div>
-                                  <Label htmlFor="blockName">
-                                    Facility Name
-                                  </Label>
-                                  <Input
-                                    id="blockName"
-                                    className="mb-3"
-                                    value={formData.spaceName}
-                                    onChange={(e) =>
-                                      setFormData({
-                                        ...formData,
-                                        spaceName: e.target.value,
-                                      })
-                                    }
-                                    required
-                                  />
-                                  <Label htmlFor="selectSpaceType">
-                                    Facility Type
-                                  </Label>
-                                  <div id="selectSpaceType">
-                                    <Select
-                                      value={formData.spaceTypeId}
-                                      onValueChange={(value) => {
-                                        const selected = spaceTypes.find(
-                                          (type) => type.spaceTypeId === value
-                                        );
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center py-8">
+                        <Spinner className="mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    spaces.map((space) => (
+                      <React.Fragment key={space.spaceId}>
+                        <TableRow className="hover:bg-[hsl(var(--tech-blue))/5]">
+                          <TableCell>
+                            <ExpandableRow
+                              isOpen={expandedSpaces[space.spaceId] || false}
+                              onClick={() => toggleSpace(space.spaceId)}
+                              icon={Building2}
+                              name={space.spaceName}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                              onClick={() => {
+                                setSelectedSpace(space);
+                                setViewMode("equipmentTable");
+                              }}
+                            >
+                              View Equipment
+                            </Button>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                              onClick={() => handleEdit(space)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              className="mr-2"
+                              variant="destructive"
+                              onClick={() => setDeleteSpaceId(space.spaceId)}
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                          <TableCell>
+                            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                              <DialogTrigger asChild>
+                                <Button
+                                  className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                  onClick={() => {
+                                    setIsEdit(false);
+                                    setFormData({
+                                      spaceName: "",
+                                    });
+                                  }}
+                                >
+                                  Add New Facility
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                                    {isEdit ? "Edit Space" : "Add New Space"}
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <form
+                                  onSubmit={handleSubmit}
+                                  className="space-y-4 text-xl text-neutral-700"
+                                >
+                                  <div>
+                                    <Label htmlFor="blockName">
+                                      Facility Name
+                                    </Label>
+                                    <Input
+                                      id="blockName"
+                                      className="mb-3"
+                                      value={formData.spaceName}
+                                      onChange={(e) =>
                                         setFormData({
                                           ...formData,
-                                          spaceTypeId:
-                                            selected?.spaceTypeId || "",
-                                          spaceTypeName:
-                                            selected?.spaceTypeName || "",
-                                        });
-                                      }}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Select Space Type" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {(() => {
-                                          const parentType = spaceTypes.find(
-                                            (type) =>
-                                              type.spaceTypeId ===
-                                              space.spaceTypeId
+                                          spaceName: e.target.value,
+                                        })
+                                      }
+                                      required
+                                    />
+                                    <Label htmlFor="selectSpaceType">
+                                      Facility Type
+                                    </Label>
+                                    <div id="selectSpaceType">
+                                      <Select
+                                        value={formData.spaceTypeId}
+                                        onValueChange={(value) => {
+                                          const selected = spaceTypes.find(
+                                            (type) => type.spaceTypeId === value
                                           );
-                                          const nextLevel = parentType
-                                            ? parentType.spaceLevel + 1
-                                            : null;
-
-                                          return spaceTypes
-                                            .filter(
+                                          setFormData({
+                                            ...formData,
+                                            spaceTypeId:
+                                              selected?.spaceTypeId || "",
+                                            spaceTypeName:
+                                              selected?.spaceTypeName || "",
+                                          });
+                                        }}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select Space Type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {(() => {
+                                            const parentType = spaceTypes.find(
                                               (type) =>
-                                                type.spaceLevel === nextLevel
-                                            )
-                                            .map((type) => (
-                                              <SelectItem
-                                                key={type.spaceTypeId}
-                                                value={type.spaceTypeId}
-                                              >
-                                                {type.spaceTypeName}
-                                              </SelectItem>
-                                            ));
-                                        })()}
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                </div>
-                                <Button type="submit">
-                                  {isEdit ? "Update" : "Save"}
-                                </Button>
-                              </form>
-                            </DialogContent>
-                          </Dialog>
-                        </TableCell>
-                      </TableRow>
-                      {expandedSpaces[space.spaceId] &&
-                        space.children.map((childSpace) => (
-                          <React.Fragment
-                            key={`${space.spaceId}-${childSpace.spaceId}`}
-                          >
-                            <TableRow className="bg-muted/50">
-                              <TableCell>
-                                <ExpandableRow
-                                  isOpen={
-                                    expandedSpaces[childSpace.spaceId] || false
-                                  }
-                                  onClick={() =>
-                                    toggleSpace(childSpace.spaceId)
-                                  }
-                                  icon={DoorClosed}
-                                  name={childSpace.spaceName}
-                                  level={1}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Button
-                                  className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                                  variant="outline"
-                                  onClick={() => {
-                                    setSelectedSpace(childSpace);
-                                    setViewMode("equipmentTable");
-                                  }}
-                                >
-                                  View Equipment
-                                </Button>
-                              </TableCell>
-                              <TableCell>
-                                <Button
-                                  variant="outline"
-                                  className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                                  onClick={() => {
-                                    setFormData(childSpace);
-                                    setIsEdit(true);
-                                    setIsOpen(true);
-                                  }}
-                                >
-                                  Edit
-                                </Button>
-                                <Button
-                                  className="mr-2"
-                                  variant="destructive"
-                                  onClick={() =>
-                                    handleDelete(childSpace.spaceId)
-                                  }
-                                >
-                                  Delete
-                                </Button>
-                              </TableCell>
-                              <TableCell>
-                                <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                                  <DialogTrigger asChild>
-                                    <Button
-                                      className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                                      onClick={() => {
-                                        setIsEdit(false);
-                                        setFormData({
-                                          spaceName: "",
-                                        });
-                                      }}
-                                    >
-                                      Add New Facility
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent>
-                                    <DialogHeader>
-                                      <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                                        {isEdit
-                                          ? "Edit Space"
-                                          : "Add New Space"}
-                                      </DialogTitle>
-                                    </DialogHeader>
-                                    <form
-                                      onSubmit={handleSubmit}
-                                      className="space-y-4 text-xl text-neutral-700"
-                                    >
-                                      <div>
-                                        <Label htmlFor="blockName">
-                                          Facility Name
-                                        </Label>
-                                        <Input
-                                          id="blockName"
-                                          className="mb-3"
-                                          value={formData.spaceName}
-                                          onChange={(e) =>
-                                            setFormData({
-                                              ...formData,
-                                              spaceName: e.target.value,
-                                            })
-                                          }
-                                          required
-                                        />
-                                        <Label htmlFor="selectSpaceType">
-                                          Facility Type
-                                        </Label>
-                                        <div id="selectSpaceType">
-                                          <Select
-                                            value={formData.spaceTypeId}
-                                            onValueChange={(value) => {
-                                              const selected = spaceTypes.find(
+                                                type.spaceTypeId ===
+                                                space.spaceTypeId
+                                            );
+                                            const nextLevel = parentType
+                                              ? parentType.spaceLevel + 1
+                                              : null;
+
+                                            return spaceTypes
+                                              .filter(
                                                 (type) =>
-                                                  type.spaceTypeId === value
-                                              );
+                                                  type.spaceLevel === nextLevel
+                                              )
+                                              .map((type) => (
+                                                <SelectItem
+                                                  key={type.spaceTypeId}
+                                                  value={type.spaceTypeId}
+                                                >
+                                                  {type.spaceTypeName}
+                                                </SelectItem>
+                                              ));
+                                          })()}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  </div>
+                                  <Button type="submit">
+                                    {isEdit ? "Update" : "Save"}
+                                  </Button>
+                                </form>
+                              </DialogContent>
+                            </Dialog>
+                          </TableCell>
+                        </TableRow>
+                        {expandedSpaces[space.spaceId] &&
+                          space.children.map((childSpace) => (
+                            <React.Fragment
+                              key={`${space.spaceId}-${childSpace.spaceId}`}
+                            >
+                              <TableRow className="bg-muted/50">
+                                <TableCell>
+                                  <ExpandableRow
+                                    isOpen={
+                                      expandedSpaces[childSpace.spaceId] ||
+                                      false
+                                    }
+                                    onClick={() =>
+                                      toggleSpace(childSpace.spaceId)
+                                    }
+                                    icon={DoorClosed}
+                                    name={childSpace.spaceName}
+                                    level={1}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Button
+                                    className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedSpace(childSpace);
+                                      setViewMode("equipmentTable");
+                                    }}
+                                  >
+                                    View Equipment
+                                  </Button>
+                                </TableCell>
+                                <TableCell>
+                                  <Button
+                                    variant="outline"
+                                    className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                                    onClick={() => {
+                                      setFormData(childSpace);
+                                      setIsEdit(true);
+                                      setIsOpen(true);
+                                    }}
+                                  >
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    className="mr-2"
+                                    variant="destructive"
+                                    onClick={() =>
+                                      setDeleteSpaceId(childSpace.spaceId)
+                                    }
+                                  >
+                                    Delete
+                                  </Button>
+                                </TableCell>
+                                <TableCell>
+                                  <Dialog
+                                    open={isOpen}
+                                    onOpenChange={setIsOpen}
+                                  >
+                                    <DialogTrigger asChild>
+                                      <Button
+                                        className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                        onClick={() => {
+                                          setIsEdit(false);
+                                          setFormData({
+                                            spaceName: "",
+                                          });
+                                        }}
+                                      >
+                                        Add New Facility
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                      <DialogHeader>
+                                        <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                                          {isEdit
+                                            ? "Edit Space"
+                                            : "Add New Space"}
+                                        </DialogTitle>
+                                      </DialogHeader>
+                                      <form
+                                        onSubmit={handleSubmit}
+                                        className="space-y-4 text-xl text-neutral-700"
+                                      >
+                                        <div>
+                                          <Label htmlFor="blockName">
+                                            Facility Name
+                                          </Label>
+                                          <Input
+                                            id="blockName"
+                                            className="mb-3"
+                                            value={formData.spaceName}
+                                            onChange={(e) =>
                                               setFormData({
                                                 ...formData,
-                                                spaceTypeId:
-                                                  selected?.spaceTypeId || "",
-                                                spaceTypeName:
-                                                  selected?.spaceTypeName || "",
-                                              });
-                                            }}
-                                          >
-                                            <SelectTrigger>
-                                              <SelectValue placeholder="Select Space Type" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              {(() => {
-                                                const parentType =
+                                                spaceName: e.target.value,
+                                              })
+                                            }
+                                            required
+                                          />
+                                          <Label htmlFor="selectSpaceType">
+                                            Facility Type
+                                          </Label>
+                                          <div id="selectSpaceType">
+                                            <Select
+                                              value={formData.spaceTypeId}
+                                              onValueChange={(value) => {
+                                                const selected =
                                                   spaceTypes.find(
                                                     (type) =>
-                                                      type.spaceTypeId ===
-                                                      childSpace.spaceTypeId
+                                                      type.spaceTypeId === value
                                                   );
-                                                const nextLevel = parentType
-                                                  ? parentType.spaceLevel + 1
-                                                  : null;
+                                                setFormData({
+                                                  ...formData,
+                                                  spaceTypeId:
+                                                    selected?.spaceTypeId || "",
+                                                  spaceTypeName:
+                                                    selected?.spaceTypeName ||
+                                                    "",
+                                                });
+                                              }}
+                                            >
+                                              <SelectTrigger>
+                                                <SelectValue placeholder="Select Space Type" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                {(() => {
+                                                  const parentType =
+                                                    spaceTypes.find(
+                                                      (type) =>
+                                                        type.spaceTypeId ===
+                                                        childSpace.spaceTypeId
+                                                    );
+                                                  const nextLevel = parentType
+                                                    ? parentType.spaceLevel + 1
+                                                    : null;
 
-                                                return spaceTypes
-                                                  .filter(
-                                                    (type) =>
-                                                      type.spaceLevel ===
-                                                      nextLevel
-                                                  )
-                                                  .map((type) => (
-                                                    <SelectItem
-                                                      key={type.spaceTypeId}
-                                                      value={type.spaceTypeId}
-                                                    >
-                                                      {type.spaceTypeName}
-                                                    </SelectItem>
-                                                  ));
-                                              })()}
-                                            </SelectContent>
-                                          </Select>
+                                                  return spaceTypes
+                                                    .filter(
+                                                      (type) =>
+                                                        type.spaceLevel ===
+                                                        nextLevel
+                                                    )
+                                                    .map((type) => (
+                                                      <SelectItem
+                                                        key={type.spaceTypeId}
+                                                        value={type.spaceTypeId}
+                                                      >
+                                                        {type.spaceTypeName}
+                                                      </SelectItem>
+                                                    ));
+                                                })()}
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
                                         </div>
-                                      </div>
-                                      <Button type="submit">
-                                        {isEdit ? "Update" : "Save"}
-                                      </Button>
-                                    </form>
-                                  </DialogContent>
-                                </Dialog>
-                              </TableCell>
-                            </TableRow>
-                            {expandedSpaces[childSpace.spaceId] &&
-                              childSpace.children.map((grandchildSpace) => (
-                                <React.Fragment
-                                  key={`${space.spaceId}-${childSpace.spaceId}-${grandchildSpace.spaceId}`}
-                                >
-                                  <TableRow className="bg-muted/30">
-                                    <TableCell>
-                                      <div
-                                        className="flex items-center gap-2"
-                                        style={{ paddingLeft: "60px" }}
-                                      >
-                                        <DoorClosed size={16} />
-                                        <span>{grandchildSpace.spaceName}</span>
-                                      </div>
-                                    </TableCell>
-                                    <TableCell>
-                                      <Button
-                                        className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                                        variant="outline"
-                                        onClick={() => {
-                                          setSelectedSpace(grandchildSpace);
-                                          setViewMode("equipmentTable");
-                                        }}
-                                      >
-                                        View Equipment
-                                      </Button>
-                                    </TableCell>
-                                    <TableCell>
-                                      <Button
-                                        variant="outline"
-                                        className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                                        onClick={() => {
-                                          setFormData(grandchildSpace);
-                                          setIsEdit(true);
-                                          setIsOpen(true);
-                                        }}
-                                      >
-                                        Edit
-                                      </Button>
-                                      <Button
-                                        className="mr-2"
-                                        variant="destructive"
-                                        onClick={() =>
-                                          handleDelete(grandchildSpace.spaceId)
-                                        }
-                                      >
-                                        Delete
-                                      </Button>
-                                    </TableCell>
-                                    <TableCell>
-                                      <Dialog
-                                        open={isOpen}
-                                        onOpenChange={setIsOpen}
-                                      >
-                                        <DialogTrigger asChild>
-                                          <Button
-                                            className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                                            onClick={() => {
-                                              setIsEdit(false);
-                                              setFormData({
-                                                spaceName: "",
-                                              });
-                                            }}
-                                          >
-                                            Add New Facility
-                                          </Button>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                          <DialogHeader>
-                                            <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                                              {isEdit
-                                                ? "Edit Space"
-                                                : "Add New Space"}
-                                            </DialogTitle>
-                                          </DialogHeader>
-                                          <form
-                                            onSubmit={handleSubmit}
-                                            className="space-y-4 text-xl text-neutral-700"
-                                          >
-                                            <div>
-                                              <Label htmlFor="blockName">
-                                                Facility Name
-                                              </Label>
-                                              <Input
-                                                id="blockName"
-                                                className="mb-3"
-                                                value={formData.spaceName}
-                                                onChange={(e) =>
-                                                  setFormData({
-                                                    ...formData,
-                                                    spaceName: e.target.value,
-                                                  })
-                                                }
-                                                required
-                                              />
-                                              <Label htmlFor="selectSpaceType">
-                                                Facility Type
-                                              </Label>
-                                              <div id="selectSpaceType">
-                                                <Select
-                                                  value={formData.spaceTypeId}
-                                                  onValueChange={(value) => {
-                                                    const selected =
-                                                      spaceTypes.find(
-                                                        (type) =>
-                                                          type.spaceTypeId ===
-                                                          value
-                                                      );
+                                        <Button type="submit">
+                                          {isEdit ? "Update" : "Save"}
+                                        </Button>
+                                      </form>
+                                    </DialogContent>
+                                  </Dialog>
+                                </TableCell>
+                              </TableRow>
+                              {expandedSpaces[childSpace.spaceId] &&
+                                childSpace.children.map((grandchildSpace) => (
+                                  <React.Fragment
+                                    key={`${space.spaceId}-${childSpace.spaceId}-${grandchildSpace.spaceId}`}
+                                  >
+                                    <TableRow className="bg-muted/30">
+                                      <TableCell>
+                                        <div
+                                          className="flex items-center gap-2"
+                                          style={{ paddingLeft: "60px" }}
+                                        >
+                                          <DoorClosed size={16} />
+                                          <span>
+                                            {grandchildSpace.spaceName}
+                                          </span>
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Button
+                                          className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                                          variant="outline"
+                                          onClick={() => {
+                                            setSelectedSpace(grandchildSpace);
+                                            setViewMode("equipmentTable");
+                                          }}
+                                        >
+                                          View Equipment
+                                        </Button>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Button
+                                          variant="outline"
+                                          className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                                          onClick={() => {
+                                            setFormData(grandchildSpace);
+                                            setIsEdit(true);
+                                            setIsOpen(true);
+                                          }}
+                                        >
+                                          Edit
+                                        </Button>
+                                        <Button
+                                          className="mr-2"
+                                          variant="destructive"
+                                          onClick={() =>
+                                            setDeleteSpaceId(
+                                              grandchildSpace.spaceId
+                                            )
+                                          }
+                                        >
+                                          Delete
+                                        </Button>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Dialog
+                                          open={isOpen}
+                                          onOpenChange={setIsOpen}
+                                        >
+                                          <DialogTrigger asChild>
+                                            <Button
+                                              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                              onClick={() => {
+                                                setIsEdit(false);
+                                                setFormData({
+                                                  spaceName: "",
+                                                });
+                                              }}
+                                            >
+                                              Add New Facility
+                                            </Button>
+                                          </DialogTrigger>
+                                          <DialogContent>
+                                            <DialogHeader>
+                                              <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                                                {isEdit
+                                                  ? "Edit Space"
+                                                  : "Add New Space"}
+                                              </DialogTitle>
+                                            </DialogHeader>
+                                            <form
+                                              onSubmit={handleSubmit}
+                                              className="space-y-4 text-xl text-neutral-700"
+                                            >
+                                              <div>
+                                                <Label htmlFor="blockName">
+                                                  Facility Name
+                                                </Label>
+                                                <Input
+                                                  id="blockName"
+                                                  className="mb-3"
+                                                  value={formData.spaceName}
+                                                  onChange={(e) =>
                                                     setFormData({
                                                       ...formData,
-                                                      spaceTypeId:
-                                                        selected?.spaceTypeId ||
-                                                        "",
-                                                      spaceTypeName:
-                                                        selected?.spaceTypeName ||
-                                                        "",
-                                                    });
-                                                  }}
-                                                >
-                                                  <SelectTrigger>
-                                                    <SelectValue placeholder="Select Space Type" />
-                                                  </SelectTrigger>
-                                                  <SelectContent>
-                                                    {(() => {
-                                                      const parentType =
+                                                      spaceName: e.target.value,
+                                                    })
+                                                  }
+                                                  required
+                                                />
+                                                <Label htmlFor="selectSpaceType">
+                                                  Facility Type
+                                                </Label>
+                                                <div id="selectSpaceType">
+                                                  <Select
+                                                    value={formData.spaceTypeId}
+                                                    onValueChange={(value) => {
+                                                      const selected =
                                                         spaceTypes.find(
                                                           (type) =>
                                                             type.spaceTypeId ===
-                                                            grandchildSpace.spaceTypeId
+                                                            value
                                                         );
-                                                      const nextLevel =
-                                                        parentType
-                                                          ? parentType.spaceLevel +
-                                                            1
-                                                          : null;
+                                                      setFormData({
+                                                        ...formData,
+                                                        spaceTypeId:
+                                                          selected?.spaceTypeId ||
+                                                          "",
+                                                        spaceTypeName:
+                                                          selected?.spaceTypeName ||
+                                                          "",
+                                                      });
+                                                    }}
+                                                  >
+                                                    <SelectTrigger>
+                                                      <SelectValue placeholder="Select Space Type" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                      {(() => {
+                                                        const parentType =
+                                                          spaceTypes.find(
+                                                            (type) =>
+                                                              type.spaceTypeId ===
+                                                              grandchildSpace.spaceTypeId
+                                                          );
+                                                        const nextLevel =
+                                                          parentType
+                                                            ? parentType.spaceLevel +
+                                                              1
+                                                            : null;
 
-                                                      return spaceTypes
-                                                        .filter(
-                                                          (type) =>
-                                                            type.spaceLevel ===
-                                                            nextLevel
-                                                        )
-                                                        .map((type) => (
-                                                          <SelectItem
-                                                            key={
-                                                              type.spaceTypeId
-                                                            }
-                                                            value={
-                                                              type.spaceTypeId
-                                                            }
-                                                          >
-                                                            {type.spaceTypeName}
-                                                          </SelectItem>
-                                                        ));
-                                                    })()}
-                                                  </SelectContent>
-                                                </Select>
+                                                        return spaceTypes
+                                                          .filter(
+                                                            (type) =>
+                                                              type.spaceLevel ===
+                                                              nextLevel
+                                                          )
+                                                          .map((type) => (
+                                                            <SelectItem
+                                                              key={
+                                                                type.spaceTypeId
+                                                              }
+                                                              value={
+                                                                type.spaceTypeId
+                                                              }
+                                                            >
+                                                              {
+                                                                type.spaceTypeName
+                                                              }
+                                                            </SelectItem>
+                                                          ));
+                                                      })()}
+                                                    </SelectContent>
+                                                  </Select>
+                                                </div>
                                               </div>
-                                            </div>
-                                            <Button type="submit">
-                                              {isEdit ? "Update" : "Save"}
-                                            </Button>
-                                          </form>
-                                        </DialogContent>
-                                      </Dialog>
-                                    </TableCell>
-                                  </TableRow>
-                                </React.Fragment>
-                              ))}
-                          </React.Fragment>
-                        ))}
-                    </React.Fragment>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </>
-      )}
-      {viewMode === "equipmentTable" && selectedSpace && (
-        <>
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
-              List of Equipment in {selectedSpace.spaceTypeName}{" "}
-              {selectedSpace.spaceName}
-            </h2>
-            <Dialog
-              open={isEquipmentDialogOpen}
-              onOpenChange={setIsEquipmentDialogOpen}
-            >
-              <div>
-                <Button
-                  className="mr-2"
-                  variant="outline"
-                  onClick={() => {
-                    setIsEquipmentDialogOpen(false);
-                    setIsEquipmentEdit(false);
-                    setEquipmentFormData({ equipmentName: "", deviceId: "" });
-                    setSelectedSpace(null);
-                    setViewMode("spaceManagement");
-                  }}
-                >
-                  ← Back to Block List
-                </Button>
-                <Button
-                  className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                  onClick={() => {
-                    setIsEquipmentEdit(false);
-                    setEquipmentFormData({
-                      equipmentName: "",
-                      deviceId: "",
-                      equipmentTypeId: "",
-                      categoryId: 0,
-                      spaceId: selectedSpace.spaceId,
-                    });
-                    setIsEquipmentDialogOpen(true);
-                  }}
-                >
-                  Add New Equipment
-                </Button>
-              </div>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                    {isEdit ? "Edit Equipment" : "Add New Equipment"}
-                  </DialogTitle>
-                </DialogHeader>
-                <form
-                  onSubmit={handleEquipmentSubmit}
-                  className="space-y-4 text-xl text-neutral-700"
-                >
-                  <div>
-                    <Label htmlFor="equipmentName" className="text-neutral-700">
-                      Equipment Name
-                    </Label>
-                    <Input
-                      id="equipmentName"
-                      value={equipmentFormData.equipmentName || ""}
-                      onChange={(e) =>
-                        setEquipmentFormData({
-                          ...equipmentFormData,
-                          equipmentName: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="deviceId" className="text-neutral-700">
-                      Device ID
-                    </Label>
-                    <Input
-                      className="mb-3"
-                      id="deviceId"
-                      value={equipmentFormData.deviceId || ""}
-                      onChange={(e) =>
-                        setEquipmentFormData({
-                          ...equipmentFormData,
-                          deviceId: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                    <Label htmlFor="selectEquipmentType">Equipment Type</Label>
-                    <div id="selectEquipmentType" className="mb-3">
-                      <Select
-                        value={equipmentFormData.equipmentTypeId}
-                        onValueChange={(value) => {
-                          const selected = equipmentTypes.find(
-                            (type) => type.equipmentTypeId === value
-                          );
-                          setEquipmentFormData({
-                            ...equipmentFormData,
-                            equipmentTypeId: selected?.equipmentTypeId || "",
-                          });
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {equipmentTypes.map((type) => (
-                            <SelectItem
-                              key={type.equipmentTypeId}
-                              value={type.equipmentTypeId}
-                            >
-                              {type.equipmentTypeName}
-                            </SelectItem>
+                                              <Button type="submit">
+                                                {isEdit ? "Update" : "Save"}
+                                              </Button>
+                                            </form>
+                                          </DialogContent>
+                                        </Dialog>
+                                      </TableCell>
+                                    </TableRow>
+                                  </React.Fragment>
+                                ))}
+                            </React.Fragment>
                           ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Label htmlFor="selectCategory">Category</Label>
-                    <div id="selectCategory">
-                      <Select
-                        value={
-                          equipmentFormData.categoryId !== null
-                            ? String(equipmentFormData.categoryId)
-                            : ""
-                        }
-                        onValueChange={(value) => {
-                          const selected = categories.find(
-                            (category) =>
-                              category.categoryId.toString() === value
-                          );
-                          setEquipmentFormData({
-                            ...equipmentFormData,
-                            categoryId: selected?.categoryId,
-                          });
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem
-                              key={category.categoryId}
-                              value={String(category.categoryId)}
-                            >
-                              {category.categoryName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <Button type="submit">
-                    {isEquipmentEdit ? "Update" : "Save"}
+                      </React.Fragment>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        )}
+        {viewMode === "equipmentTable" && selectedSpace && (
+          <>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
+                List of Equipment in {selectedSpace.spaceTypeName}{" "}
+                {selectedSpace.spaceName}
+              </h2>
+              <Dialog
+                open={isEquipmentDialogOpen}
+                onOpenChange={setIsEquipmentDialogOpen}
+              >
+                <div>
+                  <Button
+                    className="mr-2"
+                    variant="outline"
+                    onClick={() => {
+                      setIsEquipmentDialogOpen(false);
+                      setIsEquipmentEdit(false);
+                      setEquipmentFormData({ equipmentName: "", deviceId: "" });
+                      setSelectedSpace(null);
+                      setViewMode("spaceManagement");
+                    }}
+                  >
+                    ← Back to Block List
                   </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="rounded-md border border-border text-neutral-700">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-[hsl(var(--tech-blue))/5]">
-                  <TableHead>Name</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={2} className="text-center py-8">
-                      <Spinner className="mx-auto" />
-                    </TableCell>
+                  <Button
+                    className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                    onClick={() => {
+                      setIsEquipmentEdit(false);
+                      setEquipmentFormData({
+                        equipmentName: "",
+                        deviceId: "",
+                        equipmentTypeId: "",
+                        categoryId: 0,
+                        spaceId: selectedSpace.spaceId,
+                      });
+                      setIsEquipmentDialogOpen(true);
+                    }}
+                  >
+                    Add New Equipment
+                  </Button>
+                </div>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                      {isEdit ? "Edit Equipment" : "Add New Equipment"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <form
+                    onSubmit={handleEquipmentSubmit}
+                    className="space-y-4 text-xl text-neutral-700"
+                  >
+                    <div>
+                      <Label
+                        htmlFor="equipmentName"
+                        className="text-neutral-700"
+                      >
+                        Equipment Name
+                      </Label>
+                      <Input
+                        id="equipmentName"
+                        value={equipmentFormData.equipmentName || ""}
+                        onChange={(e) =>
+                          setEquipmentFormData({
+                            ...equipmentFormData,
+                            equipmentName: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="deviceId" className="text-neutral-700">
+                        Device ID
+                      </Label>
+                      <Input
+                        className="mb-3"
+                        id="deviceId"
+                        value={equipmentFormData.deviceId || ""}
+                        onChange={(e) =>
+                          setEquipmentFormData({
+                            ...equipmentFormData,
+                            deviceId: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                      <Label htmlFor="selectEquipmentType">
+                        Equipment Type
+                      </Label>
+                      <div id="selectEquipmentType" className="mb-3">
+                        <Select
+                          value={equipmentFormData.equipmentTypeId}
+                          onValueChange={(value) => {
+                            const selected = equipmentTypes.find(
+                              (type) => type.equipmentTypeId === value
+                            );
+                            setEquipmentFormData({
+                              ...equipmentFormData,
+                              equipmentTypeId: selected?.equipmentTypeId || "",
+                            });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {equipmentTypes.map((type) => (
+                              <SelectItem
+                                key={type.equipmentTypeId}
+                                value={type.equipmentTypeId}
+                              >
+                                {type.equipmentTypeName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Label htmlFor="selectCategory">Category</Label>
+                      <div id="selectCategory">
+                        <Select
+                          value={
+                            equipmentFormData.categoryId !== null
+                              ? String(equipmentFormData.categoryId)
+                              : ""
+                          }
+                          onValueChange={(value) => {
+                            const selected = categories.find(
+                              (category) =>
+                                category.categoryId.toString() === value
+                            );
+                            setEquipmentFormData({
+                              ...equipmentFormData,
+                              categoryId: selected?.categoryId,
+                            });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem
+                                key={category.categoryId}
+                                value={String(category.categoryId)}
+                              >
+                                {category.categoryName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <Button type="submit">
+                      {isEquipmentEdit ? "Update" : "Save"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="rounded-md border border-border text-neutral-700">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-[hsl(var(--tech-blue))/5]">
+                    <TableHead>Name</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ) : (
-                  selectedSpace?.equipments.map((equipment) => (
-                    <React.Fragment key={equipment.equipmentId}>
-                      <TableRow className="bg-muted/20">
-                        <TableCell>
-                          <div
-                            className="flex items-center gap-2"
-                            style={{ paddingLeft: "60px" }}
-                          >
-                            <Cpu size={16} />
-                            <span>{equipment.equipmentName}</span>
-                            <span className="text-sm text-muted-foreground">
-                              (ID: {equipment.equipmentId}, Device ID:{" "}
-                              {equipment.deviceId})
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                            onClick={() => {
-                              setEquipmentFormData(equipment);
-                              setIsEquipmentEdit(true);
-                              setIsEquipmentDialogOpen(true);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            onClick={() =>
-                              handleDeleteEquipment(equipment.equipmentId)
-                            }
-                          >
-                            Delete
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    </React.Fragment>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </>
-      )}
-    </div>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center py-8">
+                        <Spinner className="mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    selectedSpace?.equipments.map((equipment) => (
+                      <React.Fragment key={equipment.equipmentId}>
+                        <TableRow className="bg-muted/20">
+                          <TableCell>
+                            <div
+                              className="flex items-center gap-2"
+                              style={{ paddingLeft: "60px" }}
+                            >
+                              <Cpu size={16} />
+                              <span>{equipment.equipmentName}</span>
+                              <span className="text-sm text-muted-foreground">
+                                (ID: {equipment.equipmentId}, Device ID:{" "}
+                                {equipment.deviceId})
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                              onClick={() => {
+                                setEquipmentFormData(equipment);
+                                setIsEquipmentEdit(true);
+                                setIsEquipmentDialogOpen(true);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={() =>
+                                setDeleteEquipmentId(equipment.equipmentId)
+                              }
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      </React.Fragment>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        )}
+      </div>
 
-    //modal for delete confirmation
+      <DeleteConfirmModal
+        isOpen={!!deleteSpaceId}
+        onClose={() => setDeleteSpaceId(null)}
+        onConfirm={confirmDelete}
+        loading={isDeleting}
+        title="Delete Space"
+        description="Are you sure you want to delete this space? This action cannot be undone."
+        confirmText="Delete"
+      />
+
+      <DeleteConfirmModal
+        isOpen={!!deleteEquipmentId}
+        onClose={() => setDeleteEquipmentId(null)}
+        onConfirm={confirmDeleteEquipment}
+        loading={isDeleting}
+        title="Delete Equipment"
+        description="Are you sure you want to delete this equipment? This action cannot be undone."
+        confirmText="Delete"
+      />
+    </>
   );
 }

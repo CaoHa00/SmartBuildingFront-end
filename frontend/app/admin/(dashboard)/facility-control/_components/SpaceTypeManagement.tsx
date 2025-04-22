@@ -25,6 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Building2 } from "lucide-react";
 import { SpaceType, NewSpaceTypeData } from "@/types/space";
+import { DeleteConfirmModal } from "@/components/delete-confirmation";
 
 export function SpaceTypeManagement() {
   const { toast } = useToast();
@@ -36,6 +37,8 @@ export function SpaceTypeManagement() {
     spaceTypeName: "",
     spaceLevel: 0,
   });
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchSpaceTypes();
@@ -93,9 +96,28 @@ export function SpaceTypeManagement() {
     }
   };
 
-  const handleDelete = async (spaceId: string) => {
+  // const handleDelete = async (spaceId: string) => {
+  //   try {
+  //     await api.delete(`/space-types/${spaceId}`);
+  //     fetchSpaceTypes();
+  //     toast({
+  //       title: "Success",
+  //       description: "Space type deleted successfully",
+  //     });
+  //   } catch (error) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Error",
+  //       description: "Failed to delete space type",
+  //     });
+  //   }
+  // };
+
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
     try {
-      await api.delete(`/space-types/${spaceId}`);
+      setIsDeleting(true);
+      await api.delete(`/space-types/${deleteTargetId}`);
       fetchSpaceTypes();
       toast({
         title: "Success",
@@ -107,6 +129,9 @@ export function SpaceTypeManagement() {
         title: "Error",
         description: "Failed to delete space type",
       });
+    } finally {
+      setDeleteTargetId(null);
+      setIsDeleting(false);
     }
   };
 
@@ -117,128 +142,143 @@ export function SpaceTypeManagement() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
-          Space Type Management
-        </h2>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button
-              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-              onClick={() => {
-                setIsEdit(false);
-                setFormData({
-                  spaceTypeName: "",
-                });
-              }}
-            >
-              Add New Space Type
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                {isEdit ? "Edit Space" : "Add New Space"}
-              </DialogTitle>
-            </DialogHeader>
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-4 text-xl text-neutral-700"
-            >
-              <div>
-                <Label htmlFor="spaceTypeName">Space Type Name</Label>
-                <Input
-                  id="spaceTypeName"
-                  className="mb-3"
-                  value={formData.spaceTypeName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, spaceTypeName: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="spaceTypeLevel">Space Type Level</Label>
-                <Input
-                  id="spaceTypeLevel"
-                  className="mb-3"
-                  value={formData.spaceLevel === 0 ? 0 : formData.spaceLevel}
-                  onChange={
-                    !isEdit
-                      ? (e) =>
-                          setFormData({
-                            ...formData,
-                            spaceLevel: Number(e.target.value || 0),
-                          })
-                      : undefined
-                  }
-                  required
-                  disabled={isEdit}
-                />
-              </div>
-              <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+    <>
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
+            Space Type Management
+          </h2>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button
+                className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                onClick={() => {
+                  setIsEdit(false);
+                  setFormData({
+                    spaceTypeName: "",
+                  });
+                }}
+              >
+                Add New Space Type
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+                  {isEdit ? "Edit Space" : "Add New Space"}
+                </DialogTitle>
+              </DialogHeader>
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-4 text-xl text-neutral-700"
+              >
+                <div>
+                  <Label htmlFor="spaceTypeName">Space Type Name</Label>
+                  <Input
+                    id="spaceTypeName"
+                    className="mb-3"
+                    value={formData.spaceTypeName}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        spaceTypeName: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="spaceTypeLevel">Space Type Level</Label>
+                  <Input
+                    id="spaceTypeLevel"
+                    className="mb-3"
+                    value={formData.spaceLevel === 0 ? 0 : formData.spaceLevel}
+                    onChange={
+                      !isEdit
+                        ? (e) =>
+                            setFormData({
+                              ...formData,
+                              spaceLevel: Number(e.target.value || 0),
+                            })
+                        : undefined
+                    }
+                    required
+                    disabled={isEdit}
+                  />
+                </div>
+                <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      <div className="rounded-md border border-border text-neutral-700">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-[hsl(var(--tech-blue))/5]">
-              <TableHead>Name</TableHead>
-              <TableHead>Level</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={2} className="text-center py-8">
-                  <Spinner className="mx-auto" />
-                </TableCell>
+        <div className="rounded-md border border-border text-neutral-700">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-[hsl(var(--tech-blue))/5]">
+                <TableHead>Name</TableHead>
+                <TableHead>Level</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ) : (
-              spaceTypes.map((spaceType) => (
-                <React.Fragment key={spaceType.spaceTypeId}>
-                  <TableRow className="hover:bg-[hsl(var(--tech-blue))/5]">
-                    <TableCell>
-                      <div className="flex items-center gap-2 cursor-pointer">
-                        <Building2 size={16} />
-                        <span>{spaceType.spaceTypeName}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2 cursor-pointer">
-                        <span>{spaceType.spaceLevel}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                        onClick={() => handleEdit(spaceType)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        className="mr-2"
-                        variant="destructive"
-                        onClick={() => handleDelete(spaceType.spaceTypeId)}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
-              ))
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center py-8">
+                    <Spinner className="mx-auto" />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                spaceTypes.map((spaceType) => (
+                  <React.Fragment key={spaceType.spaceTypeId}>
+                    <TableRow className="hover:bg-[hsl(var(--tech-blue))/5]">
+                      <TableCell>
+                        <div className="flex items-center gap-2 cursor-pointer">
+                          <Building2 size={16} />
+                          <span>{spaceType.spaceTypeName}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 cursor-pointer">
+                          <span>{spaceType.spaceLevel}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                          onClick={() => handleEdit(spaceType)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          className="mr-2"
+                          variant="destructive"
+                          onClick={() =>
+                            setDeleteTargetId(spaceType.spaceTypeId)
+                          }
+                        >
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
 
-    //modal for delete confirmation
+      <DeleteConfirmModal
+        isOpen={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={confirmDelete}
+        loading={isDeleting}
+        title="Delete Space Type"
+        description="Are you sure you want to delete this space type? This action cannot be undone."
+        confirmText="Delete"
+      />
+    </>
   );
 }
