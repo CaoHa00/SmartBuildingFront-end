@@ -97,35 +97,46 @@ function FacilityDialog({
   formData: Partial<Space>;
   setFormData: React.Dispatch<React.SetStateAction<Partial<Space>>>;
 }) {
-  const isRoot = space.spaceName === "root";
+  const targetLevel = (() => {
+    if (isEdit) {
+      const type = spaceTypes.find(
+        (type) => type.spaceTypeId === formData.spaceTypeId
+      );
+      return type ? type.spaceLevel : null;
+    } else {
+      const parentType =
+        space.spaceName === "root"
+          ? null
+          : spaceTypes.find((type) => type.spaceTypeId === space.spaceTypeId);
 
-  const parentType = isRoot
-    ? null
-    : spaceTypes.find((type) => type.spaceTypeId === space.spaceTypeId);
+      return parentType ? parentType.spaceLevel + 1 : 1;
+    }
+  })();
 
-  const targetLevel = parentType ? parentType.spaceLevel + 1 : 1;
-
-  const options = spaceTypes.filter((type) => type.spaceLevel === targetLevel);
+  const options = spaceTypes.filter((type) =>
+    targetLevel !== null ? type.spaceLevel === targetLevel : true
+  );
 
   const isLastLevel = options.length === 0;
 
   useEffect(() => {
-    if (space?.spaceName === "root") {
+    if (!space) return;
+
+    if (isEdit) {
       setFormData((prev) => ({
         ...prev,
-        parentId: null,
-        spaceTypeId: "",
-        spaceTypeName: "",
+        spaceTypeId: prev.spaceTypeId || space.spaceTypeId,
+        spaceTypeName: prev.spaceTypeName || space.spaceTypeName,
       }));
-    } else if (space) {
+    } else {
       setFormData((prev) => ({
         ...prev,
-        parentId: space.spaceId,
+        parentId: space.spaceName === "root" ? null : space.spaceId,
         spaceTypeId: "",
         spaceTypeName: "",
       }));
     }
-  }, [space]);
+  }, [space, isEdit]);
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -366,7 +377,16 @@ export function SpaceManagement() {
   };
 
   const handleEdit = (space: Space) => {
-    setFormData(space);
+    const selectedType = spaceTypes.find(
+      (type) => type.spaceTypeName === space.spaceTypeName
+    );
+    setFormData({
+      spaceId: space.spaceId,
+      spaceName: space.spaceName,
+      parentId: space.parentId ?? null,
+      spaceTypeId: space.spaceTypeId ?? selectedType?.spaceTypeId ?? "",
+      spaceTypeName: space.spaceTypeName ?? selectedType?.spaceTypeName ?? "",
+    });
     setIsEdit(true);
     setCurrentParent(space);
     setIsOpen(true);
@@ -480,7 +500,7 @@ export function SpaceManagement() {
                 Facility Management
               </h2>
               <Button
-                className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                className="bg-[#F7CA18] hover:bg-[#FFB61E]"
                 onClick={() => {
                   const rootSpaceType = spaceTypes.find(
                     (type) => type.spaceLevel === 1
@@ -520,10 +540,13 @@ export function SpaceManagement() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-[hsl(var(--tech-blue))/5]">
-                    <TableHead>Name</TableHead>
-                    <TableHead>Equipment</TableHead>
-                    <TableHead>Actions</TableHead>
-                    <TableHead>Add</TableHead>
+                    <TableHead className="w-[50%]">Name</TableHead>
+                    <TableHead className="w-[30%] text-center">
+                      Equipment
+                    </TableHead>
+                    <TableHead className="w-[20%] text-center">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -545,10 +568,9 @@ export function SpaceManagement() {
                               name={space.spaceName}
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="flex justify-center">
                             <Button
-                              variant="outline"
-                              className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
+                              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
                               onClick={() => {
                                 setSelectedSpace(space);
                                 setViewMode("equipmentTable");
@@ -572,10 +594,8 @@ export function SpaceManagement() {
                             >
                               Delete
                             </Button>
-                          </TableCell>
-                          <TableCell>
                             <Button
-                              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                              className="bg-[#F7CA18] hover:bg-[#FFB61E]"
                               onClick={() => {
                                 setIsEdit(false);
                                 setFormData({
@@ -621,10 +641,9 @@ export function SpaceManagement() {
                                     level={1}
                                   />
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="flex justify-center">
                                   <Button
-                                    className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                                    variant="outline"
+                                    className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
                                     onClick={() => {
                                       setSelectedSpace(childSpace);
                                       setViewMode("equipmentTable");
@@ -638,9 +657,7 @@ export function SpaceManagement() {
                                     variant="outline"
                                     className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
                                     onClick={() => {
-                                      setFormData(childSpace);
-                                      setIsEdit(true);
-                                      setIsOpen(true);
+                                      handleEdit(childSpace);
                                     }}
                                   >
                                     Edit
@@ -654,10 +671,8 @@ export function SpaceManagement() {
                                   >
                                     Delete
                                   </Button>
-                                </TableCell>
-                                <TableCell>
                                   <Button
-                                    className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                    className="bg-[#F7CA18] hover:bg-[#FFB61E]"
                                     onClick={() => {
                                       setIsEdit(false);
                                       setFormData({
@@ -701,10 +716,9 @@ export function SpaceManagement() {
                                           </span>
                                         </div>
                                       </TableCell>
-                                      <TableCell>
+                                      <TableCell className="flex justify-center">
                                         <Button
-                                          className="border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                                          variant="outline"
+                                          className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
                                           onClick={() => {
                                             setSelectedSpace(grandchildSpace);
                                             setViewMode("equipmentTable");
@@ -718,9 +732,7 @@ export function SpaceManagement() {
                                           variant="outline"
                                           className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
                                           onClick={() => {
-                                            setFormData(grandchildSpace);
-                                            setIsEdit(true);
-                                            setIsOpen(true);
+                                            handleEdit(grandchildSpace);
                                           }}
                                         >
                                           Edit
@@ -736,127 +748,8 @@ export function SpaceManagement() {
                                         >
                                           Delete
                                         </Button>
-                                      </TableCell>
-                                      <TableCell>
-                                        {/* <Dialog
-                                          open={isOpen}
-                                          onOpenChange={setIsOpen}
-                                        >
-                                          <DialogTrigger asChild>
-                                            <Button
-                                              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                                              onClick={() => {
-                                                setIsEdit(false);
-                                                setFormData({
-                                                  spaceName: "",
-                                                });
-                                              }}
-                                            >
-                                              Add New Facility
-                                            </Button>
-                                          </DialogTrigger>
-                                          <DialogContent>
-                                            <DialogHeader>
-                                              <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                                                {isEdit
-                                                  ? "Edit Space"
-                                                  : "Add New Space"}
-                                              </DialogTitle>
-                                            </DialogHeader>
-                                            <form
-                                              onSubmit={handleSubmit}
-                                              className="space-y-4 text-xl text-neutral-700"
-                                            >
-                                              <div>
-                                                <Label htmlFor="blockName">
-                                                  Facility Name
-                                                </Label>
-                                                <Input
-                                                  id="blockName"
-                                                  className="mb-3"
-                                                  value={formData.spaceName}
-                                                  onChange={(e) =>
-                                                    setFormData({
-                                                      ...formData,
-                                                      spaceName: e.target.value,
-                                                    })
-                                                  }
-                                                  required
-                                                />
-                                                <Label htmlFor="selectSpaceType">
-                                                  Facility Type
-                                                </Label>
-                                                <div id="selectSpaceType">
-                                                  <Select
-                                                    value={formData.spaceTypeId}
-                                                    onValueChange={(value) => {
-                                                      const selected =
-                                                        spaceTypes.find(
-                                                          (type) =>
-                                                            type.spaceTypeId ===
-                                                            value
-                                                        );
-                                                      setFormData({
-                                                        ...formData,
-                                                        spaceTypeId:
-                                                          selected?.spaceTypeId ||
-                                                          "",
-                                                        spaceTypeName:
-                                                          selected?.spaceTypeName ||
-                                                          "",
-                                                      });
-                                                    }}
-                                                  >
-                                                    <SelectTrigger>
-                                                      <SelectValue placeholder="Select Space Type" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      {(() => {
-                                                        const parentType =
-                                                          spaceTypes.find(
-                                                            (type) =>
-                                                              type.spaceTypeId ===
-                                                              grandchildSpace.spaceTypeId
-                                                          );
-                                                        const nextLevel =
-                                                          parentType
-                                                            ? parentType.spaceLevel +
-                                                              1
-                                                            : null;
-
-                                                        return spaceTypes
-                                                          .filter(
-                                                            (type) =>
-                                                              type.spaceLevel ===
-                                                              nextLevel
-                                                          )
-                                                          .map((type) => (
-                                                            <SelectItem
-                                                              key={
-                                                                type.spaceTypeId
-                                                              }
-                                                              value={
-                                                                type.spaceTypeId
-                                                              }
-                                                            >
-                                                              {
-                                                                type.spaceTypeName
-                                                              }
-                                                            </SelectItem>
-                                                          ));
-                                                      })()}
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                              </div>
-                                              <Button type="submit">
-                                                {isEdit ? "Update" : "Save"}
-                                              </Button>
-                                            </form>
-                                          </DialogContent>
-                                        </Dialog> */}
                                         <Button
-                                          className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                          className="bg-[#F7CA18] hover:bg-[#FFB61E]"
                                           onClick={() => {
                                             setIsEdit(false);
                                             setFormData({
@@ -914,7 +807,7 @@ export function SpaceManagement() {
               >
                 <div>
                   <Button
-                    className="mr-2"
+                    className="mr-2 text-black"
                     variant="outline"
                     onClick={() => {
                       setIsEquipmentDialogOpen(false);

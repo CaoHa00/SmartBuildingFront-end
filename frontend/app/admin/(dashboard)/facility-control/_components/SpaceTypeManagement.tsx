@@ -96,23 +96,6 @@ export function SpaceTypeManagement() {
     }
   };
 
-  // const handleDelete = async (spaceId: string) => {
-  //   try {
-  //     await api.delete(`/space-types/${spaceId}`);
-  //     fetchSpaceTypes();
-  //     toast({
-  //       title: "Success",
-  //       description: "Space type deleted successfully",
-  //     });
-  //   } catch (error) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Error",
-  //       description: "Failed to delete space type",
-  //     });
-  //   }
-  // };
-
   const confirmDelete = async () => {
     if (!deleteTargetId) return;
     try {
@@ -216,9 +199,9 @@ export function SpaceTypeManagement() {
           <Table>
             <TableHeader>
               <TableRow className="bg-[hsl(var(--tech-blue))/5]">
-                <TableHead>Name</TableHead>
-                <TableHead>Level</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="w-[25%]">Name</TableHead>
+                <TableHead className="w-[60%] text-center">Level</TableHead>
+                <TableHead className="w-[15%] text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -233,17 +216,19 @@ export function SpaceTypeManagement() {
                   <React.Fragment key={spaceType.spaceTypeId}>
                     <TableRow className="hover:bg-[hsl(var(--tech-blue))/5]">
                       <TableCell>
-                        <div className="flex items-center gap-2 cursor-pointer">
+                        <div className="flex items-center gap-2">
                           <Building2 size={16} />
                           <span>{spaceType.spaceTypeName}</span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2 cursor-pointer">
-                          <span>{spaceType.spaceLevel}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="mx-auto">
+                            {spaceType.spaceLevel}
+                          </span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <Button
                           variant="outline"
                           className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
