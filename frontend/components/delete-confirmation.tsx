@@ -35,11 +35,18 @@ export const DeleteConfirmModal: React.FC<ConfirmModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="text-black">{title}</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p className="text-sm text-muted-foreground text-black">
+          {description}
+        </p>
         <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={onClose} disabled={loading}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={loading}
+            className="text-black"
+          >
             {cancelText}
           </Button>
           <Button
