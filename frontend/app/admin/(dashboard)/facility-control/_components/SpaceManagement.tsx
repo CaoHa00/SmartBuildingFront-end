@@ -80,17 +80,129 @@ function ExpandableRow({
   );
 }
 
+function FacilityDialog({
+  space,
+  spaceTypes,
+  isEdit,
+  onClose,
+  onSubmit,
+  formData,
+  setFormData,
+}: {
+  space: Space;
+  spaceTypes: SpaceType[];
+  isEdit: boolean;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  formData: Partial<Space>;
+  setFormData: React.Dispatch<React.SetStateAction<Partial<Space>>>;
+}) {
+  const isRoot = space.spaceName === "root";
+
+  const parentType = isRoot
+    ? null
+    : spaceTypes.find((type) => type.spaceTypeId === space.spaceTypeId);
+
+  const targetLevel = parentType ? parentType.spaceLevel + 1 : 1;
+
+  const options = spaceTypes.filter((type) => type.spaceLevel === targetLevel);
+
+  const isLastLevel = options.length === 0;
+
+  useEffect(() => {
+    if (space?.spaceName === "root") {
+      setFormData((prev) => ({
+        ...prev,
+        parentId: null,
+        spaceTypeId: "",
+        spaceTypeName: "",
+      }));
+    } else if (space) {
+      setFormData((prev) => ({
+        ...prev,
+        parentId: space.spaceId,
+        spaceTypeId: "",
+        spaceTypeName: "",
+      }));
+    }
+  }, [space]);
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
+            {isEdit ? "Edit Space" : "Add New Facility"}
+          </DialogTitle>
+        </DialogHeader>
+        <form
+          onSubmit={onSubmit}
+          className="space-y-4 text-xl text-neutral-700"
+        >
+          <div>
+            <Label htmlFor="blockName">Facility Name</Label>
+            <Input
+              id="blockName"
+              className="mb-3"
+              value={formData.spaceName}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  spaceName: e.target.value,
+                })
+              }
+              required
+            />
+            <Label htmlFor="selectSpaceType">Facility Type</Label>
+            <div id="selectSpaceType">
+              <Select
+                value={formData.spaceTypeId || ""}
+                onValueChange={(value) => {
+                  const selected = spaceTypes.find(
+                    (type) => type.spaceTypeId === value
+                  );
+                  setFormData({
+                    ...formData,
+                    spaceTypeId: value || "",
+                    spaceTypeName: selected?.spaceTypeName || "",
+                  });
+                }}
+                disabled={isLastLevel}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Space Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {options.map((type) => (
+                    <SelectItem key={type.spaceTypeId} value={type.spaceTypeId}>
+                      {type.spaceTypeName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function SpaceManagement() {
   const { toast } = useToast();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [spaceTypes, setSpaceType] = useState<SpaceType[]>([]);
+  const [currentParent, setCurrentParent] = useState<Space | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [openDialogs, setOpenDialogs] = useState<Record<string, boolean>>({});
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<
-    Partial<Space & { parentId: string }>
-  >({
+  const [formData, setFormData] = useState<Partial<Space>>({
     spaceName: "",
+    spaceTypeId: "",
+    spaceTypeName: "",
+    parentId: null,
   });
   const [expandedSpaces, setExpandedSpaces] = useState<Record<string, boolean>>(
     {}
@@ -118,6 +230,14 @@ export function SpaceManagement() {
     fetchEquipmentTypes();
     fetchCategories();
   }, []);
+
+  const openDialogFor = (id: string) => {
+    setOpenDialogs((prev) => ({ ...prev, [id]: true }));
+  };
+
+  const closeDialogFor = (id: string) => {
+    setOpenDialogs((prev) => ({ ...prev, [id]: false }));
+  };
 
   const fetchSpaces = async () => {
     try {
@@ -192,15 +312,23 @@ export function SpaceManagement() {
           spaceName: formData.spaceName || "",
           spaceTypeId: formData.spaceTypeId || "",
           spaceTypeName: formData.spaceTypeName || "",
-          parentId: formData.parentId || "",
+          parentId: formData.parentId ?? null,
           equipment: [],
           children: [],
         };
+        console.log(newSpace);
         await api.post("/spaces", newSpace);
       }
       fetchSpaces();
+      const dialogId = formData.parentId ?? "root";
+      closeDialogFor(dialogId);
       setIsOpen(false);
-      setFormData({ spaceName: "" });
+      setFormData({
+        spaceName: "",
+        spaceTypeId: "",
+        spaceTypeName: "",
+        parentId: null,
+      });
       setIsEdit(false);
       toast({
         title: "Success",
@@ -240,6 +368,7 @@ export function SpaceManagement() {
   const handleEdit = (space: Space) => {
     setFormData(space);
     setIsEdit(true);
+    setCurrentParent(space);
     setIsOpen(true);
   };
 
@@ -306,32 +435,6 @@ export function SpaceManagement() {
     }
   };
 
-  // const handleDeleteEquipment = async (equipmentId: number) => {
-  //   try {
-  //     await api.delete(`/equipment/${equipmentId}`);
-  //     setSelectedSpace((prev) =>
-  //       prev
-  //         ? {
-  //             ...prev,
-  //             equipments: prev.equipments.filter(
-  //               (eq) => eq.equipmentId !== equipmentId
-  //             ),
-  //           }
-  //         : null
-  //     );
-  //     toast({
-  //       title: "Success",
-  //       description: "Equipment deleted successfully",
-  //     });
-  //   } catch (error) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Error",
-  //       description: "Failed to delete equipment",
-  //     });
-  //   }
-  // };
-
   const confirmDeleteEquipment = async () => {
     if (!deleteEquipmentId) return;
     try {
@@ -376,55 +479,41 @@ export function SpaceManagement() {
               <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
                 Facility Management
               </h2>
-              <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                    onClick={() => {
-                      const rootSpaceType = spaceTypes.find(
-                        (type) => type.spaceLevel === 1
-                      );
-                      if (!rootSpaceType) return;
-                      setIsEdit(false);
-                      setFormData({
-                        spaceName: "",
-                        spaceTypeId: rootSpaceType.spaceTypeId,
-                        spaceTypeName: rootSpaceType.spaceTypeName,
-                      });
-                    }}
-                  >
-                    Add New Block
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                      {isEdit ? "Edit Space" : "Add New Space"}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <form
-                    onSubmit={handleSubmit}
-                    className="space-y-4 text-xl text-neutral-700"
-                  >
-                    <div>
-                      <Label htmlFor="blockName">Block Name</Label>
-                      <Input
-                        id="blockName"
-                        className="mb-3"
-                        value={formData.spaceName}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            spaceName: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </div>
-                    <Button type="submit">{isEdit ? "Update" : "Save"}</Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
+              <Button
+                className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                onClick={() => {
+                  const rootSpaceType = spaceTypes.find(
+                    (type) => type.spaceLevel === 1
+                  );
+                  if (!rootSpaceType) return;
+
+                  setFormData({
+                    spaceName: "",
+                    spaceTypeId: rootSpaceType.spaceTypeId || "",
+                    spaceTypeName: rootSpaceType.spaceTypeName || "",
+                  });
+                  setCurrentParent({
+                    spaceName: "root",
+                    spaceTypeId: "",
+                  } as Space);
+                  setIsEdit(false);
+                  setIsOpen(true);
+                }}
+              >
+                Add New Facility
+              </Button>
+
+              {isOpen && currentParent && (
+                <FacilityDialog
+                  space={currentParent}
+                  spaceTypes={spaceTypes}
+                  isEdit={isEdit}
+                  formData={formData}
+                  setFormData={setFormData}
+                  onClose={() => setIsOpen(false)}
+                  onSubmit={handleSubmit}
+                />
+              )}
             </div>
 
             <div className="rounded-md border border-border text-neutral-700">
@@ -485,103 +574,31 @@ export function SpaceManagement() {
                             </Button>
                           </TableCell>
                           <TableCell>
-                            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                              <DialogTrigger asChild>
-                                <Button
-                                  className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                                  onClick={() => {
-                                    setIsEdit(false);
-                                    setFormData({
-                                      spaceName: "",
-                                    });
-                                  }}
-                                >
-                                  Add New Facility
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                                    {isEdit ? "Edit Space" : "Add New Space"}
-                                  </DialogTitle>
-                                </DialogHeader>
-                                <form
-                                  onSubmit={handleSubmit}
-                                  className="space-y-4 text-xl text-neutral-700"
-                                >
-                                  <div>
-                                    <Label htmlFor="blockName">
-                                      Facility Name
-                                    </Label>
-                                    <Input
-                                      id="blockName"
-                                      className="mb-3"
-                                      value={formData.spaceName}
-                                      onChange={(e) =>
-                                        setFormData({
-                                          ...formData,
-                                          spaceName: e.target.value,
-                                        })
-                                      }
-                                      required
-                                    />
-                                    <Label htmlFor="selectSpaceType">
-                                      Facility Type
-                                    </Label>
-                                    <div id="selectSpaceType">
-                                      <Select
-                                        value={formData.spaceTypeId}
-                                        onValueChange={(value) => {
-                                          const selected = spaceTypes.find(
-                                            (type) => type.spaceTypeId === value
-                                          );
-                                          setFormData({
-                                            ...formData,
-                                            spaceTypeId:
-                                              selected?.spaceTypeId || "",
-                                            spaceTypeName:
-                                              selected?.spaceTypeName || "",
-                                          });
-                                        }}
-                                      >
-                                        <SelectTrigger>
-                                          <SelectValue placeholder="Select Space Type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          {(() => {
-                                            const parentType = spaceTypes.find(
-                                              (type) =>
-                                                type.spaceTypeId ===
-                                                space.spaceTypeId
-                                            );
-                                            const nextLevel = parentType
-                                              ? parentType.spaceLevel + 1
-                                              : null;
-
-                                            return spaceTypes
-                                              .filter(
-                                                (type) =>
-                                                  type.spaceLevel === nextLevel
-                                              )
-                                              .map((type) => (
-                                                <SelectItem
-                                                  key={type.spaceTypeId}
-                                                  value={type.spaceTypeId}
-                                                >
-                                                  {type.spaceTypeName}
-                                                </SelectItem>
-                                              ));
-                                          })()}
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                  </div>
-                                  <Button type="submit">
-                                    {isEdit ? "Update" : "Save"}
-                                  </Button>
-                                </form>
-                              </DialogContent>
-                            </Dialog>
+                            <Button
+                              className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                              onClick={() => {
+                                setIsEdit(false);
+                                setFormData({
+                                  spaceName: "",
+                                  spaceTypeId: "",
+                                });
+                                setCurrentParent(space);
+                                openDialogFor(space.spaceId);
+                              }}
+                            >
+                              Add New Facility
+                            </Button>
+                            {openDialogs[space.spaceId] && (
+                              <FacilityDialog
+                                space={space}
+                                spaceTypes={spaceTypes}
+                                isEdit={false}
+                                formData={formData}
+                                setFormData={setFormData}
+                                onClose={() => closeDialogFor(space.spaceId)}
+                                onSubmit={handleSubmit}
+                              />
+                            )}
                           </TableCell>
                         </TableRow>
                         {expandedSpaces[space.spaceId] &&
@@ -639,113 +656,32 @@ export function SpaceManagement() {
                                   </Button>
                                 </TableCell>
                                 <TableCell>
-                                  <Dialog
-                                    open={isOpen}
-                                    onOpenChange={setIsOpen}
+                                  <Button
+                                    className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                    onClick={() => {
+                                      setIsEdit(false);
+                                      setFormData({
+                                        spaceName: "",
+                                        spaceTypeId: "",
+                                      });
+                                      openDialogFor(childSpace.spaceId);
+                                    }}
                                   >
-                                    <DialogTrigger asChild>
-                                      <Button
-                                        className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
-                                        onClick={() => {
-                                          setIsEdit(false);
-                                          setFormData({
-                                            spaceName: "",
-                                          });
-                                        }}
-                                      >
-                                        Add New Facility
-                                      </Button>
-                                    </DialogTrigger>
-                                    <DialogContent>
-                                      <DialogHeader>
-                                        <DialogTitle className="text-xl text-[hsl(var(--tech-dark-blue))]">
-                                          {isEdit
-                                            ? "Edit Space"
-                                            : "Add New Space"}
-                                        </DialogTitle>
-                                      </DialogHeader>
-                                      <form
-                                        onSubmit={handleSubmit}
-                                        className="space-y-4 text-xl text-neutral-700"
-                                      >
-                                        <div>
-                                          <Label htmlFor="blockName">
-                                            Facility Name
-                                          </Label>
-                                          <Input
-                                            id="blockName"
-                                            className="mb-3"
-                                            value={formData.spaceName}
-                                            onChange={(e) =>
-                                              setFormData({
-                                                ...formData,
-                                                spaceName: e.target.value,
-                                              })
-                                            }
-                                            required
-                                          />
-                                          <Label htmlFor="selectSpaceType">
-                                            Facility Type
-                                          </Label>
-                                          <div id="selectSpaceType">
-                                            <Select
-                                              value={formData.spaceTypeId}
-                                              onValueChange={(value) => {
-                                                const selected =
-                                                  spaceTypes.find(
-                                                    (type) =>
-                                                      type.spaceTypeId === value
-                                                  );
-                                                setFormData({
-                                                  ...formData,
-                                                  spaceTypeId:
-                                                    selected?.spaceTypeId || "",
-                                                  spaceTypeName:
-                                                    selected?.spaceTypeName ||
-                                                    "",
-                                                });
-                                              }}
-                                            >
-                                              <SelectTrigger>
-                                                <SelectValue placeholder="Select Space Type" />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                {(() => {
-                                                  const parentType =
-                                                    spaceTypes.find(
-                                                      (type) =>
-                                                        type.spaceTypeId ===
-                                                        childSpace.spaceTypeId
-                                                    );
-                                                  const nextLevel = parentType
-                                                    ? parentType.spaceLevel + 1
-                                                    : null;
-
-                                                  return spaceTypes
-                                                    .filter(
-                                                      (type) =>
-                                                        type.spaceLevel ===
-                                                        nextLevel
-                                                    )
-                                                    .map((type) => (
-                                                      <SelectItem
-                                                        key={type.spaceTypeId}
-                                                        value={type.spaceTypeId}
-                                                      >
-                                                        {type.spaceTypeName}
-                                                      </SelectItem>
-                                                    ));
-                                                })()}
-                                              </SelectContent>
-                                            </Select>
-                                          </div>
-                                        </div>
-                                        <Button type="submit">
-                                          {isEdit ? "Update" : "Save"}
-                                        </Button>
-                                      </form>
-                                    </DialogContent>
-                                  </Dialog>
+                                    Add New Facility
+                                  </Button>
+                                  {openDialogs[childSpace.spaceId] && (
+                                    <FacilityDialog
+                                      space={childSpace}
+                                      spaceTypes={spaceTypes}
+                                      isEdit={isEdit}
+                                      formData={formData}
+                                      setFormData={setFormData}
+                                      onClose={() =>
+                                        closeDialogFor(childSpace.spaceId)
+                                      }
+                                      onSubmit={handleSubmit}
+                                    />
+                                  )}
                                 </TableCell>
                               </TableRow>
                               {expandedSpaces[childSpace.spaceId] &&
@@ -802,7 +738,7 @@ export function SpaceManagement() {
                                         </Button>
                                       </TableCell>
                                       <TableCell>
-                                        <Dialog
+                                        {/* <Dialog
                                           open={isOpen}
                                           onOpenChange={setIsOpen}
                                         >
@@ -918,7 +854,39 @@ export function SpaceManagement() {
                                               </Button>
                                             </form>
                                           </DialogContent>
-                                        </Dialog>
+                                        </Dialog> */}
+                                        <Button
+                                          className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
+                                          onClick={() => {
+                                            setIsEdit(false);
+                                            setFormData({
+                                              spaceName: "",
+                                              spaceTypeId: "",
+                                            });
+                                            openDialogFor(
+                                              grandchildSpace.spaceId
+                                            );
+                                          }}
+                                        >
+                                          Add New Facility
+                                        </Button>
+                                        {openDialogs[
+                                          grandchildSpace.spaceId
+                                        ] && (
+                                          <FacilityDialog
+                                            space={grandchildSpace}
+                                            spaceTypes={spaceTypes}
+                                            isEdit={isEdit}
+                                            formData={formData}
+                                            setFormData={setFormData}
+                                            onClose={() =>
+                                              closeDialogFor(
+                                                grandchildSpace.spaceId
+                                              )
+                                            }
+                                            onSubmit={handleSubmit}
+                                          />
+                                        )}
                                       </TableCell>
                                     </TableRow>
                                   </React.Fragment>
