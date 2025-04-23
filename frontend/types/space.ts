@@ -3,7 +3,7 @@ import { Equipment } from "./equipment";
 export interface Space {
   spaceId: string;
   spaceName: string;
-  parentId: string;
+  parentId: string | null;
   spaceTypeId: string;
   spaceTypeName: string;
   children: Space[];
@@ -20,7 +20,7 @@ export interface NewSpaceData {
   spaceName: string;
   spaceTypeId: string;
   spaceTypeName: string;
-  parentId: string;
+  parentId: string | null;
   children: Space[];
   equipment: Equipment[];
 }
