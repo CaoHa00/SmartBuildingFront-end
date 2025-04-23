@@ -306,32 +306,6 @@ export function SpaceManagement() {
     }
   };
 
-  // const handleDeleteEquipment = async (equipmentId: number) => {
-  //   try {
-  //     await api.delete(`/equipment/${equipmentId}`);
-  //     setSelectedSpace((prev) =>
-  //       prev
-  //         ? {
-  //             ...prev,
-  //             equipments: prev.equipments.filter(
-  //               (eq) => eq.equipmentId !== equipmentId
-  //             ),
-  //           }
-  //         : null
-  //     );
-  //     toast({
-  //       title: "Success",
-  //       description: "Equipment deleted successfully",
-  //     });
-  //   } catch (error) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Error",
-  //       description: "Failed to delete equipment",
-  //     });
-  //   }
-  // };
-
   const confirmDeleteEquipment = async () => {
     if (!deleteEquipmentId) return;
     try {
@@ -946,7 +920,7 @@ export function SpaceManagement() {
               >
                 <div>
                   <Button
-                    className="mr-2"
+                    className="mr-2 text-black"
                     variant="outline"
                     onClick={() => {
                       setIsEquipmentDialogOpen(false);
