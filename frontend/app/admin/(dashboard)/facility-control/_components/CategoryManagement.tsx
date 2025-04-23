@@ -152,9 +152,9 @@ const CategoryManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="w-[60%]">ID</TableHead>
+                <TableHead className="w-[25%]">Name</TableHead>
+                <TableHead className="w-[15%] text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -171,7 +171,7 @@ const CategoryManagement = () => {
                       category.categoryName
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     {editingId === category.categoryId ? (
                       <Button
                         className="mr-2 bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
