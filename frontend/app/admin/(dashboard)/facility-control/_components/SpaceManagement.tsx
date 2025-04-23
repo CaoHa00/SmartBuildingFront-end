@@ -113,6 +113,7 @@ function FacilityDialog({
     }
   })();
 
+
   const options = spaceTypes.filter((type) =>
     targetLevel !== null ? type.spaceLevel === targetLevel : true
   );
