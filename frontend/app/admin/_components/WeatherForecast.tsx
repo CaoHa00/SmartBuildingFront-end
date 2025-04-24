@@ -106,28 +106,15 @@ const WeatherForecast = () => {
     day: "numeric",
   });
 
-  // const formattedTime = adminWeather.timestamp.toLocaleTimeString("en-US", {
-  //   hour: "2-digit",
-  //   minute: "2-digit",
-  //   hour12: false,
-  // });
-
   return (
     <div
-      className={`flex flex-col gap-4 ${
-        adminWeather.isDaytime
-          ? "bg-gradient-to-b from-blue-100 to-blue-50"
-          : "bg-gradient-to-b from-slate-900 to-slate-800"
+      className={`flex flex-col gap-4 bg-primary
       } p-6 rounded-lg`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-primary" />
-          <span
-            className={`text-2xl font-semibold ${
-              adminWeather.isDaytime ? "text-slate-900" : "text-white"
-            }`}
-          >
+          <MapPin className="w-4 h-4 text-red-500" />
+          <span className={`text-2xl font-semibold text-primary-foreground`}>
             {adminWeather.location}
           </span>
         </div>
@@ -138,11 +125,7 @@ const WeatherForecast = () => {
         )}
       </div>
 
-      <div
-        className={`text-sm ${
-          adminWeather.isDaytime ? "text-slate-600" : "text-slate-300"
-        }`}
-      >
+      <div className={`text-sm text-muted-foreground`}>
         <p>{formattedDate}</p>
         <p>{clock}</p>
       </div>
@@ -153,11 +136,7 @@ const WeatherForecast = () => {
             condition={adminWeather.condition}
             isDaytime={adminWeather.isDaytime}
           />
-          <span
-            className={`text-2xl font-semibold ${
-              adminWeather.isDaytime ? "text-slate-900" : "text-white"
-            }`}
-          >
+          <span className={`text-2xl font-semibold text-primary-foreground`}>
             {adminWeather.condition}
           </span>
         </div>
@@ -169,19 +148,27 @@ const WeatherForecast = () => {
         >
           <div className="flex items-center gap-2">
             <Thermometer className="w-4 h-4 text-orange-500" />
-            <p>Temperature: {adminWeather.temperature}°C</p>
+            <p className="text-muted-foreground">
+              Temperature: {adminWeather.temperature}°C
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Droplets className="w-4 h-4 text-blue-500" />
-            <p>Humidity: {adminWeather.humidity}%</p>
+            <p className="text-muted-foreground">
+              Humidity: {adminWeather.humidity}%
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Wind className="w-4 h-4 text-slate-500" />
-            <p>Wind Speed: {adminWeather.windSpeed} km/h</p>
+            <p className="text-muted-foreground">
+              Wind Speed: {adminWeather.windSpeed} km/h
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Umbrella className="w-4 h-4 text-indigo-500" />
-            <p>Precipitation: {adminWeather.precipitation} mm</p>
+            <p className="text-muted-foreground">
+              Precipitation: {adminWeather.precipitation} mm
+            </p>
           </div>
         </div>
       </div>

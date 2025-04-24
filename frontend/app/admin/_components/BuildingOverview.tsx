@@ -33,9 +33,9 @@ export default function BuildingSummary() {
     <div className="flex-1 space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="grid row-span-2 sm:grid-cols-1 gap-4">
-          <Card className="bg-blue-800">
+          <Card className="bg-card">
             <CardHeader>
-              <CardTitle className="text-xl text-blue-100">
+              <CardTitle className="text-xl card-foreground">
                 Building Overview
               </CardTitle>
             </CardHeader>
@@ -57,9 +57,9 @@ export default function BuildingSummary() {
           note="Current Occupancy"
         />
         <div className="grid row-span-3 sm:grid-cols-1 gap-4">
-          <Card className="bg-blue-800">
+          <Card className="bg-card">
             <CardHeader>
-              <CardTitle className="text-xl text-blue-100">
+              <CardTitle className="text-xl text-card-foreground">
                 Weather Forecast
               </CardTitle>
             </CardHeader>
@@ -121,9 +121,9 @@ function StatCard({ title, value, icon, note }: StatCardProps) {
         <span className="text-2xl">{React.createElement(icon)}</span>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-2xl font-bold text-accent-foreground">{value}</div>
       </CardContent>
-      <CardFooter className="text-sm text-muted-foreground">
+      <CardFooter className="text-sm text-card-foreground">
         <span className="text-xs">{note}</span>
       </CardFooter>
     </Card>

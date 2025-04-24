@@ -18,7 +18,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -113,7 +112,6 @@ function FacilityDialog({
     }
   })();
 
-
   const options = spaceTypes.filter((type) =>
     targetLevel !== null ? type.spaceLevel === targetLevel : true
   );
@@ -149,7 +147,7 @@ function FacilityDialog({
         </DialogHeader>
         <form
           onSubmit={onSubmit}
-          className="space-y-4 text-xl text-neutral-700"
+          className="space-y-4 text-xl text-primary-foreground"
         >
           <div>
             <Label htmlFor="blockName">Facility Name</Label>
@@ -540,12 +538,12 @@ export function SpaceManagement() {
             <div className="rounded-md border border-border text-neutral-700">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-[hsl(var(--tech-blue))/5]">
-                    <TableHead className="w-[50%]">Name</TableHead>
+                  <TableRow>
+                    <TableHead className="w-[49%]">Name</TableHead>
                     <TableHead className="w-[30%] text-center">
                       Equipment
                     </TableHead>
-                    <TableHead className="w-[20%] text-center">
+                    <TableHead className="w-[21%] text-center">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -560,7 +558,7 @@ export function SpaceManagement() {
                   ) : (
                     spaces.map((space) => (
                       <React.Fragment key={space.spaceId}>
-                        <TableRow className="hover:bg-[hsl(var(--tech-blue))/5]">
+                        <TableRow>
                           <TableCell>
                             <ExpandableRow
                               isOpen={expandedSpaces[space.spaceId] || false}
@@ -627,7 +625,7 @@ export function SpaceManagement() {
                             <React.Fragment
                               key={`${space.spaceId}-${childSpace.spaceId}`}
                             >
-                              <TableRow className="bg-muted/50">
+                              <TableRow className="bg-background">
                                 <TableCell>
                                   <ExpandableRow
                                     isOpen={
@@ -705,7 +703,7 @@ export function SpaceManagement() {
                                   <React.Fragment
                                     key={`${space.spaceId}-${childSpace.spaceId}-${grandchildSpace.spaceId}`}
                                   >
-                                    <TableRow className="bg-muted/30">
+                                    <TableRow className="bg-background">
                                       <TableCell>
                                         <div
                                           className="flex items-center gap-2"
@@ -808,8 +806,7 @@ export function SpaceManagement() {
               >
                 <div>
                   <Button
-                    className="mr-2 text-black"
-                    variant="outline"
+                    className="mr-2 text-primary-foreground border bg-background hover:bg-[#205BCC]"
                     onClick={() => {
                       setIsEquipmentDialogOpen(false);
                       setIsEquipmentEdit(false);
@@ -845,12 +842,12 @@ export function SpaceManagement() {
                   </DialogHeader>
                   <form
                     onSubmit={handleEquipmentSubmit}
-                    className="space-y-4 text-xl text-neutral-700"
+                    className="space-y-4 text-xl text-primary-foreground"
                   >
                     <div>
                       <Label
                         htmlFor="equipmentName"
-                        className="text-neutral-700"
+                        className="text-primary-foreground"
                       >
                         Equipment Name
                       </Label>
@@ -867,9 +864,7 @@ export function SpaceManagement() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="deviceId" className="text-neutral-700">
-                        Device ID
-                      </Label>
+                      <Label htmlFor="deviceId">Device ID</Label>
                       <Input
                         className="mb-3"
                         id="deviceId"
@@ -958,7 +953,7 @@ export function SpaceManagement() {
             <div className="rounded-md border border-border text-neutral-700">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-[hsl(var(--tech-blue))/5]">
+                  <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -973,7 +968,7 @@ export function SpaceManagement() {
                   ) : (
                     selectedSpace?.equipments.map((equipment) => (
                       <React.Fragment key={equipment.equipmentId}>
-                        <TableRow className="bg-muted/20">
+                        <TableRow>
                           <TableCell>
                             <div
                               className="flex items-center gap-2"
@@ -981,7 +976,7 @@ export function SpaceManagement() {
                             >
                               <Cpu size={16} />
                               <span>{equipment.equipmentName}</span>
-                              <span className="text-sm text-muted-foreground">
+                              <span className="text-sm">
                                 (ID: {equipment.equipmentId}, Device ID:{" "}
                                 {equipment.deviceId})
                               </span>
