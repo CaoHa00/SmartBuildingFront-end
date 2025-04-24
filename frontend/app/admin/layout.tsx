@@ -13,7 +13,7 @@ import {
   Wallpaper,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
-
+import { ModeToggle } from "@/components/light-dark-mode-toggle";
 
 const sidebarItems = [
   {
@@ -62,10 +62,14 @@ export default function AdminLayout({
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="w-64 border-r border-sidebar-border bg-sidebar-background">
-        <div className="p-6 border-b border-sidebar-border">
-          <img src="/icon/logo-15yrs.svg" alt="Logo" className="h-12 w-auto" />
-          <h2 className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
+      <aside className="w-64 border-r-2 bg-[hsl(var(--sidebar-background))]">
+        <div className="p-6 border-b-2">
+          <img
+            src="/icon/logo-15yrs.svg"
+            alt="Logo"
+            className="h-12 w-auto mx-auto"
+          />
+          <h2 className="text-xl font-semibold text-[hsl(var(--card-foreground))] text-center">
             Smart Building
           </h2>
         </div>
@@ -75,18 +79,23 @@ export default function AdminLayout({
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-2 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:bg-[hsl(var(--tech-blue))] hover:text-white",
+                "flex items-center gap-2 rounded-lg px-3 py-2 text-white transition-all hover:bg-[hsl(var(--primary))] hover:text-primary-foreground",
                 pathname === item.href &&
-                  "bg-[hsl(var(--tech-dark-blue))] text-white"
+                  "bg-[hsl(var(--primary))] text-primary-foreground"
               )}
             >
-              <item.icon/>
+              <item.icon />
               {item.title}
             </Link>
           ))}
         </nav>
       </aside>
-      <main className="flex-1 bg-background">{children}</main>
+      <main className="flex-1 bg-background p-8 pt-6">
+        <div className="absolute top-0 right-0 mt-6 mr-8">
+          <ModeToggle />
+        </div>
+        {children}
+      </main>
       <Toaster />
     </div>
   );

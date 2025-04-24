@@ -6,12 +6,11 @@ import CategoryManagement from "./_components/CategoryManagement";
 
 const FacilityControl = () => {
   return (
-    <div className=" p-4">
-      <h1 className="text-2xl font-bold mb-6 text-blue-500">
+    <div className="">
+      <h1 className="text-2xl font-bold mb-4 text-blue-500">
         Facility Control
       </h1>
       <div className="space-y-4">
-        <p className="text-blue-500">Manage your facility here.</p>
         <Tabs defaultValue="spaces" className="space-y-4">
           <TabsList>
             <TabsTrigger value="spaces">Spaces</TabsTrigger>

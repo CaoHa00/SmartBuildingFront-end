@@ -127,7 +127,7 @@ const CategoryManagement = () => {
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-semibold text-[hsl(var(--tech-dark-blue))]">
+            <CardTitle className="text-xl font-semibold text-white">
               Category Management
             </CardTitle>
           </CardHeader>

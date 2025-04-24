@@ -48,6 +48,17 @@ export function CO2EmissionChart() {
           axisLine={false}
           tickMargin={8}
           tickFormatter={(value) => value.slice(0, 3)}
+          tick={({ x, y, payload }) => (
+            <text
+              x={x}
+              y={y + 10}
+              textAnchor="middle"
+              style={{ fill: "hsl(var(--label-color))", pointerEvents: "none" }}
+              fontSize={12}
+            >
+              {payload.value.slice(0, 3)}
+            </text>
+          )}
         />
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <Bar

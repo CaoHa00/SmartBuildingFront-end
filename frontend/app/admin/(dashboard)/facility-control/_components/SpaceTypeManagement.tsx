@@ -198,7 +198,7 @@ export function SpaceTypeManagement() {
         <div className="rounded-md border border-border text-neutral-700">
           <Table>
             <TableHeader>
-              <TableRow className="bg-[hsl(var(--tech-blue))/5]">
+              <TableRow>
                 <TableHead className="w-[25%]">Name</TableHead>
                 <TableHead className="w-[60%] text-center">Level</TableHead>
                 <TableHead className="w-[15%] text-center">Actions</TableHead>
@@ -214,7 +214,7 @@ export function SpaceTypeManagement() {
               ) : (
                 spaceTypes.map((spaceType) => (
                   <React.Fragment key={spaceType.spaceTypeId}>
-                    <TableRow className="hover:bg-[hsl(var(--tech-blue))/5]">
+                    <TableRow>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Building2 size={16} />
