@@ -13,7 +13,7 @@ import {
   Wallpaper,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
-import { ModeToggle } from "@/components/light-dark-mode-toggle";
+import {LightDarkModeToggle} from "@/components/light-dark-mode-toggle";
 
 const sidebarItems = [
   {
@@ -92,7 +92,7 @@ export default function AdminLayout({
       </aside>
       <main className="flex-1 bg-background p-8 pt-6">
         <div className="absolute top-0 right-0 mt-6 mr-8">
-          <ModeToggle />
+          <LightDarkModeToggle />
         </div>
         {children}
       </main>

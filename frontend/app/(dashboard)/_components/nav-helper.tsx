@@ -24,7 +24,7 @@ export function NavHelper({
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
-        <SidebarMenu>
+        <SidebarMenu className="text-xl font-bold text-blue-800 dark:text-neutral-100 group-data-[collapsible=icon]:justify-center">
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>

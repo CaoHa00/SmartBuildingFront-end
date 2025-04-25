@@ -40,11 +40,11 @@ export function NavScheduler({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:px-2">
-      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400 group-data-[collapsible=icon]:justify-center">
+      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 dark:text-neutral-100 group-data-[collapsible=icon]:justify-center">
         <Calendar className="group-data-[collapsible=icon]:w-5 group-data-[collapsible=icon]:h-5"/>
         <span className="group-data-[collapsible=icon]:hidden">Scheduler</span>
       </SidebarGroupLabel>
-      <SidebarMenu className="text-xl font-bold text-blue-800 hover:text-blue-400">
+      <SidebarMenu className="text-xl font-bold text-blue-800 dark:text-neutral-100 group-data-[collapsible=icon]:hidden">
         {scheduler.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
@@ -86,12 +86,6 @@ export function NavScheduler({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        {/* <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontal className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem> */}
       </SidebarMenu>
     </SidebarGroup>
   );

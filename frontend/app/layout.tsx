@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-providers";
 import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/components/providers/theme-provider";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "Smart Building",
@@ -24,8 +24,8 @@ export default function RootLayout({
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
+            enableSystem={true}
+            disableTransitionOnChange={true}
           >
             {children}
           </ThemeProvider>

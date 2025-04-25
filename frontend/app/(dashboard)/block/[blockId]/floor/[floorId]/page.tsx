@@ -70,15 +70,19 @@ export function FloorIdPage() {
 
   const handleRoomClick = (roomName: string) => {
     const roomNumber = roomName.replace(/\D/g, "");
-    router.push(`/block/${params.blockId}/floor/${params.floorId}/room/${roomNumber}`);
+    router.push(
+      `/block/${params.blockId}/floor/${params.floorId}/room/${roomNumber}`
+    );
   };
 
   // Show loading state during initial render
   if (isLoading) {
     return (
       <SidebarProvider>
-        <AppSidebar className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`} />
-        <SidebarInset className="bg-sky-300">
+        <AppSidebar
+          className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
+        />
+        <SidebarInset className="bg-neutral-100 dark:bg-blue-950 flex flex-col h-screen overflow-hidden">
           <div className="text-center py-4">Loading rooms...</div>
         </SidebarInset>
       </SidebarProvider>
@@ -102,13 +106,13 @@ export function FloorIdPage() {
       <AppSidebar
         className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
       />
-      <SidebarInset className="bg-sky-300">
+      <SidebarInset className="bg-neutral-100 dark:bg-blue-950 flex flex-col h-screen overflow-hidden">
         <header
           className={`flex ${
             isMobile ? "h-12" : "h-16"
           } shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 font-bold text-xl text-blue-800`}
         >
-          <div className="flex items-center gap-2 px-2 md:px-4">
+          <div className="flex items-center gap-2 px-2 md:px-4 dark:text-neutral-100">
             <SidebarTrigger className="-ml-1 w-5 h-5" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <h1 className={`${isMobile ? "text-lg" : "text-xl"} font-bold`}>
@@ -118,7 +122,9 @@ export function FloorIdPage() {
         </header>
         <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 pt-0">
           <div className="space-y-8">
-            <h1 className="text-base font-bold text-blue-800">Left Side</h1>
+            <h1 className="text-base font-bold text-blue-800 dark:text-neutral-100">
+              Left Side
+            </h1>
             {/* Even numbered rooms */}
             <div className="space-y-4">
               {evenRows.map((row, rowIndex) => (
@@ -127,8 +133,8 @@ export function FloorIdPage() {
                   className="flex gap-4 justify-start"
                 >
                   {row.map((room, index) => (
-                    <div 
-                      key={`even-${rowIndex}-${index}`} 
+                    <div
+                      key={`even-${rowIndex}-${index}`}
                       className="w-full cursor-pointer"
                       onClick={() => handleRoomClick(room.roomName)}
                     >
@@ -147,7 +153,7 @@ export function FloorIdPage() {
 
             {/* Odd numbered rooms */}
             <div className="space-y-4">
-              <h1 className="text-base font-bold text-blue-800">
+              <h1 className="text-base font-bold text-blue-800 dark:text-neutral-100">
                 Right Side
               </h1>
               {oddRows.map((row, rowIndex) => (
@@ -156,8 +162,8 @@ export function FloorIdPage() {
                   className="flex gap-4 justify-start"
                 >
                   {row.map((room, index) => (
-                    <div 
-                      key={`odd-${rowIndex}-${index}`} 
+                    <div
+                      key={`odd-${rowIndex}-${index}`}
                       className="w-full cursor-pointer"
                       onClick={() => handleRoomClick(room.roomName)}
                     >

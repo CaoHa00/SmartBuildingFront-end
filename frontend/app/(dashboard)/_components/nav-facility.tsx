@@ -28,6 +28,7 @@ export function NavFacility({ items }: NavFacilityProps) {
   const router = useRouter();
   const { setSelectedFacility } = useFacility();
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
+  const [activeItemKey, setActiveItemKey] = useState<string>();
 
   const toggleExpand = (key: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -38,8 +39,9 @@ export function NavFacility({ items }: NavFacilityProps) {
   };
 
   const handleNavigation = (item: NavFacilityProps["items"][0]) => {
-    // Update the selected facility name
+    // Update the selected facility name and active state
     setSelectedFacility(item.name);
+    setActiveItemKey(item.key);
 
     if (item.spaceTypeName === "Block") {
       router.push(`/block/${item.key}`);
@@ -65,11 +67,16 @@ export function NavFacility({ items }: NavFacilityProps) {
     const Icon = item.icon;
     const hasChildren = item.items && item.items.length > 0;
     const isExpanded = expandedItems[item.key];
+    const isActive = activeItemKey === item.key;
 
     return (
       <div key={item.key} className={`${level > 0 ? 'ml-4' : ''}`}>
         <div 
-          className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-sidebar-accent"
+          className={`flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors ${
+            isActive 
+              ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+              : 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+          }`}
           onClick={() => handleNavigation(item)}
         >
           <div className="flex items-center gap-2 flex-1">
@@ -101,13 +108,13 @@ export function NavFacility({ items }: NavFacilityProps) {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400">
+      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 dark:text-neutral-100 group-data-[collapsible=icon]:justify-center">
         <Building2 />
         Facility
       </SidebarGroupLabel>
       <SidebarMenu>
         <SidebarMenuItem>
-          <div className="w-full text-blue-800">
+          <div className="w-full text-blue-800 dark:text-neutral-100 group-data-[collapsible=icon]:justify-center">
             {items.map(item => renderItem(item))}
           </div>
         </SidebarMenuItem>

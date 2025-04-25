@@ -23,11 +23,11 @@ export function NavDevices({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden ">
-      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400">
+      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800  dark:text-neutral-100 group-data-[collapsible=icon]:justify-center">
         <Cpu />
         Active Devices
       </SidebarGroupLabel>
-      <SidebarMenu className="text-xl font-bold text-blue-800 hover:text-blue-400">
+      <SidebarMenu className="text-xl font-bold text-blue-800 dark:text-neutral-100 group-data-[collapsible=icon]:justify-center">
         <MusicPlayerCard />
         {devices.map((item) => (
           <SidebarMenuItem key={item.name}>

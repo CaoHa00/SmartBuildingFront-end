@@ -42,7 +42,7 @@ export function SpaceOverview() {
   return (
     <SidebarProvider>
       <AppSidebar className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`} />
-      <SidebarInset className="bg-sky-300">
+      <SidebarInset className="bg-neutral-100 dark:bg-blue-950 flex flex-col h-screen overflow-hidden">
         <header className={`flex ${isMobile ? "h-12" : "h-16"} shrink-0 items-center gap-2`}>
           <div className="flex items-center gap-2 px-2 md:px-4">
             <SidebarTrigger className="-ml-1 w-5 h-5" />

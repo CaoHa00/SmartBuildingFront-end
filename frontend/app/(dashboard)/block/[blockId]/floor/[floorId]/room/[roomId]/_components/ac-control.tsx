@@ -28,12 +28,12 @@ export function AirConditionerControl() {
   const rotation = (percentage / 100) * 360;
 
   return (
-    <div className="rounded-xl bg-muted/50 w-full h-full shadow-xl p-4">
+    <div className="rounded-xl bg-blue-800 dark:bg-blue-900 w-full  h-full shadow-xl p-4">
       <div className="ml-3">
-        <h2 className="flex font-bold tracking-wide text-xl text-blue-800 leading-none">
+        <h2 className="flex font-bold tracking-wide text-xl text-neutral-100 dark:text-neutral-100 leading-none">
           AIR CONDITIONERS
         </h2>
-        <p className="tracking-widest text-blue-700 text-xs font-thin leading-none">
+        <p className="tracking-widest text-neutral-100 text-xs font-thin leading-none">
           Auto Cooling
         </p>
       </div>
@@ -42,20 +42,20 @@ export function AirConditionerControl() {
           {/* Thermostat Control */}
           <div className="thermostat-container relative w-[200px] h-[200px] mx-auto">
             {/* Background track */}
-            <div className="absolute inset-4 rounded-full border-[16px] border-blue-900/30" />
+            {/* <div className="absolute inset-4 rounded-full border-[16px] border-blue-900/30" /> */}
 
             {/* Progress track */}
-            <div
+            {/* <div
               className="absolute inset-4 rounded-full border-[16px] border-t-white border-r-white border-b-transparent border-l-transparent"
               style={{
                 transform: `rotate(${rotation}deg)`,
                 transition: "transform 0.2s ease",
               }}
-            />
+            /> */}
 
             {/* Temperature display */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-bold text-white">
+              <span className="text-8xl font-bold text-white">
                 {temperature}°C
               </span>
               <span className="text-sm text-neutral-200">Temperature</span>
@@ -70,7 +70,7 @@ export function AirConditionerControl() {
             <button className="p-2 rounded-full bg-sky-300 text-white">
               <Wind />
             </button>
-            <button className="p-3 rounded-full bg-blue-900 text-white">
+            <button className="p-3 rounded-full bg-blue-900 text-white dark:bg-green-400">
               <Snowflake size={30} />
             </button>
             <button className="p-2 rounded-full bg-sky-300 text-white">

@@ -30,7 +30,7 @@ export default function ForgotPassword() {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-800 transition-colors"
           >
             Send Reset Link
           </button>
