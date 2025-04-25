@@ -10,26 +10,33 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-export function NavUser() {
+interface NavUserProps {
+  user: {
+    name: string;
+    email: string;
+    avatar: string;
+  };
+}
+
+export function NavUser({ user }: NavUserProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="group flex items-center gap-2 rounded-full p-1 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
         <Avatar className="h-8 w-8 border-2 border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600 transition-colors">
-          <AvatarImage src="" alt="User" />
+          <AvatarImage src={user.avatar} alt={user.name} />
           <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-            US
+            {user.name.split(' ').map(n => n[0]).join('')}
           </AvatarFallback>
         </Avatar>
         <div className="hidden md:flex flex-col items-start">
           <span className="text-sm font-medium text-slate-900 dark:text-white">
-            Admin User
+            {user.name}
           </span>
           <span className="text-xs text-slate-500 dark:text-slate-400">
-            admin@smartbuilding.com
+            {user.email}
           </span>
         </div>
       </DropdownMenuTrigger>
-      
       <DropdownMenuContent align="end" className="w-56 p-1">
         <DropdownMenuLabel className="px-2 py-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
           My Account
