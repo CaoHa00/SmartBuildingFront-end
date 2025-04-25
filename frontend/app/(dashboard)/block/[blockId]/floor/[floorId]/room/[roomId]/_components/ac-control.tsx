@@ -1,16 +1,8 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import {
-  Plus,
-  Minus,
-  AirVent,
-  CircleMinus,
-  CirclePlus,
-  Droplet,
-  Snowflake,
-  Wind,
+  Construction
 } from "lucide-react";
 
 export function AirConditionerControl() {
@@ -54,16 +46,18 @@ export function AirConditionerControl() {
             /> */}
 
             {/* Temperature display */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-8xl font-bold text-white">
+            <div className="absolute inset-0 flex flex-col items-center text-2xl text-yellow-500 font-bold justify-center">
+              {/* <span className="text-8xl font-bold text-white">
                 {temperature}°C
               </span>
-              <span className="text-sm text-neutral-200">Temperature</span>
+              <span className="text-sm text-neutral-200">Temperature</span> */}
+              Undercontruction
+              <Construction/>
             </div>
           </div>
 
           {/* Mode Controls */}
-          <div className="flex justify-evenly items-center">
+          {/* <div className="flex justify-evenly items-center">
             <button className="text-white">
               <CircleMinus onClick={decreaseTemp} />
             </button>
@@ -79,7 +73,7 @@ export function AirConditionerControl() {
             <button className="text-white">
               <CirclePlus onClick={increaseTemp} />
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

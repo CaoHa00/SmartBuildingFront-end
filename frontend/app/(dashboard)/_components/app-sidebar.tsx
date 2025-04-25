@@ -129,8 +129,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavFacility items={organizedSpaces.map(mapSpaceToNavItem)} />
-        <NavScheduler scheduler={data.scheduler} />
-        <NavDevices devices={[]} />
+        {/* <NavScheduler scheduler={data.scheduler} />
+        <NavDevices devices={[]} /> */}
         <NavHelper
           items={data.NavHelper}
           className="mt-auto font-bold text-blue-800"
