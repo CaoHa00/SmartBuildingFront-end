@@ -11,7 +11,7 @@ export function useElectricityData() {
     const fetchData = async () => {
       try {
         const response = await axios.post<ElectricityData>(
-          `http://10.60.253.172:9090/api/tuya/currentValue?equipmentId=10023`,
+          ``,
         );
         setData(response.data);
       } catch (err) {

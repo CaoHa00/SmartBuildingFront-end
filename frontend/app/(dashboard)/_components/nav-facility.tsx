@@ -1,188 +1,116 @@
 "use client";
 
-import {
-  AirVent,
-  AudioLines,
-  Building2,
-  ChevronRight,
-  type LucideIcon,
-} from "lucide-react";
-
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { useRouter } from "next/navigation";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-
+import { Building2, ChevronRight, ChevronDown, LucideIcon } from "lucide-react";
+import { useState } from "react";
 import { useFacility } from "@/app/context/facility-context";
-import { useRouter } from "next/navigation";
 
-interface FacilityItem {
-  key: number;
-  name: string;
-  url: string;
-  icon?: LucideIcon;
-  isActive?: boolean;
-  items?: {
-    key: number;
+interface NavFacilityProps {
+  items: {
+    key: string;
     name: string;
-    icon?: LucideIcon;
     url: string;
-    isActive?: boolean;
-    items?: {
-      key: number;
-      name: string;
-      url: string;
-      icon?: LucideIcon;
-      isActive?: boolean;
-      items?: {
-        key: number;
-        name: string;
-        url: string;
-        icon?: LucideIcon;
-        isActive?: boolean;
-      }[];
-    }[];
+    icon: LucideIcon;
+    spaceTypeId: string;
+    spaceTypeName: string;
+    spaceLevel: number;
+    items?: NavFacilityProps["items"];
   }[];
 }
 
-export function NavFacility({ items }: { items: FacilityItem[] }) {
-  const { setSelectedFacility } = useFacility();
+export function NavFacility({ items }: NavFacilityProps) {
   const router = useRouter();
+  const { setSelectedFacility } = useFacility();
+  const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
 
-  const handleItemClick = (name: string, url: string, e: React.MouseEvent) => {
+  const toggleExpand = (key: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedFacility(name);
-    router.push(url);
+    setExpandedItems(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const handleNavigation = (item: NavFacilityProps["items"][0]) => {
+    // Update the selected facility name
+    setSelectedFacility(item.name);
+
+    if (item.spaceTypeName === "Block") {
+      router.push(`/block/${item.key}`);
+    } else if (item.spaceTypeName === "Floor") {
+      const blockId = items.find(block => 
+        block.items?.some(floor => floor.key === item.key)
+      )?.key;
+      router.push(`/block/${blockId}/floor/${item.key}`);
+    } else if (item.spaceTypeName === "Room") {
+      const blockId = items.find(block => 
+        block.items?.some(floor => 
+          floor.items?.some(room => room.key === item.key)
+        )
+      )?.key;
+      const floorId = items
+        .flatMap(block => block.items || [])
+        .find(floor => floor.items?.some(room => room.key === item.key))?.key;
+      router.push(`/block/${blockId}/floor/${floorId}/room/${item.key}`);
+    }
+  };
+
+  const renderItem = (item: NavFacilityProps["items"][0], level: number = 0) => {
+    const Icon = item.icon;
+    const hasChildren = item.items && item.items.length > 0;
+    const isExpanded = expandedItems[item.key];
+
+    return (
+      <div key={item.key} className={`${level > 0 ? 'ml-4' : ''}`}>
+        <div 
+          className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-sidebar-accent"
+          onClick={() => handleNavigation(item)}
+        >
+          <div className="flex items-center gap-2 flex-1">
+            {hasChildren && (
+              <div
+                role="button"
+                onClick={(e) => toggleExpand(item.key, e)}
+                className="p-1 hover:bg-blue-100 rounded-full transition-colors"
+              >
+                {isExpanded ? (
+                  <ChevronDown className="w-3 h-3" />
+                ) : (
+                  <ChevronRight className="w-3 h-3" />
+                )}
+              </div>
+            )}
+            {Icon && <Icon className="w-4 h-4" />}
+            <span className="text-sm font-medium">{item.name}</span>
+          </div>
+        </div>
+        {hasChildren && isExpanded && (
+          <div>
+            {item.items?.map(child => renderItem(child, level + 1))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:px-2">
-      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400 group-data-[collapsible=icon]:justify-center">
-        <Building2 className="group-data-[collapsible=icon]:w-5 group-data-[collapsible=icon]:h-5" />
-        <span className="group-data-[collapsible=icon]:hidden">Facility</span>
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-xl gap-2 font-bold text-blue-800 hover:text-blue-400">
+        <Building2 />
+        Facility
       </SidebarGroupLabel>
-      <SidebarMenu className="text-xl font-bold text-blue-800 hover:text-blue-400">
-        {items.map((item) => (
-          <Collapsible
-            key={item.key}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.name}>
-                  {item.icon && <item.icon />}
-                  <span onClick={(e) => handleItemClick(item.name, item.url, e)}>
-                    {item.name}
-                  </span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <Collapsible
-                      key={subItem.key}
-                      asChild
-                      defaultOpen={subItem.isActive}
-                      className="group/subcollapsible"
-                    >
-                      <SidebarMenuSubItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuSubButton>
-                            {subItem.icon && <subItem.icon />}
-                            <span
-                              onClick={(e) =>
-                                handleItemClick(subItem.name, subItem.url, e)
-                              }
-                            >
-                              {subItem.name}
-                            </span>
-                            {subItem.items && (
-                              <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/subcollapsible:rotate-90" />
-                            )}
-                          </SidebarMenuSubButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <SidebarMenuSub>
-                            {subItem.items?.map((subSubItem) => (
-                              <Collapsible
-                                key={subSubItem.key}
-                                asChild
-                                defaultOpen={subSubItem.isActive}
-                                className="group/subsubcollapsible"
-                              >
-                                <SidebarMenuSubItem>
-                                  <CollapsibleTrigger asChild>
-                                    <SidebarMenuSubButton>
-                                      {subSubItem.icon && <subSubItem.icon />}
-                                      <span
-                                        onClick={(e) =>
-                                          handleItemClick(
-                                            subSubItem.name,
-                                            subSubItem.url,
-                                            e
-                                          )
-                                        }
-                                      >
-                                        {subSubItem.name}
-                                      </span>
-                                      {subSubItem.items && (
-                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/subsubcollapsible:rotate-90" />
-                                      )}
-                                    </SidebarMenuSubButton>
-                                  </CollapsibleTrigger>
-                                  <CollapsibleContent>
-                                    <SidebarMenuSub>
-                                      {subSubItem.items?.map((finalItem) => (
-                                        <SidebarMenuSubItem
-                                          key={finalItem.key}
-                                        >
-                                          <SidebarMenuSubButton>
-                                            {finalItem.icon && (
-                                              <finalItem.icon />
-                                            )}
-                                            <span
-                                              onClick={(e) =>
-                                                handleItemClick(
-                                                  finalItem.name,
-                                                  finalItem.url,
-                                                  e
-                                                )
-                                              }
-                                            >
-                                              {finalItem.name}
-                                            </span>
-                                          </SidebarMenuSubButton>
-                                        </SidebarMenuSubItem>
-                                      ))}
-                                    </SidebarMenuSub>
-                                  </CollapsibleContent>
-                                </SidebarMenuSubItem>
-                              </Collapsible>
-                            ))}
-                          </SidebarMenuSub>
-                        </CollapsibleContent>
-                      </SidebarMenuSubItem>
-                    </Collapsible>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="w-full text-blue-800">
+            {items.map(item => renderItem(item))}
+          </div>
+        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   );

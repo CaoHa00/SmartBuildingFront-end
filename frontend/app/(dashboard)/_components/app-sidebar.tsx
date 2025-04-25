@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { api } from "@/lib/axios";
 import {
   AudioWaveform,
   LayoutDashboard,
@@ -27,6 +26,9 @@ import {
 } from "@/components/ui/sidebar";
 import { NavScheduler } from "./nav-scheduler";
 import { NavHelper } from "./nav-helper";
+import { Space } from "@/types/space";
+import { useSpaces } from "@/hooks/use-spaces";
+
 // This is sample data.
 const data = {
   user: {
@@ -79,47 +81,46 @@ const data = {
   ],
 };
 
-interface Room {
-  roomId: number;
-  roomName: string;
-  floorId: number;
-}
-
-interface Floor {
-  floorId: number;
-  floorName: string;
-  blockId: number;
-  rooms: Room[];
-}
-
-interface Block {
-  blockId: number;
-  blockName: string;
-  floors: Floor[];
-}
+interface NavItem {
+    key: string;
+    name: string;
+    url: string;
+    icon: any;
+    spaceTypeId: string;
+    spaceTypeName: string;
+    spaceLevel: number;
+    items?: NavItem[];
+  }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  const { spaces, loading, fetchSpaces } = useSpaces();
+  const [organizedSpaces, setOrganizedSpaces] = useState<Space[]>([]);
 
   useEffect(() => {
-    const fetchBlocks = async () => {
-      try {
-        const response = await api.get<Block[]>("/block");
-        if (response.data.length > 0) {
-          const formattedBlocks = response.data.map((block) => ({
-            blockId: block.blockId,
-            blockName: block.blockName,
-            floors: block.floors,
-          }));
-          setBlocks(formattedBlocks);
-        }
-      } catch (error) {
-        console.error("Failed to fetch blocks:", error);
-      }
-    };
+    fetchSpaces();
+  }, [fetchSpaces]);
 
-    fetchBlocks();
-  }, []);
+  useEffect(() => {
+    if (spaces) {
+      // Filter for root level spaces (blocks - no parentId)
+      const blocks = spaces.filter(space => space.parentId === null);
+      setOrganizedSpaces(blocks);
+    }
+  }, [spaces]);
+
+  const mapSpaceToNavItem = (space: Space): NavItem => ({
+    key: space.spaceId,
+    name: space.spaceName,
+    url: `/block/${space.spaceId}`,
+    icon: space.spaceTypeName === "Block" ? LayoutDashboard :
+          space.spaceTypeName === "Floor" ? Layers :
+          DoorClosed,
+    spaceTypeId: space.spaceTypeId,
+    spaceTypeName: space.spaceTypeName,
+    spaceLevel: space.spaceTypeName === "Block" ? 1 :
+                space.spaceTypeName === "Floor" ? 2 : 3,
+    items: space.children?.map(mapSpaceToNavItem)
+  });
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -127,26 +128,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavFacility
-          items={blocks.map((block) => ({
-            key: block.blockId,
-            name: block.blockName,
-            url: `/block/${block.blockId}`,
-            icon: LayoutDashboard,
-            items: block.floors?.map((floor) => ({
-              key: floor.floorId,
-              name: floor.floorName,
-              url: `/block/${block.blockId}/floor/${floor.floorId}`,
-              icon: Layers,
-              items: floor.rooms?.map((room) => ({
-                key: room.roomId,
-                name: room.roomName,
-                url: `/block/${block.blockId}/floor/${floor.floorId}/room/${room.roomId}`,
-                icon: DoorClosed,
-              })),
-            })),
-          }))}
-        />
+        <NavFacility items={organizedSpaces.map(mapSpaceToNavItem)} />
         <NavScheduler scheduler={data.scheduler} />
         <NavDevices devices={[]} />
         <NavHelper
