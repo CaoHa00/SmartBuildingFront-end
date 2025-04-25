@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  AirVent,
-  AudioLines,
   Building2,
   ChevronRight,
   type LucideIcon,
@@ -83,7 +81,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton tooltip={item.name}>
-                  {item.icon && <item.icon />}
+                  {item.icon && <item.icon className="text-blue-800 dark:text-neutral-200" />}
                   <span
                     onClick={(e) => handleItemClick(item.name, item.url, e)}
                     className="text-blue-800 dark:text-neutral-200"
@@ -100,17 +98,17 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                       key={subItem.key}
                       asChild
                       defaultOpen={subItem.isActive}
-                      className="group/subcollapsible"
+                      className="group/subcollapsible text-blue-800 "
                     >
                       <SidebarMenuSubItem>
                         <CollapsibleTrigger asChild>
-                          <SidebarMenuSubButton>
-                            {subItem.icon && <subItem.icon />}
+                          <SidebarMenuSubButton >
+                            {subItem.icon && <subItem.icon className="text-blue-800" />}
                             <span
                               onClick={(e) =>
                                 handleItemClick(subItem.name, subItem.url, e)
                               }
-                              className="text-white"
+                             className="text-blue-800 dark:text-neutral-200"
                             >
                               {subItem.name}
                             </span>
@@ -131,7 +129,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                 <SidebarMenuSubItem>
                                   <CollapsibleTrigger asChild>
                                     <SidebarMenuSubButton>
-                                      {subSubItem.icon && <subSubItem.icon />}
+                                      {subSubItem.icon && <subSubItem.icon className="text-blue-800" />}
                                       <span
                                         onClick={(e) =>
                                           handleItemClick(
@@ -140,7 +138,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                             e
                                           )
                                         }
-                                        className="text-white"
+                                       className="text-blue-800 dark:text-neutral-200"
                                       >
                                         {subSubItem.name}
                                       </span>
@@ -155,7 +153,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                         <SidebarMenuSubItem key={finalItem.key}>
                                           <SidebarMenuSubButton>
                                             {finalItem.icon && (
-                                              <finalItem.icon />
+                                              <finalItem.icon className="text-blue-800 dark:text-neutral-200" />
                                             )}
                                             <span
                                               onClick={(e) =>
@@ -165,7 +163,7 @@ export function NavFacility({ items }: { items: FacilityItem[] }) {
                                                   e
                                                 )
                                               }
-                                              className="text-white"
+                                             className="text-blue-800 dark:text-neutral-200"
                                             >
                                               {finalItem.name}
                                             </span>
