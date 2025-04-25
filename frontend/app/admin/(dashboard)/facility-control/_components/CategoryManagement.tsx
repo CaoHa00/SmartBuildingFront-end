@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { api } from "@/lib/axios";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,112 +12,44 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
-import { Category } from "@/types/category";
+import { useCategories } from "@/hooks/use-categories";
 import { DeleteConfirmModal } from "@/components/delete-confirmation";
+import { useEffect } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 const CategoryManagement = () => {
-  const { toast } = useToast();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { categories, loading, isDeleting, fetchCategories, createCategory, updateCategory, deleteCategory } = useCategories();
   const [newCategory, setNewCategory] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
-    try {
-      const response = await api.get<Category[]>("/category");
-      setCategories(response.data);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch categories",
-      });
-    }
-  };
-
   const handleAdd = async () => {
-    if (!newCategory.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Category name cannot be empty",
-      });
-      return;
-    }
-    try {
-      await api.post("/category", {
-        categoryName: newCategory,
-      });
+    if (!newCategory.trim()) return;
+    const success = await createCategory(newCategory);
+    if (success) {
       setNewCategory("");
-      fetchCategories();
-      toast({
-        title: "Success",
-        description: "Category added successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to add category",
-      });
     }
   };
 
   const handleUpdate = async (id: number) => {
-    if (!editName.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Category name cannot be empty",
-      });
-      return;
-    }
-    try {
-      await api.put(`/category/${id}`, {
-        categoryName: editName,
-      });
+    if (!editName.trim()) return;
+    const success = await updateCategory(id, editName);
+    if (success) {
       setEditingId(null);
       setEditName("");
-      fetchCategories();
-      toast({
-        title: "Success",
-        description: "Category updated successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update category",
-      });
     }
   };
 
   const confirmDelete = async () => {
     if (!deleteTargetId) return;
-    try {
-      setIsDeleting(true);
-      await api.delete(`/category/${deleteTargetId}`);
-      fetchCategories();
-      toast({
-        title: "Success",
-        description: "Category deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete category",
-      });
-    } finally {
+    const success = await deleteCategory(deleteTargetId);
+    if (success) {
       setDeleteTargetId(null);
-      setIsDeleting(false);
     }
   };
 
@@ -158,7 +89,13 @@ const CategoryManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.map((category) => (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center py-8">
+                    <Spinner className="mx-auto" />
+                  </TableCell>
+                </TableRow>
+              ) : categories.map((category) => (
                 <TableRow key={category.categoryId}>
                   <TableCell>{category.categoryId}</TableCell>
                   <TableCell>

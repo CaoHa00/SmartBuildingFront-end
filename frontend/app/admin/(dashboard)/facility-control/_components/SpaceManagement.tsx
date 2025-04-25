@@ -1,9 +1,13 @@
 "use client";
 
-import React from "react";
-import { useState, useEffect } from "react";
-import { api } from "@/lib/axios";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState, useEffect } from "react";
+import { useSpaces } from "@/hooks/use-spaces";
+import { useSpaceTypes } from "@/hooks/use-space-types";
+import { useEquipment } from "@/hooks/use-equipment";
+import { useEquipmentTypes } from "@/hooks/use-equipment-types";
+import { useCategories } from "@/hooks/use-categories";
+import { Space, NewSpaceData } from "@/types/space";
+import { Equipment } from "@/types/equipment";
 import {
   Table,
   TableBody,
@@ -36,9 +40,6 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
-import { Equipment, EquipmentType, NewEquipmentData } from "@/types/equipment";
-import { Space, SpaceType, NewSpaceData } from "@/types/space";
-import { Category } from "@/types/category";
 import { DeleteConfirmModal } from "@/components/delete-confirmation";
 
 function ExpandableRow({
@@ -89,7 +90,7 @@ function FacilityDialog({
   setFormData,
 }: {
   space: Space;
-  spaceTypes: SpaceType[];
+  spaceTypes: any[];
   isEdit: boolean;
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -200,39 +201,30 @@ function FacilityDialog({
 }
 
 export function SpaceManagement() {
-  const { toast } = useToast();
-  const [spaces, setSpaces] = useState<Space[]>([]);
-  const [spaceTypes, setSpaceType] = useState<SpaceType[]>([]);
+  const { spaces, loading, isDeleting, fetchSpaces, createSpace, updateSpace, deleteSpace } = useSpaces();
+  const { spaceTypes, loading: spaceTypesLoading, fetchSpaceTypes } = useSpaceTypes();
+  const { equipment, createEquipment, updateEquipment, deleteEquipment, setEquipment } = useEquipment();
+  const { equipmentTypes, fetchEquipmentTypes } = useEquipmentTypes();
+  const { categories, fetchCategories } = useCategories();
+
   const [currentParent, setCurrentParent] = useState<Space | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [openDialogs, setOpenDialogs] = useState<Record<string, boolean>>({});
   const [isEdit, setIsEdit] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Partial<Space>>({
     spaceName: "",
     spaceTypeId: "",
     spaceTypeName: "",
     parentId: null,
   });
-  const [expandedSpaces, setExpandedSpaces] = useState<Record<string, boolean>>(
-    {}
-  );
+  const [expandedSpaces, setExpandedSpaces] = useState<Record<string, boolean>>({});
   const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
-  const [viewMode, setViewMode] = useState<
-    "spaceManagement" | "equipmentTable"
-  >("spaceManagement");
-  const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
+  const [viewMode, setViewMode] = useState<"spaceManagement" | "equipmentTable">("spaceManagement");
   const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false);
-  const [equipmentFormData, setEquipmentFormData] = useState<
-    Partial<Equipment & { spaceId: string }>
-  >({});
+  const [equipmentFormData, setEquipmentFormData] = useState<Partial<Equipment & { spaceId: string }>>({});
   const [isEquipmentEdit, setIsEquipmentEdit] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [deleteSpaceId, setDeleteSpaceId] = useState<string | null>(null);
-  const [deleteEquipmentId, setDeleteEquipmentId] = useState<number | null>(
-    null
-  );
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteEquipmentId, setDeleteEquipmentId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchSpaces();
@@ -249,87 +241,25 @@ export function SpaceManagement() {
     setOpenDialogs((prev) => ({ ...prev, [id]: false }));
   };
 
-  const fetchSpaces = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get<Space[]>("/spaces/all");
-      if (response.data.length > 0) {
-        setSpaces(response.data);
-      }
-      return response.data;
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch spaces",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchSpaceTypes = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get<SpaceType[]>("/space-types");
-      if (response.data.length > 0) {
-        setSpaceType(response.data);
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch space types",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchEquipmentTypes = async () => {
-    try {
-      const response = await api.get<EquipmentType[]>("/equipmentType");
-      setEquipmentTypes(response.data);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch equipment types",
-      });
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const response = await api.get<Category[]>("/category");
-      setCategories(response.data);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch categories",
-      });
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      if (isEdit) {
-        await api.put(`/spaces/${formData.spaceId}`, formData);
-      } else {
-        const newSpace: NewSpaceData = {
-          spaceName: formData.spaceName || "",
-          spaceTypeId: formData.spaceTypeId || "",
-          spaceTypeName: formData.spaceTypeName || "",
-          parentId: formData.parentId ?? null,
-          equipment: [],
-          children: [],
-        };
-        console.log(newSpace);
-        await api.post("/spaces", newSpace);
-      }
-      fetchSpaces();
+    let success = false;
+    
+    if (isEdit && formData.spaceId) {
+      success = await updateSpace(formData.spaceId, formData);
+    } else {
+      const newSpace: NewSpaceData = {
+        spaceName: formData.spaceName || "",
+        spaceTypeId: formData.spaceTypeId || "",
+        spaceTypeName: formData.spaceTypeName || "",
+        parentId: formData.parentId ?? null,
+        equipment: [],
+        children: [],
+      };
+      success = await createSpace(newSpace);
+    }
+
+    if (success) {
       const dialogId = formData.parentId ?? "root";
       closeDialogFor(dialogId);
       setIsOpen(false);
@@ -340,148 +270,49 @@ export function SpaceManagement() {
         parentId: null,
       });
       setIsEdit(false);
-      toast({
-        title: "Success",
-        description: `Space ${isEdit ? "updated" : "created"} successfully`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to ${isEdit ? "update" : "create"} block`,
-      });
     }
+  };
+
+  const handleEquipmentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();   
+    if (isEquipmentEdit && equipmentFormData.equipmentId) {
+      const updatedEquipment = await updateEquipment(equipmentFormData.equipmentId, equipmentFormData);
+      if (selectedSpace) {
+        setSelectedSpace((prev) => prev ? {...prev, equipments: prev.equipments.map((eq) => eq.equipmentId === updatedEquipment.equipmentId ? updatedEquipment : eq),}:null);
+      }
+    } else {
+      const equipment = await createEquipment({
+        equipmentName: equipmentFormData.equipmentName || "",
+        deviceId: equipmentFormData.deviceId || "",
+        equipmentTypeId: equipmentFormData.equipmentTypeId || "",
+        categoryId: equipmentFormData.categoryId || 0,
+        spaceId: equipmentFormData.spaceId || "",
+      });
+      setSelectedSpace((prev) => prev ? {...prev,equipments:[...prev.equipments, equipment!]}:null)
+    }
+    fetchSpaces();
+    setIsEquipmentDialogOpen(false);
+    setEquipmentFormData({});
+    setIsEquipmentEdit(false);
+
   };
 
   const confirmDelete = async () => {
     if (!deleteSpaceId) return;
-    try {
-      setIsDeleting(true);
-      await api.delete(`/spaces/${deleteSpaceId}`);
-      fetchSpaces();
-      toast({
-        title: "Success",
-        description: "Space deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete space",
-      });
-    } finally {
+    const success = await deleteSpace(deleteSpaceId);
+    if (success) {
       setDeleteSpaceId(null);
-      setIsDeleting(false);
-    }
-  };
-
-  const handleEdit = (space: Space) => {
-    const selectedType = spaceTypes.find(
-      (type) => type.spaceTypeName === space.spaceTypeName
-    );
-    setFormData({
-      spaceId: space.spaceId,
-      spaceName: space.spaceName,
-      parentId: space.parentId ?? null,
-      spaceTypeId: space.spaceTypeId ?? selectedType?.spaceTypeId ?? "",
-      spaceTypeName: space.spaceTypeName ?? selectedType?.spaceTypeName ?? "",
-    });
-    setIsEdit(true);
-    setCurrentParent(space);
-    setIsOpen(true);
-  };
-
-  const handleEquipmentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (isEquipmentEdit) {
-        const response = await api.put(
-          `/equipment/${equipmentFormData.equipmentId}`,
-          equipmentFormData
-        );
-        if (selectedSpace) {
-          const updatedEquipment = response.data;
-          setSelectedSpace((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  equipments: prev.equipments.map((eq) =>
-                    eq.equipmentId === updatedEquipment.equipmentId
-                      ? updatedEquipment
-                      : eq
-                  ),
-                }
-              : null
-          );
-        }
-      } else {
-        const newEquipment: NewEquipmentData = {
-          equipmentName: equipmentFormData.equipmentName || "",
-          deviceId: equipmentFormData.deviceId || "",
-          equipmentTypeId: equipmentFormData.equipmentTypeId || "",
-          categoryId: equipmentFormData.categoryId || 0,
-          spaceId: equipmentFormData.spaceId || "",
-        };
-        const response = await api.post(`/equipment`, newEquipment);
-        const createdEquipment = response.data;
-        setSelectedSpace((prev) =>
-          prev
-            ? {
-                ...prev,
-                equipments: [...prev.equipments, createdEquipment],
-              }
-            : null
-        );
-      }
-      fetchSpaces();
-      setIsEquipmentDialogOpen(false);
-      setEquipmentFormData({});
-      setIsEquipmentEdit(false);
-      toast({
-        title: "Success",
-        description: `Equipment ${
-          isEquipmentEdit ? "updated" : "created"
-        } successfully`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to ${
-          isEquipmentEdit ? "update" : "create"
-        } equipment`,
-      });
     }
   };
 
   const confirmDeleteEquipment = async () => {
     if (!deleteEquipmentId) return;
-    try {
-      setIsDeleting(true);
-      await api.delete(`/equipment/${deleteEquipmentId}`);
-      setSelectedSpace((prev) =>
-        prev
-          ? {
-              ...prev,
-              equipments: prev.equipments.filter(
-                (eq) => eq.equipmentId !== deleteEquipmentId
-              ),
-            }
-          : null
-      );
-      toast({
-        title: "Success",
-        description: "Equipment deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete equipment",
-      });
-    } finally {
+
+    const success = await deleteEquipment(deleteEquipmentId);
+    setSelectedSpace((prev) => prev ? {...prev, equipments: prev.equipments.filter(eq => eq.equipmentId !== deleteEquipmentId)}:null)
+    if (success) {
       setDeleteEquipmentId(null);
-      setIsDeleting(false);
+
     }
   };
 
@@ -582,7 +413,18 @@ export function SpaceManagement() {
                             <Button
                               variant="outline"
                               className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
-                              onClick={() => handleEdit(space)}
+                              onClick={() => {
+                                setFormData({
+                                  spaceId: space.spaceId,
+                                  spaceName: space.spaceName,
+                                  parentId: space.parentId ?? null,
+                                  spaceTypeId: space.spaceTypeId ?? "",
+                                  spaceTypeName: space.spaceTypeName ?? "",
+                                });
+                                setIsEdit(true);
+                                setCurrentParent(space);
+                                setIsOpen(true);
+                              }}
                             >
                               Edit
                             </Button>
@@ -656,7 +498,17 @@ export function SpaceManagement() {
                                     variant="outline"
                                     className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
                                     onClick={() => {
-                                      handleEdit(childSpace);
+                                      setFormData({
+                                        spaceId: childSpace.spaceId,
+                                        spaceName: childSpace.spaceName,
+                                        parentId: childSpace.parentId ?? null,
+                                        spaceTypeId: childSpace.spaceTypeId ?? "",
+                                        spaceTypeName:
+                                          childSpace.spaceTypeName ?? "",
+                                      });
+                                      setIsEdit(true);
+                                      setCurrentParent(childSpace);
+                                      setIsOpen(true);
                                     }}
                                   >
                                     Edit
@@ -731,7 +583,22 @@ export function SpaceManagement() {
                                           variant="outline"
                                           className="mr-2 border-[hsl(var(--tech-blue))] text-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-blue))] hover:text-white"
                                           onClick={() => {
-                                            handleEdit(grandchildSpace);
+                                            setFormData({
+                                              spaceId: grandchildSpace.spaceId,
+                                              spaceName:
+                                                grandchildSpace.spaceName,
+                                              parentId:
+                                                grandchildSpace.parentId ?? null,
+                                              spaceTypeId:
+                                                grandchildSpace.spaceTypeId ??
+                                                "",
+                                              spaceTypeName:
+                                                grandchildSpace.spaceTypeName ??
+                                                "",
+                                            });
+                                            setIsEdit(true);
+                                            setCurrentParent(grandchildSpace);
+                                            setIsOpen(true);
                                           }}
                                         >
                                           Edit
