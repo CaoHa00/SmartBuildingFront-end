@@ -21,3 +21,10 @@ export interface EquipmentType {
   equipmentTypeName: string;
   equipments: any[];
 }
+
+export interface EquipmentValue {
+  valueResponse: number;
+  valueName: string;
+  equipmentName: string;
+  equipmentId: string;
+}

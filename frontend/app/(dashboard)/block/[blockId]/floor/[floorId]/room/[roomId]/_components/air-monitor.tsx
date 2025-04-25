@@ -1,39 +1,18 @@
 "use client";
 import { Droplet, TriangleAlert, Waves } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { AirQualityResponse } from "@/types/indoor-air-quality";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useEquipmentValues } from "@/hooks/use-equipment-values";
 
-async function fetchAirQuality() {
-  const { data } = await axios.post<AirQualityResponse>(
-    `${process.env.NEXT_PUBLIC_AQARA_API_URL}/currentValue?equipmentId=10018`
-  );
-  return data;
-}
-
-function formatTimeUTC7(timestamp: string) {
-  const date = new Date(Number(timestamp));
-  const options: Intl.DateTimeFormatOptions = {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    timeZone: "Asia/Bangkok", // UTC+7
-    hour12: false,
-  };
-  return date.toLocaleTimeString("en-US", options);
-}
+const SPACE_ID = "5aa571e0-d317-4697-8970-9fc439b98030";
 
 export function AirMonitor() {
   const isMobile = useIsMobile();
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["airQuality"],
-    queryFn: fetchAirQuality,
-    refetchInterval: 30000,
-  });
+  const { values, loading: isLoading, getValueByName } = useEquipmentValues(SPACE_ID);
 
-  // if (isLoading) return <div>Loading...</div>;
-  // if (error) return <div>Error loading data</div>;
+  if (isLoading) return <div>Loading...</div>;
+
+  const humidity = getValueByName("humidity");
+  const temperature = getValueByName("temperature");
 
   return (
     <div className="w-full h-full aspect-video relative rounded-xl bg-muted/50 p-2 mx-auto">
@@ -42,7 +21,7 @@ export function AirMonitor() {
           Humidity
         </div>
         <div className="absolute inset-0 flex items-center justify-center font-bold text-2xl md:text-3xl text-white pt-4">
-          {data?.humidity ?? "N/A"} %
+          {humidity ?? "N/A"} %
         </div>
         <div className="absolute top-0 right-0 p-1 text-white">
           <Droplet className="w-4 h-4 md:w-6 md:h-6" />
@@ -53,7 +32,7 @@ export function AirMonitor() {
           Temperature
         </div>
         <div className="absolute inset-0 flex items-center justify-center font-bold text-2xl md:text-3xl text-white pt-4">
-          {data?.temperature ?? "N/A"}°C
+          {temperature ?? "N/A"}°C
         </div>
         <div className="absolute top-0 right-0 p-1 text-white">
           <Waves className="w-4 h-4 md:w-6 md:h-6" />
@@ -67,10 +46,6 @@ export function AirMonitor() {
           <p>CO</p>
           <TriangleAlert className="w-4 h-4 md:w-5 md:h-5" />
           <p>CO₂</p>
-        </div>
-        <div className="text-[10px] md:text-[12px] text-center font-bold text-white/80 italic absolute bottom-1 w-full">
-          Last update:{" "}
-          {data?.timeStamp ? formatTimeUTC7(data.timeStamp) : "N/A"}
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { api } from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,113 +12,43 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
+import { useEquipmentTypes } from "@/hooks/use-equipment-types";
 import { DeleteConfirmModal } from "@/components/delete-confirmation";
-
-interface EquipmentType {
-  equipmentTypeId: string; // Matches the DTO
-  equipmentTypeName: string; // Matches the DTO
-  equipments: any[]; // Matches the DTO
-}
+import { Spinner } from "@/components/ui/spinner";
 
 const EquipmentTypeManagement = () => {
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
-  const [equipmentTypes, setEquipmentTypes] = useState<EquipmentType[]>([]);
+  const { equipmentTypes, loading, isDeleting, fetchEquipmentTypes, createEquipmentType, updateEquipmentType, deleteEquipmentType } = useEquipmentTypes();
   const [newType, setNewType] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchEquipmentTypes();
   }, []);
 
-  const fetchEquipmentTypes = async () => {
-    try {
-      setIsLoading(true);
-      const response = await api.get<EquipmentType[]>("/equipmentType");
-      setEquipmentTypes(response.data);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch equipment types",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleAdd = async () => {
-    if (!newType.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Equipment type name cannot be empty",
-      });
-      return;
-    }
-    try {
-      await api.post("/equipmentType", {
-        equipmentTypeName: newType,
-      });
+    if (!newType.trim()) return;
+    const success = await createEquipmentType(newType);
+    if (success) {
       setNewType("");
-      fetchEquipmentTypes();
-      toast({
-        title: "Success",
-        description: "Equipment type added successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to add equipment type",
-      });
     }
   };
 
   const handleUpdate = async (id: string) => {
-    try {
-      await api.put(`/equipmentType/${id}`, {
-        equipmentTypeName: editName,
-      });
+    if (!editName.trim()) return;
+    const success = await updateEquipmentType(id, editName);
+    if (success) {
       setEditingId(null);
       setEditName("");
-      fetchEquipmentTypes();
-      toast({
-        title: "Success",
-        description: "Equipment type updated successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update equipment type",
-      });
     }
   };
 
   const confirmDelete = async () => {
     if (!deleteTargetId) return;
-    try {
-      setIsDeleting(true);
-      await api.delete(`/equipmentType/${deleteTargetId}`);
-      fetchEquipmentTypes();
-      toast({
-        title: "Success",
-        description: "Equipment type deleted successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete equipment type",
-      });
-    } finally {
+    const success = await deleteEquipmentType(deleteTargetId);
+    if (success) {
       setDeleteTargetId(null);
-      setIsDeleting(false);
     }
   };
 
@@ -159,10 +88,10 @@ const EquipmentTypeManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading ? (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center">
-                    Loading...
+                  <TableCell colSpan={3} className="text-center py-8">
+                    <Spinner className="mx-auto" />
                   </TableCell>
                 </TableRow>
               ) : equipmentTypes.length > 0 ? (
