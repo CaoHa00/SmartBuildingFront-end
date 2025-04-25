@@ -9,7 +9,7 @@ export const useEquipment = (spaceId?: string) => {
   const [loading, setLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const createEquipment = async (newEquipment: NewEquipmentData) => {
+  const createEquipment = async (newEquipment: NewEquipmentData): Promise<Equipment | null> => {
     try {
       const response = await api.post("/equipment", newEquipment);
       const createdEquipment = response.data;
@@ -18,14 +18,14 @@ export const useEquipment = (spaceId?: string) => {
         title: "Success",
         description: "Equipment created successfully",
       });
-      return true;
+      return createdEquipment;
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to create equipment",
       });
-      return false;
+      return null;
     }
   };
 
@@ -40,14 +40,14 @@ export const useEquipment = (spaceId?: string) => {
         title: "Success",
         description: "Equipment updated successfully",
       });
-      return true;
+      return updatedEquipment;
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to update equipment",
       });
-      return false;
+      return null;
     }
   };
 
