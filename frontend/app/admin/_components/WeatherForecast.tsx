@@ -109,7 +109,7 @@ const WeatherForecast = () => {
   return (
     <div
       className={`flex flex-col gap-4 bg-primary
-      } p-6 rounded-lg`}
+      } px-6 py-3 rounded-lg`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -173,7 +173,7 @@ const WeatherForecast = () => {
         </div>
       </div>
 
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         {adminWeather.news.map((news, index) => (
           <Alert
             key={index}
@@ -193,7 +193,7 @@ const WeatherForecast = () => {
             </div>
           </Alert>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

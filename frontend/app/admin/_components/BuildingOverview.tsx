@@ -20,15 +20,19 @@ import {
   Zap,
 } from "lucide-react";
 import WeatherForecast from "./WeatherForecast";
+import useCurrentElectricalReading from "@/hooks/use-current-electrical-reading";
 
 interface StatCardProps {
   title: string;
-  value: string;
+  value: number;
+  unit: string;
   note: string;
   icon: LucideIcon;
+  iconColor: string;
 }
 
 export default function BuildingSummary() {
+  const currentBuildingElectricalReading = useCurrentElectricalReading();
   return (
     <div className="flex-1 space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -45,18 +49,22 @@ export default function BuildingSummary() {
           </Card>
         </div>
         <StatCard
-          title="Average Temperature"
-          value="22°C"
+          title=" Current Average Temperature"
+          value={22}
+          unit="°C"
           icon={Thermometer}
-          note="Avarage Daily Usage"
+          note=""
+          iconColor="#de2612"
         />
         <StatCard
-          title="Occupancy"
-          value="342"
-          icon={UserRoundCheck}
-          note="Current Occupancy"
+          title="Equipment"
+          value={98}
+          unit="%"
+          icon={Cpu}
+          note="Equipment Running Today"
+          iconColor="#0aced1"
         />
-        <div className="grid row-span-3 sm:grid-cols-1 gap-4">
+        <div className="grid row-span-2 sm:grid-cols-1 gap-4">
           <Card className="bg-card">
             <CardHeader>
               <CardTitle className="text-xl text-card-foreground">
@@ -68,21 +76,28 @@ export default function BuildingSummary() {
             </CardContent>
           </Card>
         </div>
-        <StatCard title="Energy Usage" value="4.2 kWh" icon={Zap} note="" />
         <StatCard
-          title="CO2"
-          value="539 ppm"
+          title="Current Energy Usage"
+          value={
+            Math.round(
+              (currentBuildingElectricalReading
+                ? currentBuildingElectricalReading.electricalReading
+                : 0) * 100
+            ) / 100
+          }
+          unit="kW"
+          icon={Zap}
+          note=""
+          iconColor="#e0b61d"
+        />
+        <StatCard
+          title="Current CO₂ Emission"
+          value={539}
+          unit="ppm"
           icon={CloudFog}
-          note="Max C02 Level/ Building"
+          note=""
+          iconColor="#1ba80c"
         />
-        <StatCard
-          title="Equipment"
-          value="98%"
-          icon={Cpu}
-          note="Equipment Running Today"
-        />
-        <StatCard title="Active Alerts" value="2" icon={AlertCircle} note="" />
-        <StatCard title="Active Alerts" value="2" icon={AlertCircle} note="" />
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -113,15 +128,27 @@ export default function BuildingSummary() {
   );
 }
 
-function StatCard({ title, value, icon, note }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  unit,
+  icon,
+  note,
+  iconColor,
+}: StatCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <span className="text-2xl">{React.createElement(icon)}</span>
+        <span className="text-2xl">
+          {React.createElement(icon, { color: iconColor })}
+        </span>
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold text-accent-foreground">{value}</div>
+      <CardContent className="pb-2">
+        <div className="text-2xl font-bold text-accent-foreground">
+          <span>{value}</span>
+          <span> {unit}</span>
+        </div>
       </CardContent>
       <CardFooter className="text-sm text-card-foreground">
         <span className="text-xs">{note}</span>
