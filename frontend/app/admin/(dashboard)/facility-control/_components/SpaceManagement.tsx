@@ -274,26 +274,27 @@ export function SpaceManagement() {
   };
 
   const handleEquipmentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    let success = false;
-
+    e.preventDefault();   
     if (isEquipmentEdit && equipmentFormData.equipmentId) {
-      success = await updateEquipment(equipmentFormData.equipmentId, equipmentFormData);
+      const updatedEquipment = await updateEquipment(equipmentFormData.equipmentId, equipmentFormData);
+      if (selectedSpace) {
+        setSelectedSpace((prev) => prev ? {...prev, equipments: prev.equipments.map((eq) => eq.equipmentId === updatedEquipment.equipmentId ? updatedEquipment : eq),}:null);
+      }
     } else {
-      success = await createEquipment({
+      const equipment = await createEquipment({
         equipmentName: equipmentFormData.equipmentName || "",
         deviceId: equipmentFormData.deviceId || "",
         equipmentTypeId: equipmentFormData.equipmentTypeId || "",
         categoryId: equipmentFormData.categoryId || 0,
         spaceId: equipmentFormData.spaceId || "",
       });
+      setSelectedSpace((prev) => prev ? {...prev,equipments:[...prev.equipments, equipment!]}:null)
     }
+    fetchSpaces();
+    setIsEquipmentDialogOpen(false);
+    setEquipmentFormData({});
+    setIsEquipmentEdit(false);
 
-    if (success) {
-      setIsEquipmentDialogOpen(false);
-      setEquipmentFormData({});
-      setIsEquipmentEdit(false);
-    }
   };
 
   const confirmDelete = async () => {
@@ -307,6 +308,7 @@ export function SpaceManagement() {
   const confirmDeleteEquipment = async () => {
     if (!deleteEquipmentId) return;
     const success = await deleteEquipment(deleteEquipmentId);
+    setSelectedSpace((prev) => prev ? {...prev, equipments: prev.equipments.filter(eq => eq.equipmentId !== deleteEquipmentId)}:null)
     if (success) {
       setDeleteEquipmentId(null);
     }
