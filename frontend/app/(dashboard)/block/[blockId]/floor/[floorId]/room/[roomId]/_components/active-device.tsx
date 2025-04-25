@@ -66,7 +66,8 @@ export default function ActiveDevice() {
 
   const handleLightSwitch = async (deviceId: string, newStatus: boolean) => {
     try {
-      await api.post(`/spaces/${SPACE_ID}/light-control?value=${newStatus ? 1 : 0}`);
+      // Send exactly 0.0 for off, 1.0 for on
+      await api.post(`/spaces/${SPACE_ID}/light-control?value=${newStatus ? 1.0 : 0.0}`);
       
       setActiveDevices(prev => 
         prev.map(device => 
@@ -102,12 +103,17 @@ export default function ActiveDevice() {
       ).map(equipmentId => {
         const equipmentValues = values.filter(v => v.equipmentId === equipmentId);
         const firstValue = equipmentValues[0];
-        const hasValue = equipmentValues.some(v => v.valueResponse !== null && v.valueResponse !== undefined);
+        // Check if any value response is not null/undefined and not 0.0
+        const hasValue = equipmentValues.some(v => 
+          v.valueResponse !== null && 
+          v.valueResponse !== undefined && 
+          Math.abs(v.valueResponse) > 0.001
+        );
         const isLightSwitch = firstValue.equipmentName.toLowerCase().includes('light');
         
-        // Get the light status from the API response
+        // Get the light status from the API response - check for exactly 0.0 as off
         const apiLightStatus = isLightSwitch 
-          ? equipmentValues.find(v => v.valueName === 'light-status')?.valueResponse === 1
+          ? Math.abs(equipmentValues.find(v => v.valueName === 'light-status')?.valueResponse ?? 0) > 0.001
           : undefined;
         
         // Try to get saved status from localStorage for light switches
@@ -126,7 +132,7 @@ export default function ActiveDevice() {
           icon: getDeviceIcon(firstValue.equipmentName),
           status: hasValue ? "online" : "offline",
           isLightSwitch,
-          lightStatus: savedStatus ?? apiLightStatus // Use saved status if available, otherwise use API status
+          lightStatus: savedStatus ?? apiLightStatus
         };
       });
 
@@ -134,17 +140,17 @@ export default function ActiveDevice() {
     }
   }, [values]);
 
-  if (loading) {
-    return (
-      <div className="rounded-xl w-full h-full bg-blue-800 shadow-xl p-4">
-        <div className="ml-3">
-          <h2 className="flex font-bold tracking-wide text-xl text-neutral-100 leading-none">
-            Loading Devices...
-          </h2>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="rounded-xl w-full h-full bg-blue-800 shadow-xl p-4">
+  //       <div className="ml-3">
+  //         <h2 className="flex font-bold tracking-wide text-xl text-neutral-100 leading-none">
+  //           Loading Devices...
+  //         </h2>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="rounded-xl w-full h-full bg-blue-800  shadow-xl p-4">

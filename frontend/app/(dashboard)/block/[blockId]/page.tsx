@@ -49,11 +49,16 @@ export const BlockIdPage = () => {
       activeRooms: 5,
     },
   ]);
-  const [elevators] = useState([
-    { id: "A", status: "idle" as const, electricityConsumption: 2.5 },
-    { id: "B", status: "moving" as const, electricityConsumption: 4.8 },
-    { id: "C", status: "maintenance" as const, electricityConsumption: 0.5 },
-  ]);
+  const [elevator] = useState({
+    id: "A",
+    status: "moving" as const,
+    phaseConsumption: {
+      phase1: 2.8,
+      phase2: 2.6,
+      phase3: 2.7
+    },
+    totalConsumption: 45.0
+  });
 
   const stats = {
     electricity: { value: "2,400 kWh", highestFloor: "Floor 3" },
@@ -170,20 +175,18 @@ export const BlockIdPage = () => {
 
           {/* Right Side Content */}
           <div className="w-96 flex flex-col gap-4">
-            {/* Elevators */}
+            {/* Elevator */}
             <div className="bg-white/90 rounded-xl p-4">
               <h2 className="text-base font-bold text-blue-800 mb-4">
-                Elevators
+                Elevator Status
               </h2>
-              <div className="grid grid-cols-1 gap-4">
-                {elevators.map((elevator) => (
-                  <Elevator
-                    key={elevator.id}
-                    id={elevator.id}
-                    status={elevator.status}
-                    electricityConsumption={elevator.electricityConsumption}
-                  />
-                ))}
+              <div>
+                <Elevator
+                  id={elevator.id}
+                  status={elevator.status}
+                  phaseConsumption={elevator.phaseConsumption}
+                  totalConsumption={elevator.totalConsumption}
+                />
               </div>
             </div>
 
