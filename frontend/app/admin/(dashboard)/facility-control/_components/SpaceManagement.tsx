@@ -307,10 +307,12 @@ export function SpaceManagement() {
 
   const confirmDeleteEquipment = async () => {
     if (!deleteEquipmentId) return;
+
     const success = await deleteEquipment(deleteEquipmentId);
     setSelectedSpace((prev) => prev ? {...prev, equipments: prev.equipments.filter(eq => eq.equipmentId !== deleteEquipmentId)}:null)
     if (success) {
       setDeleteEquipmentId(null);
+
     }
   };
 
@@ -328,7 +330,7 @@ export function SpaceManagement() {
                 Facility Management
               </h2>
               <Button
-                className="bg-[#F7CA18] hover:bg-[#FFB61E]"
+                className="bg-[#F7CA18] hover:bg-[#FFB61E] text-black"
                 onClick={() => {
                   const rootSpaceType = spaceTypes.find(
                     (type) => type.spaceLevel === 1
@@ -434,7 +436,7 @@ export function SpaceManagement() {
                               Delete
                             </Button>
                             <Button
-                              className="bg-[#F7CA18] hover:bg-[#FFB61E]"
+                              className="bg-[#F7CA18] hover:bg-[#FFB61E] text-black"
                               onClick={() => {
                                 setIsEdit(false);
                                 setFormData({
@@ -521,7 +523,7 @@ export function SpaceManagement() {
                                     Delete
                                   </Button>
                                   <Button
-                                    className="bg-[#F7CA18] hover:bg-[#FFB61E]"
+                                    className="bg-[#F7CA18] hover:bg-[#FFB61E] text-black"
                                     onClick={() => {
                                       setIsEdit(false);
                                       setFormData({
@@ -613,7 +615,7 @@ export function SpaceManagement() {
                                           Delete
                                         </Button>
                                         <Button
-                                          className="bg-[#F7CA18] hover:bg-[#FFB61E]"
+                                          className="bg-[#F7CA18] hover:bg-[#FFB61E] text-black"
                                           onClick={() => {
                                             setIsEdit(false);
                                             setFormData({
@@ -892,7 +894,10 @@ export function SpaceManagement() {
       <DeleteConfirmModal
         isOpen={!!deleteEquipmentId}
         onClose={() => setDeleteEquipmentId(null)}
-        onConfirm={confirmDeleteEquipment}
+        onConfirm={() => {
+          confirmDeleteEquipment();
+          console.log(deleteEquipmentId);
+        }}
         loading={isDeleting}
         title="Delete Equipment"
         description="Are you sure you want to delete this equipment? This action cannot be undone."

@@ -5,7 +5,7 @@ export function BuildingModel3D() {
       <div className="w-full h-auto rounded-xl bg-primary shadow-xl flex justify-center items-center">
         <img src="/img/IIC.png" alt="Building Model" />
       </div>
-      <p className="text-sm font-bold text-card-foreground mt-2">
+      <p className="text-sm font-bold text-card-foreground mt-6">
         Buliding Name: Block 8
       </p>
     </>
