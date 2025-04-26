@@ -19,7 +19,7 @@ interface Device {
 }
 
 // Keys for localStorage
-const LIGHT_SWITCH_STATUS_KEY = 'lightSwitchStatus';
+const LIGHT_SWITCH_STATUS_KEY = "lightSwitchStatus";
 
 const getDeviceIcon = (name: string): LucideIcon => {
   if (name.toLowerCase().includes("ac") || name.toLowerCase().includes("air"))
@@ -33,7 +33,9 @@ const getDeviceIcon = (name: string): LucideIcon => {
 export default function ActiveDevice() {
   const params = useParams();
   const isMobile = useIsMobile();
-  const { values, loading, error, fetchEquipmentValues } = useEquipmentValues(params.roomId as string);
+  const { values, loading, error, fetchEquipmentValues } = useEquipmentValues(
+    params.roomId as string
+  );
   const [activeDevices, setActiveDevices] = useState<Device[]>([]);
 
   // Load saved light switch statuses from localStorage
@@ -41,12 +43,12 @@ export default function ActiveDevice() {
     const savedStatuses = localStorage.getItem(LIGHT_SWITCH_STATUS_KEY);
     if (savedStatuses) {
       const parsedStatuses = JSON.parse(savedStatuses);
-      setActiveDevices(prev => 
-        prev.map(device => ({
+      setActiveDevices((prev) =>
+        prev.map((device) => ({
           ...device,
-          lightStatus: device.isLightSwitch 
-            ? parsedStatuses[device.id] ?? device.lightStatus 
-            : device.lightStatus
+          lightStatus: device.isLightSwitch
+            ? parsedStatuses[device.id] ?? device.lightStatus
+            : device.lightStatus,
         }))
       );
     }
@@ -54,43 +56,56 @@ export default function ActiveDevice() {
 
   // Save light switch statuses to localStorage whenever they change
   useEffect(() => {
-    const lightSwitches = activeDevices.filter(d => d.isLightSwitch);
+    const lightSwitches = activeDevices.filter((d) => d.isLightSwitch);
     if (lightSwitches.length > 0) {
-      const statusesToSave = lightSwitches.reduce((acc, device) => ({
-        ...acc,
-        [device.id]: device.lightStatus
-      }), {});
-      localStorage.setItem(LIGHT_SWITCH_STATUS_KEY, JSON.stringify(statusesToSave));
+      const statusesToSave = lightSwitches.reduce(
+        (acc, device) => ({
+          ...acc,
+          [device.id]: device.lightStatus,
+        }),
+        {}
+      );
+      localStorage.setItem(
+        LIGHT_SWITCH_STATUS_KEY,
+        JSON.stringify(statusesToSave)
+      );
     }
   }, [activeDevices]);
 
   const handleLightSwitch = async (deviceId: string, newStatus: boolean) => {
     try {
-      // Send exactly 0.0 for off, 1.0 for on
-      await api.post(`/spaces/${params.roomId}/light-control?value=${newStatus ? 1.0 : 0.0}`);
-      
-      setActiveDevices(prev => 
-        prev.map(device => 
-          device.id === deviceId 
+      const value = newStatus ? 1 : 0;
+      await api.post(`/spaces/${params.roomId}/light-control?value=${value}`);
+
+      setActiveDevices((prev) =>
+        prev.map((device) =>
+          device.id === deviceId
             ? { ...device, lightStatus: newStatus }
             : device
         )
       );
-      
+
       toast({
         title: "Light switch updated",
-        description: `Light has been turned ${newStatus ? 'on' : 'off'}.`,
+        description: `Light has been turned ${newStatus ? "on" : "off"}.`,
       });
 
       // Refresh the equipment values after a short delay
       setTimeout(() => {
         fetchEquipmentValues();
       }, 1000);
-    } catch (error) {
-      console.error('Error controlling light:', error);
+    } catch (error: any) {
+      console.error("Error controlling light:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      });
+      
+      const errorMessage = error.response?.data?.message || error.message || "Failed to control the light switch";
+      
       toast({
         title: "Error",
-        description: "Failed to control the light switch.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -99,23 +114,29 @@ export default function ActiveDevice() {
   useEffect(() => {
     if (values && values.length > 0) {
       const devices: Device[] = Array.from(
-        new Set(values.map(v => v.equipmentId))
-      ).map(equipmentId => {
-        const equipmentValues = values.filter(v => v.equipmentId === equipmentId);
-        const firstValue = equipmentValues[0];
-        // Check if any value response is not null/undefined and not 0.0
-        const hasValue = equipmentValues.some(v => 
-          v.valueResponse !== null && 
-          v.valueResponse !== undefined && 
-          Math.abs(v.valueResponse) > 0.001
+        new Set(values.map((v) => v.equipmentId))
+      ).map((equipmentId) => {
+        const equipmentValues = values.filter(
+          (v) => v.equipmentId === equipmentId
         );
-        const isLightSwitch = firstValue.equipmentName.toLowerCase().includes('light');
-        
-        // Get the light status from the API response - check for exactly 0.0 as off
-        const apiLightStatus = isLightSwitch 
-          ? Math.abs(equipmentValues.find(v => v.valueName === 'light-status')?.valueResponse ?? 0) > 0.001
-          : undefined;
-        
+        const firstValue = equipmentValues[0];
+        // Check if any value response is not null/undefined
+        const hasValue = equipmentValues.some(
+          (v) => v.valueResponse !== null && v.valueResponse !== undefined
+        );
+        const isLightSwitch = firstValue.equipmentName
+          .toLowerCase()
+          .includes("light");
+
+        // Get the light status from the API response - strictly check for 1.0 as on, 0.0 as off
+        let apiLightStatus;
+        if (isLightSwitch) {
+          const lightStatusValue = equipmentValues.find(
+            (v) => v.valueName === "light-status"
+          )?.valueResponse;
+          apiLightStatus = lightStatusValue === 1; // Only true if exactly 1.0
+        }
+
         // Try to get saved status from localStorage for light switches
         let savedStatus;
         if (isLightSwitch) {
@@ -125,14 +146,14 @@ export default function ActiveDevice() {
             savedStatus = parsedStatuses[equipmentId];
           }
         }
-        
+
         return {
           id: equipmentId,
           name: firstValue.equipmentName,
           icon: getDeviceIcon(firstValue.equipmentName),
           status: hasValue ? "online" : "offline",
           isLightSwitch,
-          lightStatus: savedStatus ?? apiLightStatus
+          lightStatus: savedStatus ?? apiLightStatus ?? false,
         };
       });
 
@@ -163,7 +184,7 @@ export default function ActiveDevice() {
           </h2>
           <div className="text-neutral-100">
             <p className="mb-4">{error || "No devices found"}</p>
-            <button 
+            <button
               onClick={() => fetchEquipmentValues()}
               className="px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-700 text-white"
             >
@@ -218,15 +239,27 @@ export default function ActiveDevice() {
                     className="data-[state=checked]:bg-green-500"
                   />
                 )}
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    device.status === "online"
-                      ? "bg-green-500/20 text-green-300"
-                      : "bg-red-500/20 text-red-300"
-                  }`}
-                >
-                  {device.status}
-                </span>
+                {device.isLightSwitch ? (
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      device.lightStatus
+                        ? "bg-green-500/20 text-green-300"
+                        : "bg-red-500/20 text-red-300"
+                    }`}
+                  >
+                    {device.lightStatus ? "online" : "offline"}
+                  </span>
+                ) : (
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      device.status === "online"
+                        ? "bg-green-500/20 text-green-300"
+                        : "bg-red-500/20 text-red-300"
+                    }`}
+                  >
+                    {device.status}
+                  </span>
+                )}
               </div>
             </div>
           </div>

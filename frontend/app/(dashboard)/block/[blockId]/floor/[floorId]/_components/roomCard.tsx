@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { AirVent, Lightbulb, Tv, Thermometer, Droplets } from "lucide-react";
 
 interface RoomCardProps {
