@@ -3,12 +3,12 @@ import { Droplet, TriangleAlert, Waves, Thermometer } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEquipmentValues } from "@/hooks/use-equipment-values";
 import { useEffect } from "react";
-
-const SPACE_ID = "5aa571e0-d317-4697-8970-9fc439b98030";
+import { useParams } from "next/navigation";
 
 export function AirMonitor() {
   const isMobile = useIsMobile();
-  const { values, loading: isLoading, getValueByName, fetchEquipmentValues } = useEquipmentValues(SPACE_ID);
+  const params = useParams();
+  const { values, loading: isLoading, getValueByName, fetchEquipmentValues } = useEquipmentValues(params.roomId as string);
 
   useEffect(() => {
     fetchEquipmentValues();
