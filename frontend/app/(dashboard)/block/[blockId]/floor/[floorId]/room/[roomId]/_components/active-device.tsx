@@ -7,6 +7,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useEquipmentValues } from "@/hooks/use-equipment-values";
 import { api } from "@/lib/axios";
 import { toast } from "@/hooks/use-toast";
+import { useParams } from "next/navigation";
 
 interface Device {
   id: string;
@@ -29,11 +30,10 @@ const getDeviceIcon = (name: string): LucideIcon => {
   return Lightbulb;
 };
 
-const SPACE_ID = "5aa571e0-d317-4697-8970-9fc439b98030";
-
 export default function ActiveDevice() {
+  const params = useParams();
   const isMobile = useIsMobile();
-  const { values, loading, fetchEquipmentValues } = useEquipmentValues(SPACE_ID);
+  const { values, loading, error, fetchEquipmentValues } = useEquipmentValues(params.roomId as string);
   const [activeDevices, setActiveDevices] = useState<Device[]>([]);
 
   // Load saved light switch statuses from localStorage
@@ -67,7 +67,7 @@ export default function ActiveDevice() {
   const handleLightSwitch = async (deviceId: string, newStatus: boolean) => {
     try {
       // Send exactly 0.0 for off, 1.0 for on
-      await api.post(`/spaces/${SPACE_ID}/light-control?value=${newStatus ? 1.0 : 0.0}`);
+      await api.post(`/spaces/${params.roomId}/light-control?value=${newStatus ? 1.0 : 0.0}`);
       
       setActiveDevices(prev => 
         prev.map(device => 
@@ -137,20 +137,43 @@ export default function ActiveDevice() {
       });
 
       setActiveDevices(devices);
+    } else {
+      setActiveDevices([]); // Clear devices when no values
     }
   }, [values]);
 
-  // if (loading) {
-  //   return (
-  //     <div className="rounded-xl w-full h-full bg-blue-800 shadow-xl p-4">
-  //       <div className="ml-3">
-  //         <h2 className="flex font-bold tracking-wide text-xl text-neutral-100 leading-none">
-  //           Loading Devices...
-  //         </h2>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <div className="rounded-xl w-full h-full bg-blue-800 shadow-xl p-4">
+        <div className="ml-3">
+          <h2 className="flex font-bold tracking-wide text-xl text-neutral-100 leading-none">
+            Loading Devices...
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || (!loading && (!values || values.length === 0))) {
+    return (
+      <div className="rounded-xl w-full h-full bg-blue-800 shadow-xl p-4">
+        <div className="ml-3">
+          <h2 className="flex font-bold tracking-wide text-xl text-neutral-100 leading-none mb-4">
+            Active Devices
+          </h2>
+          <div className="text-neutral-100">
+            <p className="mb-4">{error || "No devices found"}</p>
+            <button 
+              onClick={() => fetchEquipmentValues()}
+              className="px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-700 text-white"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-xl w-full h-full bg-blue-800  shadow-xl p-4">

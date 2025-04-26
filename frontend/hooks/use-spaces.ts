@@ -1,20 +1,30 @@
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { api } from "@/lib/axios";
 import { useToast } from "@/hooks/use-toast";
 import { Space, NewSpaceData } from "@/types/space";
 import axios, { AxiosError } from "axios";
 
-// Cache for storing space data
-let spacesCache: Space[] = [];
-
+// Cache for storing space data with timestamp
+let spacesCache: { data: Space[]; timestamp: number } | null = null;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const DEBOUNCE_DELAY = 300; // 300ms
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
 export const useSpaces = () => {
   const { toast } = useToast();
-  const [spaces, setSpaces] = useState<Space[]>(spacesCache);
-  const [loading, setLoading] = useState(spacesCache.length === 0);
+  const [spaces, setSpaces] = useState<Space[]>(spacesCache?.data || []);
+  const [loading, setLoading] = useState(!spacesCache?.data);
   const [isDeleting, setIsDeleting] = useState(false);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const isCacheValid = useCallback(() => {
+    return (
+      spacesCache !== null &&
+      spacesCache.timestamp > Date.now() - CACHE_TTL &&
+      spacesCache.data.length > 0
+    );
+  }, []);
 
   const fetchWithRetry = async (retryCount = 0): Promise<Space[]> => {
     try {
@@ -24,7 +34,6 @@ export const useSpaces = () => {
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
         if ((axiosError.code === "ECONNABORTED" || axiosError.message.includes("timeout")) && retryCount < MAX_RETRIES) {
-          // Wait before retrying
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
           return fetchWithRetry(retryCount + 1);
         }
@@ -33,20 +42,25 @@ export const useSpaces = () => {
     }
   };
 
-  const fetchSpaces = async () => {
-    // If we already have data in the cache, use it
-    if (spacesCache.length > 0) {
-      setSpaces(spacesCache);
+  const fetchSpaces = useCallback(async () => {
+    // Clear any pending debounced calls
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    // If cache is valid, use it
+    if (isCacheValid()) {
+      setSpaces(spacesCache!.data);
       setLoading(false);
-      return spacesCache;
+      return spacesCache!.data;
     }
 
     try {
       setLoading(true);
       const data = await fetchWithRetry();
       if (data.length > 0) {
-        // Update both state and cache
-        spacesCache = data;
+        // Update both state and cache with timestamp
+        spacesCache = { data, timestamp: Date.now() };
         setSpaces(data);
       }
       return data;
@@ -65,20 +79,27 @@ export const useSpaces = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast, isCacheValid]);
 
   // Function to force refresh data (for manual reload)
-  const refreshSpaces = async () => {
-    // Clear cache
-    spacesCache = [];
-    // Fetch fresh data
-    return fetchSpaces();
-  };
+  const refreshSpaces = useCallback(() => {
+    // Invalidate cache
+    spacesCache = null;
+    // Fetch fresh data with debouncing
+    return new Promise((resolve) => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+      debounceTimer.current = setTimeout(() => {
+        resolve(fetchSpaces());
+      }, DEBOUNCE_DELAY);
+    });
+  }, [fetchSpaces]);
 
   const createSpace = async (newSpace: NewSpaceData) => {
     try {
       await api.post("/spaces", newSpace);
-      await refreshSpaces(); // Force refresh after creating
+      await refreshSpaces();
       toast({
         title: "Success",
         description: "Space created successfully",

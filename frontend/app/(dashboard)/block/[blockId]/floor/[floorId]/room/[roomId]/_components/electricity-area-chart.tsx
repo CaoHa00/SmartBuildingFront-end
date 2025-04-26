@@ -6,9 +6,7 @@ import { useEquipmentValues } from "@/hooks/use-equipment-values";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Zap } from "lucide-react";
 import { useEffect, useState } from "react";
-
-const SPACE_ID = "5aa571e0-d317-4697-8970-9fc439b98030";
-const ELECTRIC_EQUIPMENT_ID = "cfeec65c-2573-480a-86fa-02f686bd3b27";
+import { useParams } from "next/navigation";
 
 interface ChartDataPoint {
   timestamp: string;
@@ -18,13 +16,14 @@ interface ChartDataPoint {
 }
 
 export function ElectricityAreaChart() {
-  const { values, loading: isLoading } = useEquipmentValues(SPACE_ID);
+  const params = useParams();
+  const { values, loading: isLoading } = useEquipmentValues(params.roomId as string);
   const isMobile = useIsMobile();
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
     if (values.length > 0) {
-      const electricValues = values.filter(v => v.equipmentId === ELECTRIC_EQUIPMENT_ID);
+      const electricValues = values.filter(v => v.equipmentName.toLowerCase().includes('electric'));
       
       const current = electricValues.find(v => v.valueName === "electricCurrent")?.valueResponse || 0;
       const power = electricValues.find(v => v.valueName === "active-power")?.valueResponse || 0;
