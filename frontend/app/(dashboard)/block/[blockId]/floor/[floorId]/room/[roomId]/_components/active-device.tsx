@@ -98,11 +98,14 @@ export default function ActiveDevice() {
       console.error("Error controlling light:", {
         message: error.message,
         status: error.response?.status,
-        data: error.response?.data
+        data: error.response?.data,
       });
-      
-      const errorMessage = error.response?.data?.message || error.message || "Failed to control the light switch";
-      
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to control the light switch";
+
       toast({
         title: "Error",
         description: errorMessage,

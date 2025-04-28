@@ -5,7 +5,7 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 1000,
+  timeout: 5000,
 });
 
 // Add interceptors for better error handling
