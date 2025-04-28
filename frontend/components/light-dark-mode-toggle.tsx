@@ -42,7 +42,7 @@ export function LightDarkModeToggle() {
         </svg>
         {/* Moon icon */}
         <svg
-          className={`absolute inset-0 h-4 w-4 rotate-90 transform text-slate-400 transition-all duration-200 ${
+          className={`absolute inset-0 h-4 w-4 transform text-slate-400 transition-all duration-200 ${
             theme === "dark" ? "scale-100 opacity-100" : "scale-0 opacity-0"
           }`}
           fill="none"

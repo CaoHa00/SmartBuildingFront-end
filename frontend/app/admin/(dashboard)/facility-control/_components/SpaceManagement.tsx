@@ -201,9 +201,28 @@ function FacilityDialog({
 }
 
 export function SpaceManagement() {
-  const { spaces, loading, isDeleting, fetchSpaces, createSpace, updateSpace, deleteSpace } = useSpaces();
-  const { spaceTypes, loading: spaceTypesLoading, fetchSpaceTypes } = useSpaceTypes();
-  const { equipment, createEquipment, updateEquipment, deleteEquipment, setEquipment } = useEquipment();
+  const {
+    spaces,
+    loading,
+    isDeleting,
+    fetchSpaces,
+    createSpace,
+    updateSpace,
+    deleteSpace,
+    updateNestedSpace,
+  } = useSpaces();
+  const {
+    spaceTypes,
+    loading: spaceTypesLoading,
+    fetchSpaceTypes,
+  } = useSpaceTypes();
+  const {
+    equipment,
+    createEquipment,
+    updateEquipment,
+    deleteEquipment,
+    setEquipment,
+  } = useEquipment();
   const { equipmentTypes, fetchEquipmentTypes } = useEquipmentTypes();
   const { categories, fetchCategories } = useCategories();
 
@@ -217,14 +236,22 @@ export function SpaceManagement() {
     spaceTypeName: "",
     parentId: null,
   });
-  const [expandedSpaces, setExpandedSpaces] = useState<Record<string, boolean>>({});
+  const [expandedSpaces, setExpandedSpaces] = useState<Record<string, boolean>>(
+    {}
+  );
   const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
-  const [viewMode, setViewMode] = useState<"spaceManagement" | "equipmentTable">("spaceManagement");
+  const [viewMode, setViewMode] = useState<
+    "spaceManagement" | "equipmentTable"
+  >("spaceManagement");
   const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false);
-  const [equipmentFormData, setEquipmentFormData] = useState<Partial<Equipment & { spaceId: string }>>({});
+  const [equipmentFormData, setEquipmentFormData] = useState<
+    Partial<Equipment & { spaceId: string }>
+  >({});
   const [isEquipmentEdit, setIsEquipmentEdit] = useState(false);
   const [deleteSpaceId, setDeleteSpaceId] = useState<string | null>(null);
-  const [deleteEquipmentId, setDeleteEquipmentId] = useState<number | null>(null);
+  const [deleteEquipmentId, setDeleteEquipmentId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     fetchSpaces();
@@ -244,7 +271,7 @@ export function SpaceManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let success = false;
-    
+
     if (isEdit && formData.spaceId) {
       success = await updateSpace(formData.spaceId, formData);
     } else {
@@ -274,11 +301,24 @@ export function SpaceManagement() {
   };
 
   const handleEquipmentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();   
+    e.preventDefault();
     if (isEquipmentEdit && equipmentFormData.equipmentId) {
-      const updatedEquipment = await updateEquipment(equipmentFormData.equipmentId, equipmentFormData);
-      if (selectedSpace) {
-        setSelectedSpace((prev) => prev ? {...prev, equipments: prev.equipments.map((eq) => eq.equipmentId === updatedEquipment.equipmentId ? updatedEquipment : eq),}:null);
+      const updatedEquipment = await updateEquipment(
+        equipmentFormData.equipmentId,
+        equipmentFormData
+      );
+      if (updatedEquipment && selectedSpace) {
+        const updatedSelectedSpace = {
+          ...selectedSpace,
+          equipments: selectedSpace.equipments.map((eq) =>
+            eq.equipmentId === updatedEquipment.equipmentId
+              ? updatedEquipment
+              : eq
+          ),
+        };
+
+        setSelectedSpace(updatedSelectedSpace);
+        updateNestedSpace(updatedSelectedSpace);
       }
     } else {
       const equipment = await createEquipment({
@@ -288,13 +328,19 @@ export function SpaceManagement() {
         categoryId: equipmentFormData.categoryId || 0,
         spaceId: equipmentFormData.spaceId || "",
       });
-      setSelectedSpace((prev) => prev ? {...prev,equipments:[...prev.equipments, equipment!]}:null)
+      if (equipment && selectedSpace) {
+        const updatedSelectedSpace = {
+          ...selectedSpace,
+          equipments: [...selectedSpace.equipments, equipment],
+        };
+
+        setSelectedSpace(updatedSelectedSpace);
+        updateNestedSpace(updatedSelectedSpace);
+      }
     }
-    fetchSpaces();
     setIsEquipmentDialogOpen(false);
     setEquipmentFormData({});
     setIsEquipmentEdit(false);
-
   };
 
   const confirmDelete = async () => {
@@ -309,11 +355,18 @@ export function SpaceManagement() {
     if (!deleteEquipmentId) return;
 
     const success = await deleteEquipment(deleteEquipmentId);
-    setSelectedSpace((prev) => prev ? {...prev, equipments: prev.equipments.filter(eq => eq.equipmentId !== deleteEquipmentId)}:null)
-    if (success) {
-      setDeleteEquipmentId(null);
+    if (success && selectedSpace) {
+      const updatedSelectedSpace = {
+        ...selectedSpace,
+        equipments: selectedSpace.equipments.filter(
+          (eq) => eq.equipmentId !== deleteEquipmentId
+        ),
+      };
 
+      setSelectedSpace(updatedSelectedSpace);
+      updateNestedSpace(updatedSelectedSpace);
     }
+    setDeleteEquipmentId(null);
   };
 
   const toggleSpace = (spaceId: string) => {
@@ -502,7 +555,8 @@ export function SpaceManagement() {
                                         spaceId: childSpace.spaceId,
                                         spaceName: childSpace.spaceName,
                                         parentId: childSpace.parentId ?? null,
-                                        spaceTypeId: childSpace.spaceTypeId ?? "",
+                                        spaceTypeId:
+                                          childSpace.spaceTypeId ?? "",
                                         spaceTypeName:
                                           childSpace.spaceTypeName ?? "",
                                       });
@@ -572,6 +626,7 @@ export function SpaceManagement() {
                                           className="bg-[hsl(var(--tech-blue))] hover:bg-[hsl(var(--tech-dark-blue))]"
                                           onClick={() => {
                                             setSelectedSpace(grandchildSpace);
+                                            console.log(selectedSpace);
                                             setViewMode("equipmentTable");
                                           }}
                                         >
@@ -588,7 +643,8 @@ export function SpaceManagement() {
                                               spaceName:
                                                 grandchildSpace.spaceName,
                                               parentId:
-                                                grandchildSpace.parentId ?? null,
+                                                grandchildSpace.parentId ??
+                                                null,
                                               spaceTypeId:
                                                 grandchildSpace.spaceTypeId ??
                                                 "",
@@ -678,7 +734,6 @@ export function SpaceManagement() {
                       setIsEquipmentDialogOpen(false);
                       setIsEquipmentEdit(false);
                       setEquipmentFormData({ equipmentName: "", deviceId: "" });
-                      setSelectedSpace(null);
                       setViewMode("spaceManagement");
                     }}
                   >

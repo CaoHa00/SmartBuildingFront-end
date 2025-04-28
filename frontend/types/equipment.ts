@@ -1,5 +1,5 @@
 export interface Equipment {
-  equipmentId: number;
+  equipmentId: string;
   equipmentName: string;
   deviceId: string;
   equipmentTypeId: string;
