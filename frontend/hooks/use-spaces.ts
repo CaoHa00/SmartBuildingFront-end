@@ -4,12 +4,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Space, NewSpaceData } from "@/types/space";
 import axios, { AxiosError } from "axios";
 
-// Cache for storing space data with timestamp
 let spacesCache: { data: Space[]; timestamp: number } | null = null;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-const DEBOUNCE_DELAY = 300; // 300ms
+const CACHE_TTL = 5 * 60 * 1000;
+const DEBOUNCE_DELAY = 300;
 const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
+const RETRY_DELAY = 1000;
 
 export const useSpaces = () => {
   const { toast } = useToast();
@@ -33,8 +32,12 @@ export const useSpaces = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
-        if ((axiosError.code === "ECONNABORTED" || axiosError.message.includes("timeout")) && retryCount < MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        if (
+          (axiosError.code === "ECONNABORTED" ||
+            axiosError.message.includes("timeout")) &&
+          retryCount < MAX_RETRIES
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
           return fetchWithRetry(retryCount + 1);
         }
       }
@@ -43,12 +46,10 @@ export const useSpaces = () => {
   };
 
   const fetchSpaces = useCallback(async () => {
-    // Clear any pending debounced calls
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
     }
 
-    // If cache is valid, use it
     if (isCacheValid()) {
       setSpaces(spacesCache!.data);
       setLoading(false);
@@ -59,15 +60,16 @@ export const useSpaces = () => {
       setLoading(true);
       const data = await fetchWithRetry();
       if (data.length > 0) {
-        // Update both state and cache with timestamp
         spacesCache = { data, timestamp: Date.now() };
         setSpaces(data);
       }
       return data;
     } catch (error) {
-      let errorMessage = "Failed to fetch spaces. Please check your connection and try again.";
+      let errorMessage =
+        "Failed to fetch spaces. Please check your connection and try again.";
       if (axios.isAxiosError(error) && error.message.includes("timeout")) {
-        errorMessage = "Request timed out. The server is taking too long to respond.";
+        errorMessage =
+          "Request timed out. The server is taking too long to respond.";
       }
       toast({
         variant: "destructive",
@@ -81,11 +83,8 @@ export const useSpaces = () => {
     }
   }, [toast, isCacheValid]);
 
-  // Function to force refresh data (for manual reload)
   const refreshSpaces = useCallback(() => {
-    // Invalidate cache
     spacesCache = null;
-    // Fetch fresh data with debouncing
     return new Promise((resolve) => {
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current);
@@ -98,8 +97,14 @@ export const useSpaces = () => {
 
   const createSpace = async (newSpace: NewSpaceData) => {
     try {
-      await api.post("/spaces", newSpace);
-      await refreshSpaces();
+      const response = await api.post("/spaces", newSpace);
+      const createdSpace = response.data;
+      if (spacesCache) {
+        spacesCache.data = [...spacesCache.data, createdSpace];
+        spacesCache.timestamp = Date.now();
+      } else {
+        spacesCache = { data: [createdSpace], timestamp: Date.now() };
+      }
       toast({
         title: "Success",
         description: "Space created successfully",
@@ -117,8 +122,15 @@ export const useSpaces = () => {
 
   const updateSpace = async (spaceId: string, spaceData: Partial<Space>) => {
     try {
-      await api.put(`/spaces/${spaceId}`, spaceData);
-      await refreshSpaces(); // Force refresh after updating
+      const response = await api.put<Space>(`/spaces/${spaceId}`, spaceData);
+      const updated = response.data;
+      if (spacesCache) {
+        spacesCache.data = spacesCache.data.map((space) =>
+          space.spaceId === spaceId ? updated : space
+        );
+        spacesCache.timestamp = Date.now();
+      }
+      setSpaces(spacesCache!.data);
       toast({
         title: "Success",
         description: "Space updated successfully",
@@ -138,7 +150,14 @@ export const useSpaces = () => {
     try {
       setIsDeleting(true);
       await api.delete(`/spaces/${spaceId}`);
-      await refreshSpaces(); // Force refresh after deleting
+      if (spacesCache) {
+        spacesCache.data = spacesCache.data.filter(
+          (space) => space.spaceId !== spaceId
+        );
+        spacesCache.timestamp = Date.now();
+      }
+
+      setSpaces(spacesCache!.data);
       toast({
         title: "Success",
         description: "Space deleted successfully",
@@ -156,16 +175,44 @@ export const useSpaces = () => {
     }
   };
 
-  // Helper functions to filter spaces by type
-  const getBlocks = () => spaces.filter(space => space.spaceTypeName === "Block");
+  const getBlocks = () =>
+    spaces.filter((space) => space.spaceTypeName === "Block");
   const getFloors = (blockId: string) => {
-    const block = spaces.find(space => space.spaceId === blockId);
+    const block = spaces.find((space) => space.spaceId === blockId);
     return block?.children || [];
   };
   const getRooms = (blockId: string, floorId: string) => {
-    const block = spaces.find(space => space.spaceId === blockId);
-    const floor = block?.children.find(space => space.spaceId === floorId);
+    const block = spaces.find((space) => space.spaceId === blockId);
+    const floor = block?.children.find((space) => space.spaceId === floorId);
     return floor?.children || [];
+  };
+
+  const updateNestedSpace = (updatedSpace: Space) => {
+    const updateChildren = (children: Space[]): Space[] => {
+      return children.map((child) => {
+        if (child.spaceId === updatedSpace.spaceId) {
+          return updatedSpace;
+        }
+        if (child.children && child.children.length > 0) {
+          return { ...child, children: updateChildren(child.children) };
+        }
+        return child;
+      });
+    };
+
+    if (spacesCache) {
+      spacesCache.data = spacesCache.data.map((space) => {
+        if (space.spaceId === updatedSpace.spaceId) {
+          return updatedSpace;
+        }
+        if (space.children && space.children.length > 0) {
+          return { ...space, children: updateChildren(space.children) };
+        }
+        return space;
+      });
+      spacesCache.timestamp = Date.now();
+      setSpaces(spacesCache.data);
+    }
   };
 
   return {
@@ -180,5 +227,6 @@ export const useSpaces = () => {
     getBlocks,
     getFloors,
     getRooms,
+    updateNestedSpace,
   };
 };

@@ -9,11 +9,13 @@ export const useEquipment = (spaceId?: string) => {
   const [loading, setLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const createEquipment = async (newEquipment: NewEquipmentData): Promise<Equipment | null> => {
+  const createEquipment = async (
+    newEquipment: NewEquipmentData
+  ): Promise<Equipment | null> => {
     try {
       const response = await api.post("/equipment", newEquipment);
       const createdEquipment = response.data;
-      setEquipment(prev => [...prev, createdEquipment]);
+      setEquipment((prev) => [...prev, createdEquipment]);
       toast({
         title: "Success",
         description: "Equipment created successfully",
@@ -29,12 +31,22 @@ export const useEquipment = (spaceId?: string) => {
     }
   };
 
-  const updateEquipment = async (equipmentId: number, equipmentData: Partial<Equipment>) => {
+  const updateEquipment = async (
+    equipmentId: string,
+    equipmentData: Partial<Equipment>
+  ) => {
     try {
-      const response = await api.put(`/equipment/${equipmentId}`, equipmentData);
+      const response = await api.put(
+        `/equipment/${equipmentId}`,
+        equipmentData
+      );
       const updatedEquipment = response.data;
-      setEquipment(prev => 
-        prev.map(eq => eq.equipmentId === updatedEquipment.equipmentId ? updatedEquipment : eq)
+      setEquipment((prev) =>
+        prev.map((eq) =>
+          eq.equipmentId === updatedEquipment.equipmentId
+            ? updatedEquipment
+            : eq
+        )
       );
       toast({
         title: "Success",
@@ -51,11 +63,13 @@ export const useEquipment = (spaceId?: string) => {
     }
   };
 
-  const deleteEquipment = async (equipmentId: number) => {
+  const deleteEquipment = async (equipmentId: string) => {
     try {
       setIsDeleting(true);
       await api.delete(`/equipment/${equipmentId}`);
-      setEquipment(prev => prev.filter(eq => eq.equipmentId !== equipmentId));
+      setEquipment((prev) =>
+        prev.filter((eq) => eq.equipmentId !== equipmentId)
+      );
       toast({
         title: "Success",
         description: "Equipment deleted successfully",
@@ -80,6 +94,6 @@ export const useEquipment = (spaceId?: string) => {
     createEquipment,
     updateEquipment,
     deleteEquipment,
-    setEquipment
+    setEquipment,
   };
 };
