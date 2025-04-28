@@ -11,8 +11,11 @@ import {
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { RoomCard } from "./_components/roomCard";
+import { api } from "@/lib/axios";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Room {
+  id: string;
   roomName: string;
   status: "available" | "occupied";
   temperature: number;
@@ -31,6 +34,7 @@ export function FloorIdPage() {
   const { selectedFacility } = useFacility();
   const [rooms, setRooms] = useState<Array<Room>>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Helper function to chunk arrays into groups
   const chunkArray = (arr: any[], size: number) => {
@@ -39,39 +43,54 @@ export function FloorIdPage() {
     );
   };
 
-  const generateRooms = () => {
-    const generatedRooms: Room[] = Array.from({ length: 16 }, (_, i) => {
-      const isOccupied = Math.random() < 0.5;
-      return {
-        roomName: `Room ${101 + i}`,
-        status: isOccupied ? "occupied" : "available",
-        temperature: Math.floor(Math.random() * (30 - 18 + 1)) + 18,
-        humidity: Math.floor(Math.random() * (75 - 30 + 1)) + 30,
-        devices: {
-          ac: isOccupied,
-          light: isOccupied,
-          tv: isOccupied && Math.random() < 0.5,
-        },
-      };
-    });
-
-    return generatedRooms.sort((a, b) => {
-      const aNum = parseInt(a.roomName.replace(/\D/g, "")) || 0;
-      const bNum = parseInt(b.roomName.replace(/\D/g, "")) || 0;
-      return aNum - bNum;
-    });
-  };
-
   useEffect(() => {
-    // Only generate rooms on the client side
-    setRooms(generateRooms());
-    setIsLoading(false);
-  }, []);
+    const fetchRooms = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await api.get(`/spaces/${params.floorId}`);
+        // The response contains the floor data with rooms in the children array
+        const roomsData = (response.data?.children || []).map((room: any) => ({
+          id: room.spaceId,
+          roomName: room.spaceName,
+          status: room.occupied ? "occupied" : "available",
+          temperature:
+            room.equipments.find(
+              (eq: any) => eq.equipmentTypeName === "Temperature"
+            )?.logValue || 0,
+          humidity:
+            room.equipments.find(
+              (eq: any) => eq.equipmentTypeName === "Humidity"
+            )?.logValue || 0,
+          devices: {
+            ac: room.equipments.some(
+              (eq: any) => eq.equipmentTypeName === "AC" && eq.logValue === 1
+            ),
+            light: room.equipments.some(
+              (eq: any) => eq.equipmentTypeName === "Light" && eq.logValue === 1
+            ),
+            tv: room.equipments.some(
+              (eq: any) => eq.equipmentTypeName === "TV" && eq.logValue === 1
+            ),
+          },
+        }));
+        setRooms(roomsData);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch rooms");
+        console.error("Error fetching rooms:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleRoomClick = (roomName: string) => {
-    const roomNumber = roomName.replace(/\D/g, "");
+    if (params.floorId) {
+      fetchRooms();
+    }
+  }, [params.floorId]);
+
+  const handleRoomClick = (room: Room) => {
     router.push(
-      `/block/${params.blockId}/floor/${params.floorId}/room/${roomNumber}`
+      `/block/${params.blockId}/floor/${params.floorId}/room/${room.id}`
     );
   };
 
@@ -84,6 +103,19 @@ export function FloorIdPage() {
         />
         <SidebarInset className="bg-neutral-100 dark:bg-blue-950 flex flex-col h-screen overflow-hidden">
           <div className="text-center py-4">Loading rooms...</div>
+        </SidebarInset>
+      </SidebarProvider>
+    );
+  }
+
+  if (error) {
+    return (
+      <SidebarProvider>
+        <AppSidebar
+          className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
+        />
+        <SidebarInset className="bg-neutral-100 dark:bg-blue-950 flex flex-col h-screen overflow-hidden">
+          <div className="text-center py-4 text-red-500">{error}</div>
         </SidebarInset>
       </SidebarProvider>
     );
@@ -106,12 +138,9 @@ export function FloorIdPage() {
       <AppSidebar
         className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
       />
-      <SidebarInset className="bg-neutral-100 dark:bg-blue-950 flex flex-col h-screen overflow-hidden">
-        <header
-          className={`flex ${
-            isMobile ? "h-12" : "h-16"
-          } shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 font-bold text-xl text-blue-800`}
-        >
+      <SidebarInset className="bg-neutral-100 dark:bg-blue-950 flex flex-col h-screen">
+        <header className={`flex ${isMobile ? "h-12" : "h-16"} shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 font-bold text-xl text-blue-800`}>
+
           <div className="flex items-center gap-2 px-2 md:px-4 dark:text-neutral-100">
             <SidebarTrigger className="-ml-1 w-5 h-5" />
             <Separator orientation="vertical" className="mr-2 h-4" />
@@ -120,25 +149,23 @@ export function FloorIdPage() {
             </h1>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 pt-0">
-          <div className="space-y-8">
-            <h1 className="text-base font-bold text-blue-800 dark:text-neutral-100">
-              Left Side
-            </h1>
-            {/* Even numbered rooms */}
-            <div className="space-y-4">
-              {evenRows.map((row, rowIndex) => (
-                <div
-                  key={`even-row-${rowIndex}`}
-                  className="flex gap-4 justify-start"
-                >
-                  {row.map((room, index) => (
+        <ScrollArea className="flex-1">
+          <div className="flex flex-col gap-4 p-4">
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-base font-bold text-blue-800 dark:text-neutral-100 mb-4">
+                  Left Side
+                </h1>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {evenRooms.map((room) => (
                     <div
-                      key={`even-${rowIndex}-${index}`}
+                      key={room.id}
                       className="w-full cursor-pointer"
-                      onClick={() => handleRoomClick(room.roomName)}
+                      onClick={() => handleRoomClick(room)}
                     >
                       <RoomCard
+                        roomId={room.id}
+                        id={room.id}
                         roomName={room.roomName}
                         status={room.status}
                         temperature={room.temperature}
@@ -148,26 +175,22 @@ export function FloorIdPage() {
                     </div>
                   ))}
                 </div>
-              ))}
-            </div>
+              </div>
 
-            {/* Odd numbered rooms */}
-            <div className="space-y-4">
-              <h1 className="text-base font-bold text-blue-800 dark:text-neutral-100">
-                Right Side
-              </h1>
-              {oddRows.map((row, rowIndex) => (
-                <div
-                  key={`odd-row-${rowIndex}`}
-                  className="flex gap-4 justify-start"
-                >
-                  {row.map((room, index) => (
+              <div>
+                <h1 className="text-base font-bold text-blue-800 dark:text-neutral-100 mb-4">
+                  Right Side
+                </h1>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {oddRooms.map((room) => (
                     <div
-                      key={`odd-${rowIndex}-${index}`}
+                      key={room.id}
                       className="w-full cursor-pointer"
-                      onClick={() => handleRoomClick(room.roomName)}
+                      onClick={() => handleRoomClick(room)}
                     >
                       <RoomCard
+                        roomId={room.id}
+                        id={room.id}
                         roomName={room.roomName}
                         status={room.status}
                         temperature={room.temperature}
@@ -177,10 +200,10 @@ export function FloorIdPage() {
                     </div>
                   ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
-        </div>
+        </ScrollArea>
       </SidebarInset>
     </SidebarProvider>
   );

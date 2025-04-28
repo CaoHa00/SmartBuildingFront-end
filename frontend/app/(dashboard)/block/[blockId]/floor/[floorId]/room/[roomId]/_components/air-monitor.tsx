@@ -37,7 +37,7 @@ export function AirMonitor() {
         )}
       </div>
 
-      <div className="h-1/3 relative rounded-xl bg-gradient-to-r from-blue-600 to-sky-300 mb-2">
+      <div className="h-1/4 relative rounded-xl bg-gradient-to-r from-blue-600 to-sky-300 mb-2">
         <div className="italic tracking-widest text-[10px] md:text-xs font-bold text-center text-white p-1">
           Humidity
         </div>
