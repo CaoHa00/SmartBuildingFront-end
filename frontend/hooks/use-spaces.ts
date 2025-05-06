@@ -95,20 +95,18 @@ export const useSpaces = () => {
     });
   }, [fetchSpaces]);
 
-  const createSpace = async (newSpace: NewSpaceData) => {
+  const createSpace = async (newSpace: NewSpaceData): Promise<boolean> => {
     try {
       const response = await api.post("/spaces", newSpace);
-      const createdSpace = response.data;
-      if (spacesCache) {
-        spacesCache.data = [...spacesCache.data, createdSpace];
-        spacesCache.timestamp = Date.now();
-      } else {
-        spacesCache = { data: [createdSpace], timestamp: Date.now() };
-      }
+      const createdSpace = response.data.data;
+
+      insertNestedSpace(createdSpace);
+
       toast({
         title: "Success",
         description: "Space created successfully",
       });
+
       return true;
     } catch (error) {
       toast({
@@ -120,21 +118,21 @@ export const useSpaces = () => {
     }
   };
 
-  const updateSpace = async (spaceId: string, spaceData: Partial<Space>) => {
+  const updateSpace = async (
+    spaceId: string,
+    spaceData: Partial<Space>
+  ): Promise<boolean> => {
     try {
-      const response = await api.put<Space>(`/spaces/${spaceId}`, spaceData);
-      const updated = response.data;
-      if (spacesCache) {
-        spacesCache.data = spacesCache.data.map((space) =>
-          space.spaceId === spaceId ? updated : space
-        );
-        spacesCache.timestamp = Date.now();
-      }
-      setSpaces(spacesCache!.data);
+      const response = await api.put(`/spaces/${spaceId}`, spaceData);
+      const updatedSpace = response.data.data;
+
+      updateNestedSpace(updatedSpace);
+
       toast({
         title: "Success",
         description: "Space updated successfully",
       });
+
       return true;
     } catch (error) {
       toast({
@@ -151,13 +149,11 @@ export const useSpaces = () => {
       setIsDeleting(true);
       await api.delete(`/spaces/${spaceId}`);
       if (spacesCache) {
-        spacesCache.data = spacesCache.data.filter(
-          (space) => space.spaceId !== spaceId
-        );
+        const newData = deleteNestedSpaceFromList(spacesCache.data, spaceId);
+        spacesCache.data = newData;
         spacesCache.timestamp = Date.now();
+        setSpaces(newData);
       }
-
-      setSpaces(spacesCache!.data);
       toast({
         title: "Success",
         description: "Space deleted successfully",
@@ -213,6 +209,45 @@ export const useSpaces = () => {
       spacesCache.timestamp = Date.now();
       setSpaces(spacesCache.data);
     }
+  };
+
+  const insertNestedSpace = (newSpace: Space) => {
+    const insertIntoChildren = (spaces: Space[]): Space[] => {
+      return spaces.map((space) => {
+        if (space.spaceId === newSpace.parentId) {
+          const updatedChildren = [...(space.children || []), newSpace];
+          return { ...space, children: updatedChildren };
+        }
+        if (space.children && space.children.length > 0) {
+          return { ...space, children: insertIntoChildren(space.children) };
+        }
+        return space;
+      });
+    };
+
+    if (spacesCache) {
+      if (newSpace.parentId) {
+        spacesCache.data = insertIntoChildren(spacesCache.data);
+      } else {
+        spacesCache.data = [...spacesCache.data, newSpace];
+      }
+      spacesCache.timestamp = Date.now();
+      setSpaces(spacesCache.data);
+    }
+  };
+
+  const deleteNestedSpaceFromList = (
+    spaces: Space[],
+    targetId: string
+  ): Space[] => {
+    return spaces
+      .filter((space) => space.spaceId !== targetId)
+      .map((space) => ({
+        ...space,
+        children: space.children
+          ? deleteNestedSpaceFromList(space.children, targetId)
+          : [],
+      }));
   };
 
   return {
