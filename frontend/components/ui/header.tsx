@@ -1,0 +1,66 @@
+"use client";
+
+import React from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Separator } from "./separator";
+import { SidebarTrigger } from "./sidebar";
+import { cn } from "@/lib/utils";
+import { NavUser } from "../nav-user";
+import { useGreeting } from "@/hooks/use-greeting";
+
+interface HeaderProps extends React.HTMLAttributes<HTMLElement> {
+  title?: string;
+  showNav?: boolean;
+}
+
+export function Header({
+  className,
+  title,
+  showNav = true,
+  ...props
+}: HeaderProps) {
+  const isMobile = useIsMobile();
+  const { greeting } = useGreeting();
+
+  return (
+    <header
+      className={cn(
+        `flex ${
+          isMobile ? "h-14" : "h-16"
+        } w-full shrink-0 items-center gap-2 border-b bg-gradient-to-br from-slate-50 to-slate-100 dark:from-blue-800 dark:to-green-400 backdrop-blur-sm transition-all ease-in-out`,
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-3 px-4 md:px-6 w-full">
+        {showNav && (
+          <div className="flex items-center gap-3">
+            <SidebarTrigger className="-ml-1 w-5 h-5 text-slate-600 hover:text-slate-900 dark:text-slate-100 dark:hover:text-slate-500 transition-colors" />
+            <Separator
+              orientation="vertical"
+              className="h-5 bg-slate-500 dark:bg-slate-100"
+            />
+            <div>
+              {/* <h1 className={`${isMobile ? "text-lg" : "text-xl"} font-bold text-slate-900 dark:text-slate-100`}>
+                {title}
+              </h1> */}
+              <img src="/icon/eiu15.svg" alt="IIC Logo" className="w-60 h-30" />
+            </div>
+          </div>
+        )}
+        <div className="flex items-center gap-2 ml-auto">
+          <p className="text-base font-semibold text-slate-600 dark:text-slate-100">
+            {greeting}
+          </p>
+          <NavUser
+            user={{
+              name: "",
+              email: "",
+              avatar: "/icon/iic-logo.svg",
+            }}
+          />
+        </div>
+      </div>
+    </header>
+  );
+}

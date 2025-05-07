@@ -13,6 +13,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { RoomCard } from "./_components/roomCard";
 import { api } from "@/lib/axios";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { NavUser } from "@/components/nav-user";
+import { useGreeting } from "@/hooks/use-greeting";
+import { Header } from "@/components/ui/header";
+import { Footer } from "@/components/ui/footer";
 
 interface Room {
   id: string;
@@ -32,6 +36,7 @@ export function FloorIdPage() {
   const params = useParams();
   const isMobile = useIsMobile();
   const { selectedFacility } = useFacility();
+  const { greeting } = useGreeting();
   const [rooms, setRooms] = useState<Array<Room>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -139,17 +144,8 @@ export function FloorIdPage() {
         className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
       />
       <SidebarInset className="bg-neutral-100 dark:bg-blue-950 flex flex-col h-screen">
-        <header className={`flex ${isMobile ? "h-12" : "h-16"} shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 font-bold text-xl text-blue-800`}>
-
-          <div className="flex items-center gap-2 px-2 md:px-4 dark:text-neutral-100">
-            <SidebarTrigger className="-ml-1 w-5 h-5" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <h1 className={`${isMobile ? "text-lg" : "text-xl"} font-bold`}>
-              {selectedFacility}
-            </h1>
-          </div>
-        </header>
-        <ScrollArea className="flex-1">
+        <Header title={selectedFacility} />
+        <ScrollArea className="flex-1 h-[calc(100vh-8rem)]">
           <div className="flex flex-col gap-4 p-4">
             <div className="space-y-6">
               <div>
@@ -204,6 +200,7 @@ export function FloorIdPage() {
             </div>
           </div>
         </ScrollArea>
+        <Footer />
       </SidebarInset>
     </SidebarProvider>
   );

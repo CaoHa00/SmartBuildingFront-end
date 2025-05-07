@@ -9,12 +9,11 @@ import {
   Clock,
   SettingsIcon,
   HelpCircleIcon,
-  Layers,
-  DoorClosed,
+  LayoutGrid,
+  AlignVerticalJustifyEnd,
 } from "lucide-react";
 
 import { NavFacility } from "./nav-facility";
-import { NavDevices } from "./nav-devices";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -24,7 +23,6 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { NavScheduler } from "./nav-scheduler";
 import { NavHelper } from "./nav-helper";
 import { Space } from "@/types/space";
 import { useSpaces } from "@/hooks/use-spaces";
@@ -82,15 +80,15 @@ const data = {
 };
 
 interface NavItem {
-    key: string;
-    name: string;
-    url: string;
-    icon: any;
-    spaceTypeId: string;
-    spaceTypeName: string;
-    spaceLevel: number;
-    items?: NavItem[];
-  }
+  key: string;
+  name: string;
+  url: string;
+  icon: any;
+  spaceTypeId: string;
+  spaceTypeName: string;
+  spaceLevel: number;
+  items?: NavItem[];
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { spaces, loading, fetchSpaces } = useSpaces();
@@ -103,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   useEffect(() => {
     if (spaces) {
       // Filter for root level spaces (blocks - no parentId)
-      const blocks = spaces.filter(space => space.parentId === null);
+      const blocks = spaces.filter((space) => space.parentId === null);
       setOrganizedSpaces(blocks);
     }
   }, [spaces]);
@@ -112,14 +110,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     key: space.spaceId,
     name: space.spaceName,
     url: `/block/${space.spaceId}`,
-    icon: space.spaceTypeName === "Block" ? LayoutDashboard :
-          space.spaceTypeName === "Floor" ? Layers :
-          DoorClosed,
+    icon:
+      space.spaceTypeName === "Block"
+        ? LayoutDashboard
+        : space.spaceTypeName === "Floor"
+        ? AlignVerticalJustifyEnd
+        : LayoutGrid,
     spaceTypeId: space.spaceTypeId,
     spaceTypeName: space.spaceTypeName,
-    spaceLevel: space.spaceTypeName === "Block" ? 1 :
-                space.spaceTypeName === "Floor" ? 2 : 3,
-    items: space.children?.map(mapSpaceToNavItem)
+    spaceLevel:
+      space.spaceTypeName === "Block"
+        ? 1
+        : space.spaceTypeName === "Floor"
+        ? 2
+        : 3,
+    items: space.children?.map(mapSpaceToNavItem),
   });
 
   return (
@@ -129,16 +134,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavFacility items={organizedSpaces.map(mapSpaceToNavItem)} />
-        {/* <NavScheduler scheduler={data.scheduler} />
-        <NavDevices devices={[]} /> */}
         <NavHelper
           items={data.NavHelper}
           className="mt-auto font-bold text-blue-800"
         />
       </SidebarContent>
-      <SidebarFooter className="flex flex-col items-start">
-        <NavUser user={data.user} />
-      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
