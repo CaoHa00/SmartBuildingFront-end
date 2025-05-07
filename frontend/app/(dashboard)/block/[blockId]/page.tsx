@@ -5,12 +5,20 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "../../_components/app-sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FacilityProvider, useFacility } from "@/app/context/facility-context";
-import { FloorCard } from "../../_components/floor-card";
-import { Elevator } from "@/components/ui/elevator";
 import { useGreeting } from "@/hooks/use-greeting";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import { useParams } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BlockOverview from "../_components/BlockOverview";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { ChevronRight } from "lucide-react";
 
 export function BlockPage() {
   const isMobile = useIsMobile();
@@ -79,7 +87,8 @@ export function BlockPage() {
       />
       <SidebarInset className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-blue-950 dark:to-slate-900 flex flex-col h-screen overflow-hidden">
         <Header title={selectedFacility} />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
           <div className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 p-5 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-200/50 dark:border-slate-700/50 hover:shadow-xl hover:scale-[1.02] transition-all">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50">
@@ -203,24 +212,20 @@ export function BlockPage() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="flex gap-4 p-4 h-[calc(100vh-16rem-4rem)]">
+        {/* <div className="flex gap-4 p-4 h-[calc(100vh-16rem)]">
           <div className="flex-1 bg-white/90 rounded-xl p-4">
-            {/* Building Image Container */}
             <div className="relative w-full h-full">
               <img
                 src="/img/IIC.png"
                 alt="Building Plan"
                 className="absolute inset-0 w-full h-full object-contain p-4"
               />
-              {/* Optional: Add zoom controls or interactive elements here */}
             </div>
           </div>
 
-          {/* Right Side Content */}
           <div className="w-96 flex flex-col gap-4">
-            {/* Elevator */}
             <div className="bg-white/90 rounded-xl p-4">
               <h2 className="text-base font-bold text-blue-800 mb-4">
                 Elevator Status
@@ -235,7 +240,6 @@ export function BlockPage() {
               </div>
             </div>
 
-            {/* Floor Cards */}
             <div className="flex-1 overflow-y-auto">
               <div className="space-y-4">
                 {floors.map((floor) => (
@@ -251,6 +255,55 @@ export function BlockPage() {
                 ))}
               </div>
             </div>
+          </div>
+        </div> */}
+        <div className="bg-background p-5">
+          <div className="space-y-4">
+            <Tabs defaultValue="overview" className="space-y-4">
+              <div className="flex justify-between">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href="/"
+                        className="text-white font-bold text-2xl"
+                      >
+                        DASHBOARD
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator>
+                      <ChevronRight />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href="/testDash"
+                        className="text-white font-bold text-2xl"
+                      >
+                        Block 8
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+                <TabsList>
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="equipment">Equipment</TabsTrigger>
+                  <TabsTrigger value="material">Material</TabsTrigger>
+                  <TabsTrigger value="control">Control</TabsTrigger>
+                </TabsList>
+              </div>
+              <TabsContent value="overview">
+                <BlockOverview />
+              </TabsContent>
+              <TabsContent value="equipment">
+                {/* Equipment Component */}
+              </TabsContent>
+              <TabsContent value="material">
+                {/* Material Component */}
+              </TabsContent>
+              <TabsContent value="control">
+                {/* Control Component */}
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
         <Footer />

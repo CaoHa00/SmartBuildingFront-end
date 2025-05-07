@@ -15,7 +15,7 @@ export default function useTotalElectricalReading() {
   const fetchTotalElectricalReading = async () => {
     try {
       const response = await axios.get<ApiResponse>(
-        "http://10.60.253.172:9090/api/qenergy/cost_consumption_summary"
+        "http://10.60.253.172:9092/api/qenergy/cost_consumption_summary"
       );
       if (response.data) {
         const totalPower = response.data["total_consumption"];

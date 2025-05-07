@@ -15,7 +15,7 @@ export default function useCurrentElectricalReading() {
   const fetchCurrentElectricalReading = async () => {
     try {
       const response = await axios.get<ApiResponse>(
-        "http://10.60.253.172:9090/api/qenergy/site-data"
+        "http://10.60.253.172:9092/api/qenergy/site-data"
       );
       if (response.data) {
         const livePower = response.data["live_power"];
