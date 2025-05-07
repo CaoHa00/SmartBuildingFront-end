@@ -731,6 +731,8 @@ export function SpaceManagement() {
                   <Button
                     className="mr-2 text-primary-foreground border bg-background hover:bg-[#205BCC]"
                     onClick={() => {
+                      console.log("Current Selected Space: ", selectedSpace);
+                      // refreshSpaces();
                       setIsEquipmentDialogOpen(false);
                       setIsEquipmentEdit(false);
                       setEquipmentFormData({ equipmentName: "", deviceId: "" });
