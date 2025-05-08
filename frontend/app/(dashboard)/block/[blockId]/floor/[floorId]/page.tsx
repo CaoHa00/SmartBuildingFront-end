@@ -13,7 +13,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { RoomCard } from "./_components/roomCard";
 import { api } from "@/lib/axios";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { NavUser } from "@/components/nav-user";
 import { useGreeting } from "@/hooks/use-greeting";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
@@ -127,10 +126,16 @@ export function FloorIdPage() {
   }
 
   // Filter even and odd rooms
-  const evenRooms = rooms.filter(
+  const sortedRooms = [...rooms].sort((a, b) => {
+    const aNum = parseInt(a.roomName.replace(/\D/g, ""));
+    const bNum = parseInt(b.roomName.replace(/\D/g, ""));
+    return aNum - bNum;
+  });
+
+  const evenRooms = sortedRooms.filter(
     (room) => parseInt(room.roomName.replace(/\D/g, "")) % 2 === 0
   );
-  const oddRooms = rooms.filter(
+  const oddRooms = sortedRooms.filter(
     (room) => parseInt(room.roomName.replace(/\D/g, "")) % 2 !== 0
   );
 
