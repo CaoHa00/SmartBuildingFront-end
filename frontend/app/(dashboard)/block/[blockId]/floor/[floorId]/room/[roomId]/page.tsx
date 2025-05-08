@@ -12,6 +12,7 @@ import { ElectricityCard } from "./_components/electricity-card";
 import { StudentChart } from "./_components/student-chart";
 import AcCard from "./_components/ac-card";
 import Co2Emission from "./_components/co2-emission";
+import RoomInfo from "./_components/roomInformation";
 
 function RoomIdPage() {
   const isMobile = useIsMobile();
@@ -25,33 +26,44 @@ function RoomIdPage() {
       <SidebarInset className="bg-neutral-100 dark:bg-blue-950">
         <Header title={selectedFacility} />
         <DashboardNavigation />
-        <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 h-[calc(100vh-8rem)] overflow-y-auto">
-          <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 auto-rows-fr min-h-0">
-            <div className="w-full h-full">
+        
+        {/* Main content area with single scroll container */}
+        <div className="flex flex-col gap-4 p-4 h-[calc(100vh-8rem)] overflow-y-auto">
+          {/* Monitoring Dashboard Grid */}
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Primary Metrics */}
+            <div className="rounded-xl bg-white dark:bg-slate-800 shadow-lg p-4 hover:shadow-xl transition-shadow">
               <ElectricityCard />
             </div>
-
-            <div className="w-full h-full rounded-xl bg-muted/50 bg-neutral-100 shadow-xl">
+            
+            <div className="rounded-xl bg-white dark:bg-slate-800 shadow-lg p-4 hover:shadow-xl transition-shadow">
               <AirMonitor />
             </div>
 
-            <div className="w-full h-full">
+            <div className="rounded-xl bg-white dark:bg-slate-800 shadow-lg p-4 hover:shadow-xl transition-shadow">
+              <Co2Emission />
+            </div>
+
+            {/* Secondary Metrics */}
+            <div className="rounded-xl bg-white dark:bg-slate-800 shadow-lg p-4 hover:shadow-xl transition-shadow">
               <StudentChart />
             </div>
 
-            <div className="w-full h-full rounded-xl bg-blue-200">
-              <Co2Emission/>
-            </div>
-
-            <div className="w-full h-full">
+            <div className="rounded-xl bg-white dark:bg-slate-800 shadow-lg p-4 hover:shadow-xl transition-shadow">
               <AcCard />
             </div>
 
-            <div className="w-full h-full">
+            <div className="rounded-xl bg-white dark:bg-slate-800 shadow-lg p-4 hover:shadow-xl transition-shadow">
               <ActiveDevice />
             </div>
-          </div>
+          </section>
+
+          {/* Room Information Section - Moved to bottom */}
+          <section className="w-full rounded-xl bg-white dark:bg-slate-800 shadow-lg p-4">
+            <RoomInfo />
+          </section>
         </div>
+
         <Footer />
       </SidebarInset>
     </SidebarProvider>

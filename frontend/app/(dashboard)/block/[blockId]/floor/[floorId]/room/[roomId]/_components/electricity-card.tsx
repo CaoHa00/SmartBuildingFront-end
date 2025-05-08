@@ -5,6 +5,24 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useEquipmentValues } from "@/hooks/use-equipment-values";
 import { useParams } from "next/navigation";
 import { Zap } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+
+const chartData = [
+  { time: "00:00", consumption: 120 },
+  { time: "04:00", consumption: 9 },
+  { time: "08:00", consumption: 280 },
+  { time: "12:00", consumption: 320 },
+  { time: "16:00", consumption: 250 },
+  { time: "20:00", consumption: 180 },
+];
+
+const chartConfig = {
+  consumption: {
+    label: "Consumption",
+    color: "#22c55e",
+  },
+} satisfies ChartConfig;
 
 export function ElectricityCard() {
   const params = useParams();
@@ -38,6 +56,36 @@ export function ElectricityCard() {
               {activePower}
               <span className="text-sm ml-1">kW</span>
             </p>
+          </div>
+          <div className="w-full h-[150px] mt-4">
+            <ChartContainer config={chartConfig} className="aspect-auto h-full">
+              <AreaChart data={chartData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="gradientConsumption" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--color-consumption)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-consumption)" stopOpacity={0.1} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke="#1e40af" opacity={0.1} />
+                <XAxis
+                  dataKey="time"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{ fill: "#fff" }}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent />}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="consumption"
+                  stroke="var(--color-consumption)"
+                  fill="url(#gradientConsumption)"
+                />
+              </AreaChart>
+            </ChartContainer>
           </div>
         </div>
       </CardContent>

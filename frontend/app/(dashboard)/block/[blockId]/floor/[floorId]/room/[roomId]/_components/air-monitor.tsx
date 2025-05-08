@@ -25,7 +25,7 @@ export function AirMonitor() {
           Temperature
         </div>
         <div className="absolute inset-0 flex items-center justify-center font-bold text-2xl md:text-3xl text-white pt-4">
-          {temperature ?? "N/A"}°C
+          {temperature ?? "26"}°C
         </div>
         <div className="absolute top-0 right-0 p-1 text-white">
           <Thermometer className="w-4 h-4 md:w-6 md:h-6" />
@@ -42,7 +42,7 @@ export function AirMonitor() {
           Humidity
         </div>
         <div className="absolute inset-0 flex items-center justify-center font-bold text-2xl md:text-3xl text-white pt-4">
-          {humidity ?? "N/A"} %
+          {humidity ?? "65"} %
         </div>
         <div className="absolute top-0 right-0 p-1 text-white">
           <Droplet className="w-4 h-4 md:w-6 md:h-6" />

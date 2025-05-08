@@ -25,6 +25,8 @@ import {
 import { NavHelper } from "./nav-helper";
 import { Space } from "@/types/space";
 import { useSpaces } from "@/hooks/use-spaces";
+import { Separator } from "@/components/ui/separator";
+
 
 // This is sample data.
 const data = {
@@ -127,19 +129,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   });
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        {/* <TeamSwitcher teams={data.teams} /> */}
-        <img src="/icon/main-logo.svg" className="w-15 h-15" alt="Main Logo" />
+    <Sidebar 
+      collapsible="icon" 
+      className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 border-r-2 border-r-blue-500"
+      {...props}
+    >
+      <SidebarHeader className="px-4 py-6">
+        <img src="/icon/main-logo.svg" className="w-32 h-auto mx-auto" alt="Main Logo" />
       </SidebarHeader>
-      <SidebarContent>
-        <NavFacility items={organizedSpaces.map(mapSpaceToNavItem)} />
+      <Separator/>
+      <SidebarContent className="px-3">
+        <NavFacility 
+          items={organizedSpaces.map(mapSpaceToNavItem)} 
+          className="space-y-1"
+        />
         <NavHelper
           items={data.NavHelper}
-          className="mt-auto font-bold text-blue-800"
+          className="mt-auto pt-6 font-medium text-gray-600 dark:text-gray-300"
         />
       </SidebarContent>
-      <SidebarRail />
+      <SidebarRail className="bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900" />
     </Sidebar>
   );
 }
