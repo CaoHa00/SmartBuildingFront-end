@@ -91,7 +91,7 @@ interface NavItem {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { spaces, loading, fetchSpaces } = useSpaces();
+  const { spaces,  fetchSpaces } = useSpaces();
   const [organizedSpaces, setOrganizedSpaces] = useState<Space[]>([]);
 
   useEffect(() => {

@@ -13,7 +13,7 @@ const RETRY_DELAY = 1000;
 export const useSpaces = () => {
   const { toast } = useToast();
   const [spaces, setSpaces] = useState<Space[]>(spacesCache?.data || []);
-  const [loading, setLoading] = useState(!spacesCache?.data);
+  // const [loading, setLoading] = useState(!spacesCache?.data);
   const [isDeleting, setIsDeleting] = useState(false);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -52,12 +52,12 @@ export const useSpaces = () => {
 
     if (isCacheValid()) {
       setSpaces(spacesCache!.data);
-      setLoading(false);
+      // setLoading(false);
       return spacesCache!.data;
     }
 
     try {
-      setLoading(true);
+      // setLoading(true);
       const data = await fetchWithRetry();
       if (data.length > 0) {
         spacesCache = { data, timestamp: Date.now() };
@@ -79,7 +79,7 @@ export const useSpaces = () => {
       console.error("Fetch spaces error:", error);
       return [];
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   }, [toast, isCacheValid]);
 
@@ -252,7 +252,7 @@ export const useSpaces = () => {
 
   return {
     spaces,
-    loading,
+    // loading,
     isDeleting,
     fetchSpaces,
     refreshSpaces,
