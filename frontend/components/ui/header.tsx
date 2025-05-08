@@ -27,7 +27,7 @@ export function Header({
       className={cn(
         `flex ${
           isMobile ? "h-14" : "h-16"
-        } w-full shrink-0 items-center gap-2 border-b bg-gradient-to-br from-slate-50 to-slate-100 dark:from-blue-800 dark:to-green-400 backdrop-blur-sm transition-all ease-in-out`,
+        } w-full shrink-0 items-center gap-2 border-b bg-gradient-to-r from-slate-50 via-slate-100 to-slate-200 dark:from-blue-800 dark:via-blue-700 dark:to-green-400 backdrop-blur-sm transition-all ease-in-out`,
         className
       )}
       {...props}
@@ -56,7 +56,7 @@ export function Header({
             user={{
               name: "",
               email: "",
-              avatar: "/icon/iic-logo.svg",
+              avatar: "/icon/iicw.svg",
             }}
           />
         </div>
