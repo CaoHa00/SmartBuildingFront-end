@@ -250,9 +250,24 @@ export const useSpaces = () => {
       }));
   };
 
+  const getSpaceById = (spaceId: string): Space | undefined => {
+    const findInTree = (spaces: Space[]): Space | undefined => {
+      for (const space of spaces) {
+        if (space.spaceId === spaceId) return space;
+        if (space.children && space.children.length > 0) {
+          const found = findInTree(space.children);
+          if (found) return found;
+        }
+      }
+      return undefined;
+    };
+
+    return findInTree(spacesCache?.data || []);
+  };
+
   return {
     spaces,
-    // loading,
+    getSpaceById,
     isDeleting,
     fetchSpaces,
     refreshSpaces,
