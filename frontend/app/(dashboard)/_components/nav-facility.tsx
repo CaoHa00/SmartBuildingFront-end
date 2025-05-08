@@ -12,7 +12,7 @@ import {
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
 import { ChevronRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useFacility } from "@/app/context/facility-context";
 import { useSpaces } from "@/hooks/use-spaces";
 import {
@@ -43,35 +43,66 @@ export function NavFacility({ items }: NavFacilityProps) {
   const { spaces } = useSpaces();
   const [activeItemKey, setActiveItemKey] = useState<string>();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
-  // Set initial active state based on current pathname
-  useEffect(() => {
-    const pathParts = pathname.split('/');
-    const findActiveItem = (items: NavItem[]): NavItem | undefined => {
-      for (const item of items) {
-        if (item.spaceTypeName === "Block" && pathname.includes(`/block/${item.key}`)) {
-          return item;
-        }
-        if (item.items) {
-          const found = findActiveItem(item.items);
-          if (found) return found;
-        }
-      }
-      return undefined;
-    };
-
-    const activeItem = findActiveItem(items);
-    if (activeItem) {
-      setActiveItemKey(activeItem.key);
-      setSelectedFacility(activeItem.name);
+  // Function to check if an item or any of its descendants are active
+  const isItemActive = (item: NavItem): boolean => {
+    if (item.key === activeItemKey) return true;
+    if (item.items) {
+      return item.items.some(subItem => isItemActive(subItem));
     }
-  }, [pathname, items, setSelectedFacility]);
+    return false;
+  };
+
+  // Memoize the active path tracking
+  const { activeBlock, activeFloor, activeRoom } = useMemo(() => {
+    const pathParts = pathname.split('/');
+    return {
+      activeBlock: pathParts.indexOf('block') >= 0 ? pathParts[pathParts.indexOf('block') + 1] : undefined,
+      activeFloor: pathParts.indexOf('floor') >= 0 ? pathParts[pathParts.indexOf('floor') + 1] : undefined,
+      activeRoom: pathParts.indexOf('room') >= 0 ? pathParts[pathParts.indexOf('room') + 1] : undefined,
+    };
+  }, [pathname]);
+
+  // Initialize open sections and active state based on current path
+  useEffect(() => {
+    const newOpenSections = new Set<string>();
+    
+    if (activeBlock) {
+      const blockItem = items.find(item => item.key === activeBlock);
+      if (blockItem) {
+        newOpenSections.add(blockItem.key);
+        setSelectedFacility(blockItem.name);
+      }
+    }
+    
+    if (activeFloor) {
+      newOpenSections.add(activeFloor);
+    }
+    
+    if (activeRoom) {
+      setActiveItemKey(activeRoom);
+    } else if (activeFloor) {
+      setActiveItemKey(activeFloor);
+    } else if (activeBlock) {
+      setActiveItemKey(activeBlock);
+    }
+
+    setOpenSections(newOpenSections);
+  }, [items, activeBlock, activeFloor, activeRoom, setSelectedFacility]);
 
   const handleNavigation = (item: NavItem) => {
     if (!item || !item.key) return;
 
     setSelectedFacility(item.name);
     setActiveItemKey(item.key);
+
+    // Keep the section open when clicking
+    setOpenSections(prev => {
+      const newSections = new Set(prev);
+      newSections.add(item.key);
+      return newSections;
+    });
 
     if (item.spaceTypeName === "Block") {
       router.push(`/block/${item.key}`, { scroll: false });
@@ -98,16 +129,30 @@ export function NavFacility({ items }: NavFacilityProps) {
     }
   };
 
+  const handleCollapsibleChange = (itemKey: string, isOpen: boolean) => {
+    setOpenSections(prev => {
+      const newSections = new Set(prev);
+      if (isOpen) {
+        newSections.add(itemKey);
+      } else {
+        newSections.delete(itemKey);
+      }
+      return newSections;
+    });
+  };
+
   const renderItem = (item: NavItem) => {
     const Icon = item.icon;
     const hasChildren = item.items && item.items.length > 0;
-    const isActive = activeItemKey === item.key;
+    const isActive = isItemActive(item);
+    const isOpen = openSections.has(item.key);
 
     return (
       <Collapsible
         key={item.key}
         asChild
-        defaultOpen={isActive}
+        open={isOpen}
+        onOpenChange={(open) => handleCollapsibleChange(item.key, open)}
         className="group/collapsible"
       >
         <SidebarMenuItem>
@@ -124,7 +169,11 @@ export function NavFacility({ items }: NavFacilityProps) {
               <Icon className="w-5 h-5" />
               {!isCollapsed && <span>{item.name}</span>}
               {hasChildren && !isCollapsed && (
-                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                <ChevronRight 
+                  className={`ml-auto transition-transform duration-200 ${
+                    isOpen ? 'rotate-90' : ''
+                  }`} 
+                />
               )}
             </SidebarMenuButton>
           </CollapsibleTrigger>
@@ -136,7 +185,7 @@ export function NavFacility({ items }: NavFacilityProps) {
                     <SidebarMenuSubButton
                       onClick={() => handleNavigation(subItem)}
                       className={
-                        activeItemKey === subItem.key
+                        isItemActive(subItem)
                           ? "bg-sidebar-accent text-sidebar-accent-foreground"
                           : ""
                       }
@@ -151,7 +200,7 @@ export function NavFacility({ items }: NavFacilityProps) {
                             <SidebarMenuSubButton
                               onClick={() => handleNavigation(roomItem)}
                               className={
-                                activeItemKey === roomItem.key
+                                isItemActive(roomItem)
                                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                                   : ""
                               }
@@ -174,10 +223,6 @@ export function NavFacility({ items }: NavFacilityProps) {
       </Collapsible>
     );
   };
-
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
 
   return (
     <SidebarGroup>
