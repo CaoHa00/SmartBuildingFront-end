@@ -48,7 +48,7 @@ export function StudentChart() {
       <CardContent className="flex flex-1 items-center pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square w-full max-w-[200px]"
+          className="mx-auto aspect-square w-full max-w-[255px]"
         >
           <RadialBarChart
             data={chartData}

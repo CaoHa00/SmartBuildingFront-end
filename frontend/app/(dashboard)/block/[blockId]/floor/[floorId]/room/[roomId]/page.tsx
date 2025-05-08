@@ -26,19 +26,28 @@ function RoomIdPage() {
         <Header title={selectedFacility} />
         <DashboardNavigation />
         <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 h-[calc(100vh-8rem)] overflow-y-auto">
-          <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-3 auto-rows-min">
-            <ElectricityCard />
+          <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 auto-rows-fr min-h-0">
+            <div className="w-full h-full">
+              <ElectricityCard />
+            </div>
 
-            <div className="col-1 flex-1 aspect-auto rounded-xl bg-muted/50 md:min-h-[300px] bg-neutral-100 shadow-xl">
+            <div className="w-full h-full rounded-xl bg-muted/50 bg-neutral-100 shadow-xl">
               <AirMonitor />
             </div>
 
-            <StudentChart />
-            <div className="aspect-video w-full relative rounded-xl bg-blue-200">
+            <div className="w-full h-full">
+              <StudentChart />
+            </div>
+
+            <div className="w-full h-full rounded-xl bg-blue-200">
               <Co2Emission/>
             </div>
-            <AcCard />
-            <div className="row-span-1 grid grid-cols-1 md:grid-cols-1 gap-2 md:gap-4">
+
+            <div className="w-full h-full">
+              <AcCard />
+            </div>
+
+            <div className="w-full h-full">
               <ActiveDevice />
             </div>
           </div>

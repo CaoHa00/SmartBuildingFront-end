@@ -31,7 +31,7 @@ export default function DashboardNavigation() {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/" className="text-white font-bold text-base">
+          <BreadcrumbLink href="/" className="text-white font-bold text-base p-4">
             DASHBOARD
           </BreadcrumbLink>
         </BreadcrumbItem>
