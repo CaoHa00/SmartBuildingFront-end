@@ -13,9 +13,8 @@ import {
   AlignVerticalJustifyEnd,
 } from "lucide-react";
 
-import { NavFacility } from "./nav-facility";
-import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
+import { NavFacility } from "./nav-facility";;
+// import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -130,7 +129,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        {/* <TeamSwitcher teams={data.teams} /> */}
+        <img src="/icon/main-logo.svg" className="w-15 h-15" alt="Main Logo" />
       </SidebarHeader>
       <SidebarContent>
         <NavFacility items={organizedSpaces.map(mapSpaceToNavItem)} />

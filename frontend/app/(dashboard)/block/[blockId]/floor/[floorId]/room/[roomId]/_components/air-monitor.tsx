@@ -51,7 +51,7 @@ export function AirMonitor() {
 
       <div className="h-1/3 relative rounded-xl bg-gradient-to-r from-blue-600 to-sky-300">
         <div className="text-xl md:text-2xl text-center font-bold text-white pt-2">
-          700-1000 PPM
+          30.25 PPM
         </div>
         <div className="flex items-center justify-between px-4 md:px-8 font-bold text-lg md:text-xl text-white">
           <p>CO</p>

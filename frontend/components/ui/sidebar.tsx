@@ -259,7 +259,7 @@ const Sidebar = React.forwardRef<
           <div
             data-sidebar="sidebar"
             className={cn(
-              "flex h-full w-full flex-col bg-blue-100 dark:bg-blue-800 rounded-3xl shadow-sidebar-ring",
+              "flex h-full w-full flex-col bg-blue-100 dark:bg-blue-950 rounded-3xl shadow-sidebar-ring",
               "group-data-[variant=floating]:rounded-3xl group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
             )}
           >

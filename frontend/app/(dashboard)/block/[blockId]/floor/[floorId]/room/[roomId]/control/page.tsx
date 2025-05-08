@@ -1,19 +1,19 @@
 "use client";
-import { AppSidebar } from "../../../../../../_components/app-sidebar";
+import { AppSidebar } from "../../../../../../../_components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import ActiveDevice from "./_components/active-device";
-import { AirMonitor } from "./_components/air-monitor";
+import ActiveDevice from "./_components/active-device-control";
+import { AirConditionerControl } from "./_components/ac-control";
+import { AirMonitor } from "../_components/air-monitor";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FacilityProvider, useFacility } from "@/app/context/facility-context";
+import { ElectricityCard } from "../_components/electricity-card";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import DashboardNavigation from "@/components/dashboard-nav";
-import { ElectricityCard } from "./_components/electricity-card";
-import { StudentChart } from "./_components/student-chart";
-import AcCard from "./_components/ac-card";
-import Co2Emission from "./_components/co2-emission";
+import TvControl from "./_components/tv-control";
+import { ElectricControl } from "./_components/electric-control";
 
-function RoomIdPage() {
+export function RoomControlPage() {
   const isMobile = useIsMobile();
   const { selectedFacility } = useFacility();
 
@@ -26,20 +26,14 @@ function RoomIdPage() {
         <Header title={selectedFacility} />
         <DashboardNavigation />
         <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 h-[calc(100vh-8rem)] overflow-y-auto">
-          <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-3 auto-rows-min">
-            <ElectricityCard />
-
-            <div className="col-1 flex-1 aspect-auto rounded-xl bg-muted/50 md:min-h-[300px] bg-neutral-100 shadow-xl">
-              <AirMonitor />
+          <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-2">
+            <ActiveDevice />
+            <div className="col-1 flex-1 aspect-auto rounded-xl bg-muted/50 md:min-h-min bg-neutral-100 shadow-xl">
+              <ElectricControl/>
             </div>
-
-            <StudentChart />
-            <div className="aspect-video w-full relative rounded-xl bg-blue-200">
-              <Co2Emission/>
-            </div>
-            <AcCard />
-            <div className="row-span-1 grid grid-cols-1 md:grid-cols-1 gap-2 md:gap-4">
-              <ActiveDevice />
+            <TvControl />
+            <div className="row-span-1 h-full grid grid-cols-1 md:grid-cols-1 gap-2 md:gap-4">
+              <AirConditionerControl />
             </div>
           </div>
         </div>
@@ -52,7 +46,7 @@ function RoomIdPage() {
 export default function Page() {
   return (
     <FacilityProvider>
-      <RoomIdPage />
+      <RoomControlPage />
     </FacilityProvider>
   );
 }
