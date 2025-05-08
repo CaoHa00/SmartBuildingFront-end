@@ -40,7 +40,7 @@ export function NavFacility({ items }: NavFacilityProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { setSelectedFacility } = useFacility();
-  const { spaces, loading } = useSpaces();
+  const { spaces } = useSpaces();
   const [activeItemKey, setActiveItemKey] = useState<string>();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -175,9 +175,9 @@ export function NavFacility({ items }: NavFacilityProps) {
     );
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <SidebarGroup>
