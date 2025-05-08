@@ -5,6 +5,7 @@ import { FacilityProvider, useFacility } from "@/app/context/facility-context";
 import { AppSidebar } from "../../../../_components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import DashboardNavigation from "@/components/dashboard-nav";
@@ -14,11 +15,13 @@ export function FloorPage() {
   const isMobile = useIsMobile();
   const { getSpaceById } = useSpaces();
   const { selectedFacility } = useFacility();
+
   const params = useParams();
   const blockId = params.blockId as string;
   const block = getSpaceById(blockId);
   const floorId = params.floorId as string;
   const floor = getSpaceById(floorId);
+
 
   return (
     <SidebarProvider>
