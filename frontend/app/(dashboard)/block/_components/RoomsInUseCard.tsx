@@ -112,7 +112,7 @@ export default function RoomsInUseCard() {
             </Select>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-3 pb-3">
           <ChartContainer
             id={id}
             config={chartConfig}

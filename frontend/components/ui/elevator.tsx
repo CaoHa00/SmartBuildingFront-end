@@ -7,7 +7,7 @@ import {
   ChartTooltip,
 } from "@/components/ui/chart";
 import { TooltipProps } from "recharts";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 interface ElevatorProps {
   id: string;
@@ -176,14 +176,18 @@ export const Elevator = ({
         />
       </div> */}
 
-      <div>
+      <div className="mt-5">
         <ChartContainer config={chartConfig}>
           <BarChart
             accessibilityLayer
             data={chartData}
             margin={{ left: 10, right: 10 }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid
+              vertical={false}
+              horizontal={true}
+              stroke="#757575"
+            />
             <XAxis
               dataKey="hour"
               tickLine={false}
@@ -191,6 +195,13 @@ export const Elevator = ({
               axisLine={false}
               ticks={["01:00", "12:00", "24:00"]}
               tickFormatter={(value) => value}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tickMargin={10}
+              width={30}
+              tickFormatter={(value) => `${value}`}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Bar dataKey="reading" fill="var(--color-reading)" radius={5} />
