@@ -7,17 +7,23 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-
 import React from "react";
 import { ChevronRight } from "lucide-react";
 import { useParams } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSpaces } from "@/hooks/use-spaces";
-
-import BlockOverview from "@/app/(dashboard)/block/[blockId]/_components/BlockOverview";
-import FloorOverview from "@/app/(dashboard)/block/[blockId]/floor/[floorId]/_components/FloorOverview";
+import { usePathname } from "next/navigation";
 
 export default function DashboardNavigation() {
+  const pathname = usePathname();
+  const segments = pathname.split("/").filter(Boolean);
+  const lastSegment = segments[segments.length - 1];
+
+  const isTab = ["overview", "control", "equipment", "material"].includes(
+    lastSegment
+  );
+  const activeTab = isTab ? lastSegment : "overview";
+
   const params = useParams();
   const { getSpaceById } = useSpaces();
   const blockId = params.blockId as string;
@@ -31,7 +37,7 @@ export default function DashboardNavigation() {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/" className="text-white font-bold text-base p-4">
+          <BreadcrumbLink href="/" className="text-white font-bold text-base">
             DASHBOARD
           </BreadcrumbLink>
         </BreadcrumbItem>
@@ -76,7 +82,6 @@ export default function DashboardNavigation() {
             </BreadcrumbSeparator>
             <BreadcrumbItem>
               <BreadcrumbLink
-
                 href={`/block/${blockId}/floor/${floorId}/room/${roomId}`}
                 className="text-white font-bold text-base"
               >
@@ -90,29 +95,49 @@ export default function DashboardNavigation() {
       </BreadcrumbList>
     </Breadcrumb>
   );
+
   return (
-    <Tabs defaultValue="overview" className="w-full">
+    <Tabs defaultValue={activeTab} value={activeTab} className="w-full">
       <div className="flex justify-between items-center mb-4">
         <div className="flex flex-col w-full">{renderBreadcrumbs()}</div>
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="control">Control</TabsTrigger>
-          <TabsTrigger value="equipment">Equipment</TabsTrigger>
-          <TabsTrigger value="material">Material</TabsTrigger>
+          <TabsTrigger value="overview" asChild>
+            <a href={pathname.replace(/\/(control|equipment|material)$/, "")}>
+              Overview
+            </a>
+          </TabsTrigger>
+          <TabsTrigger value="control" asChild>
+            <a
+              href={`${pathname.replace(
+                /(overview|equipment|material|control)?$/,
+                ""
+              )}/control`}
+            >
+              Control
+            </a>
+          </TabsTrigger>
+          <TabsTrigger value="equipment" asChild>
+            <a
+              href={`${pathname.replace(
+                /(overview|control|material|equipment)?$/,
+                ""
+              )}/equipment`}
+            >
+              Equipment
+            </a>
+          </TabsTrigger>
+          <TabsTrigger value="material" asChild>
+            <a
+              href={`${pathname.replace(
+                /(overview|control|equipment|material)?$/,
+                ""
+              )}/material`}
+            >
+              Material
+            </a>
+          </TabsTrigger>
         </TabsList>
       </div>
-      <TabsContent value="overview">
-        {room ? (
-          <>{/* RoomOverview */}</>
-        ) : floor ? (
-          <FloorOverview />
-        ) : block ? (
-          <BlockOverview />
-        ) : null}
-      </TabsContent>
-      <TabsContent value="control">{/* Control Component */}</TabsContent>
-      <TabsContent value="equipment">{/* Equipment Component */}</TabsContent>
-      <TabsContent value="material">{/* Material Component */}</TabsContent>
     </Tabs>
   );
 }

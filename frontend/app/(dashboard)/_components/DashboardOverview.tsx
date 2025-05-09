@@ -18,9 +18,13 @@ export default function DashboardOverview() {
           <OverviewElectricalCard />
         </div>
         <div className="grid col-span-2 gap-4 md:row-span-2">
-          <Card className="bg-card">
-            <CardContent className="p-4">
-              <BlockModel3D />
+          <Card className="bg-card p-0">
+            <CardContent className="p-0">
+              <img
+                src="/img/School3D.png"
+                alt="Building Plan"
+                className="inset-0 w-full h-full object-contain"
+              />
             </CardContent>
           </Card>
         </div>

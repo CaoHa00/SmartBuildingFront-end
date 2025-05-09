@@ -8,6 +8,7 @@ import { FacilityProvider, useFacility } from "@/app/context/facility-context";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import DashboardNavigation from "../../../../components/dashboard-nav";
+import BlockOverview from "./_components/BlockOverview";
 
 export function BlockPage() {
   const isMobile = useIsMobile();
@@ -24,6 +25,7 @@ export function BlockPage() {
           <div className="space-y-4">
             <DashboardNavigation />
           </div>
+          <BlockOverview />
         </div>
         <Footer />
       </SidebarInset>
