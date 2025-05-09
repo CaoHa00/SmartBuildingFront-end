@@ -7,7 +7,7 @@ export default function TopBar() {
         <div className="relative flex items-center justify-center">
           <Image
             className="relative bg-white rounded-xl p-3 md:w-[200px] md:h-[60px]"
-            src="/icon/new-15year-logo.svg"
+            src="/icon/logo-15yrs.svg"
             alt="EIU Logo"
             width={170}
             height={180}
