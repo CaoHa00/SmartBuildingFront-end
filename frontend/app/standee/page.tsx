@@ -6,7 +6,6 @@ import CarbonEmission from "./_components/carbon-emission";
 import EnergyComponent from "./_components/energy-component";
 import BorderLines from "./_components/border-lines";
 import GetRealWeather from "./_components/get-real-weather";
-import { Footer } from "@/components/ui/footer";
 
 export default function StandeeDashboard() {
   return (
@@ -29,7 +28,6 @@ export default function StandeeDashboard() {
           </div>
         </div>
       </section>
-      <Footer variant="standee" />
     </div>
   );
 }
