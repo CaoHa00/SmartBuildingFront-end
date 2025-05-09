@@ -35,9 +35,10 @@ interface NavItem {
 
 interface NavFacilityProps {
   items: NavItem[];
+  className?: string;
 }
 
-export function NavFacility({ items }: NavFacilityProps) {
+export function NavFacility({ items, className }: NavFacilityProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { setSelectedFacility } = useFacility();
@@ -262,7 +263,7 @@ export function NavFacility({ items }: NavFacilityProps) {
   };
 
   return (
-    <SidebarGroup>
+    <SidebarGroup className={className}>
       <SidebarGroupLabel className="text-xl font-bold text-neutral-100">Dashboard</SidebarGroupLabel>
       <SidebarMenu className="font-bold text-neutral-100">
         {items.map((item) => renderItem(item))}
