@@ -14,8 +14,8 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
+import { TooltipProps } from "recharts";
 
 const chartData = [
   { time: "00:00", consumption: 11 },
@@ -36,6 +36,24 @@ const chartConfig = {
 export default function ElectricalReadingCard() {
   const currentReading = useCurrentElectricalReading();
   const totalReading = useTotalElectricalReading();
+
+  const ChartTooltipContent = ({
+    active,
+    payload,
+  }: TooltipProps<number, string>) => {
+    if (!active || !payload || payload.length === 0) return null;
+
+    const data = payload[0].payload;
+
+    return (
+      <div className="rounded-md border bg-background p-2 shadow-sm">
+        <p className="text-sm font-medium text-foreground">
+          Reading: {data.consumption} kW
+        </p>
+        <p className="text-sm text-muted-foreground">Time: {data.time}</p>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -64,7 +82,7 @@ export default function ElectricalReadingCard() {
           <CardDescription>BLOCK 8</CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <div className="m-auto mt-5 flex justify-between">
+          <div className="m-auto flex justify-between">
             <div className="pr-3">
               <div>Today's Total</div>
               <span className="text-[70px] text-[#00FFFF] font-semibold leading-none">
@@ -82,7 +100,7 @@ export default function ElectricalReadingCard() {
               <div className="text-3xl">kW</div>
             </div>
           </div>
-          <div className="m-auto mt-5">
+          <div className="m-auto mt-5 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 p-4 rounded-xl border border-slate-200/50 dark:border-primary hover:shadow-lg transition-all">
             <div className="w-full h-[250px]">
               <ChartContainer
                 config={chartConfig}
@@ -90,7 +108,7 @@ export default function ElectricalReadingCard() {
               >
                 <AreaChart
                   data={chartData}
-                  margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
+                  margin={{ left: 10, right: 10, top: 10, bottom: 0 }}
                 >
                   <defs>
                     <linearGradient
@@ -123,6 +141,7 @@ export default function ElectricalReadingCard() {
                     axisLine={false}
                     tickMargin={8}
                     tick={{ fill: "#fff" }}
+                    padding={{ left: 10 }}
                   />
                   <ChartTooltip
                     cursor={false}
