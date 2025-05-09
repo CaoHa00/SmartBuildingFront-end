@@ -20,9 +20,7 @@ export function MainDashboard() {
   const { selectedFacility } = useFacility();
   return (
     <SidebarProvider>
-      <AppSidebar
-        className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
-      />
+      <AppSidebar className={`${isMobile ? "rounded-xl" : "rounded-3xl"}`} />
       <SidebarInset className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-blue-950 dark:to-slate-900 flex flex-col h-screen overflow-hidden">
         <Header title={selectedFacility} />
         <div className="bg-background p-5">
@@ -32,7 +30,7 @@ export function MainDashboard() {
                 <BreadcrumbItem>
                   <BreadcrumbLink
                     href="/"
-                    className="text-white font-bold text-base"
+                    className="text-white text-base leading-8"
                   >
                     DASHBOARD
                   </BreadcrumbLink>

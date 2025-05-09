@@ -9,6 +9,29 @@ import {
 } from "@/components/ui/card";
 import useCurrentElectricalReading from "@/hooks/use-current-electrical-reading";
 import useTotalElectricalReading from "@/hooks/use-total-electrical-reading";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
+const chartData = [
+  { time: "00:00", consumption: 11 },
+  { time: "04:00", consumption: 9 },
+  { time: "08:00", consumption: 280 },
+  { time: "12:00", consumption: 320 },
+  { time: "16:00", consumption: 200 },
+  { time: "20:00", consumption: 35 },
+];
+
+const chartConfig = {
+  consumption: {
+    label: "Consumption",
+    color: "#22c55e",
+  },
+} satisfies ChartConfig;
 
 export default function ElectricalReadingCard() {
   const currentReading = useCurrentElectricalReading();
@@ -41,21 +64,79 @@ export default function ElectricalReadingCard() {
           <CardDescription>BLOCK 8</CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <div className="m-auto mt-5">
-            <div>Current Consumption</div>
-            <span className="text-[70px] text-[#00FFFF] font-semibold leading-none">
-              {Math.round(
-                currentReading ? currentReading.electricalReading : 0
-              )}
-            </span>
-            <div className="text-3xl">kW</div>
+          <div className="m-auto mt-5 flex justify-between">
+            <div className="pr-3">
+              <div>Today's Total</div>
+              <span className="text-[70px] text-[#00FFFF] font-semibold leading-none">
+                {Math.round(totalReading ? totalReading.cumulativeEnergy : 0)}
+              </span>
+              <div className="text-3xl">kWh</div>
+            </div>
+            <div className="border-l-2 border-white pl-3">
+              <div>Current</div>
+              <span className="text-[70px] text-[#00FFFF] font-semibold leading-none">
+                {Math.round(
+                  currentReading ? currentReading.electricalReading : 0
+                )}
+              </span>
+              <div className="text-3xl">kW</div>
+            </div>
           </div>
-          <div className="m-auto mt-20">
-            <div>Today's Total</div>
-            <span className="text-[70px] text-[#00FFFF] font-semibold leading-none">
-              {Math.round(totalReading ? totalReading.cumulativeEnergy : 0)}
-            </span>
-            <div className="text-3xl">kWh</div>
+          <div className="m-auto mt-5">
+            <div className="w-full h-[250px]">
+              <ChartContainer
+                config={chartConfig}
+                className="aspect-auto h-full"
+              >
+                <AreaChart
+                  data={chartData}
+                  margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="gradientConsumption"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="var(--color-consumption)"
+                        stopOpacity={0.8}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="var(--color-consumption)"
+                        stopOpacity={0.1}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    vertical={false}
+                    stroke="#1e40af"
+                    opacity={0.1}
+                  />
+                  <XAxis
+                    dataKey="time"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tick={{ fill: "#fff" }}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent />}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="consumption"
+                    stroke="var(--color-consumption)"
+                    fill="url(#gradientConsumption)"
+                  />
+                </AreaChart>
+              </ChartContainer>
+            </div>
           </div>
         </CardContent>
       </Card>
