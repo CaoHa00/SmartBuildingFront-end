@@ -14,7 +14,6 @@ import {
 import { ChevronRight } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { useFacility } from "@/app/context/facility-context";
-import { useSpaces } from "@/hooks/use-spaces";
 import {
   Collapsible,
   CollapsibleContent,
@@ -42,7 +41,6 @@ export function NavFacility({ items, className }: NavFacilityProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { setSelectedFacility } = useFacility();
-  const { spaces } = useSpaces();
   const [activeItemKey, setActiveItemKey] = useState<string>();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
@@ -78,19 +76,19 @@ export function NavFacility({ items, className }: NavFacilityProps) {
   // Initialize open sections and active state based on current path
   useEffect(() => {
     const newOpenSections = new Set<string>();
-    
+
     if (activeBlock) {
-      const blockItem = items.find(item => item.key === activeBlock);
+      const blockItem = items.find((item) => item.key === activeBlock);
       if (blockItem) {
         newOpenSections.add(blockItem.key);
         setSelectedFacility(blockItem.name);
       }
     }
-    
+
     if (activeFloor) {
       newOpenSections.add(activeFloor);
     }
-    
+
     if (activeRoom) {
       setActiveItemKey(activeRoom);
     } else if (activeFloor) {
@@ -144,7 +142,11 @@ export function NavFacility({ items, className }: NavFacilityProps) {
     }
   };
 
-  const handleCollapsibleChange = (itemKey: string, isOpen: boolean, e?: React.MouseEvent) => {
+  const handleCollapsibleChange = (
+    itemKey: string,
+    isOpen: boolean,
+    e?: React.MouseEvent
+  ) => {
     e?.stopPropagation();
     setOpenSections((prev) => {
       const newSections = new Set(prev);
@@ -264,7 +266,9 @@ export function NavFacility({ items, className }: NavFacilityProps) {
 
   return (
     <SidebarGroup className={className}>
-      <SidebarGroupLabel className="text-xl font-bold text-neutral-100">Dashboard</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-xl font-bold text-neutral-100">
+        Dashboard
+      </SidebarGroupLabel>
       <SidebarMenu className="font-bold text-neutral-100">
         {items.map((item) => renderItem(item))}
       </SidebarMenu>

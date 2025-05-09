@@ -32,7 +32,7 @@ export function MainDashboard() {
                 <BreadcrumbItem>
                   <BreadcrumbLink
                     href="/"
-                    className="text-white font-bold text-base"
+                    className="text-white text-base leading-8"
                   >
                     DASHBOARD
                   </BreadcrumbLink>
