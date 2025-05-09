@@ -3,10 +3,8 @@ import { AppSidebar } from "../../../../../../../_components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import ActiveDevice from "./_components/active-device-control";
 import { AirConditionerControl } from "./_components/ac-control";
-import { AirMonitor } from "../_components/air-monitor";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FacilityProvider, useFacility } from "@/app/context/facility-context";
-import { ElectricityCard } from "../_components/electricity-card";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import DashboardNavigation from "@/components/dashboard-nav";
@@ -24,16 +22,20 @@ export function RoomControlPage() {
       />
       <SidebarInset className="bg-neutral-100 dark:bg-blue-950">
         <Header title={selectedFacility} />
-        <DashboardNavigation />
-        <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 h-[calc(100vh-8rem)] overflow-y-auto">
-          <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-2">
-            <ActiveDevice />
-            <div className="col-1 flex-1 aspect-auto rounded-xl bg-muted/50 md:min-h-min bg-neutral-100 shadow-xl">
-              <ElectricControl/>
-            </div>
-            <TvControl />
-            <div className="row-span-1 h-full grid grid-cols-1 md:grid-cols-1 gap-2 md:gap-4">
-              <AirConditionerControl />
+        <div className="bg-background p-5">
+          <div className="space-y-4">
+            <DashboardNavigation />
+          </div>
+          <div className="flex flex-1 flex-col gap-2 md:gap-4 p-2 md:p-4 h-[855px] overflow-y-auto">
+            <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-2">
+              <ActiveDevice />
+              <div className="col-1 flex-1 aspect-auto rounded-xl bg-muted/50 md:min-h-min bg-neutral-100 shadow-xl">
+                <ElectricControl />
+              </div>
+              <TvControl />
+              <div className="row-span-1 h-full grid grid-cols-1 md:grid-cols-1 gap-2 md:gap-4">
+                <AirConditionerControl />
+              </div>
             </div>
           </div>
         </div>

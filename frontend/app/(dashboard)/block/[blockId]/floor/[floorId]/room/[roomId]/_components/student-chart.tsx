@@ -18,11 +18,13 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [{ 
-  month: "current",
-  present: 26,
-  total: 30 
-}];
+const chartData = [
+  {
+    month: "current",
+    present: 26,
+    total: 30,
+  },
+];
 
 const chartConfig = {
   present: {
@@ -43,12 +45,14 @@ export function StudentChart() {
     <Card className="flex flex-col">
       <CardHeader className="pb-0">
         <CardTitle>Student Attendance</CardTitle>
-        <CardDescription>Present: {presentStudents}/{totalStudents} Students</CardDescription>
+        <CardDescription>
+          Present: {presentStudents}/{totalStudents} Students
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-1 items-center pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square w-full max-w-[300px]"
+          className="mx-auto aspect-square w-full max-w-[260px]"
         >
           <RadialBarChart
             data={chartData}

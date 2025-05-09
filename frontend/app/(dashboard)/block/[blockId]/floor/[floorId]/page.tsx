@@ -1,6 +1,5 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { FacilityProvider, useFacility } from "@/app/context/facility-context";
 import { AppSidebar } from "../../../../_components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -9,19 +8,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
 import DashboardNavigation from "@/components/dashboard-nav";
-import { useSpaces } from "@/hooks/use-spaces";
+import FloorOverview from "./_components/FloorOverview";
 
 export function FloorPage() {
   const isMobile = useIsMobile();
-  const { getSpaceById } = useSpaces();
   const { selectedFacility } = useFacility();
-
-  const params = useParams();
-  const blockId = params.blockId as string;
-  const block = getSpaceById(blockId);
-  const floorId = params.floorId as string;
-  const floor = getSpaceById(floorId);
-
 
   return (
     <SidebarProvider>
@@ -34,6 +25,7 @@ export function FloorPage() {
           <div className="space-y-4">
             <DashboardNavigation />
           </div>
+          <FloorOverview />
         </div>
         <Footer />
       </SidebarInset>
