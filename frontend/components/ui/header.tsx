@@ -7,6 +7,7 @@ import { SidebarTrigger } from "./sidebar";
 import { cn } from "@/lib/utils";
 import { NavUser } from "../nav-user";
 import { useGreeting } from "@/hooks/use-greeting";
+import { BellIcon } from "lucide-react";
 
 interface HeaderProps extends React.HTMLAttributes<HTMLElement> {
   title?: string;
@@ -41,17 +42,19 @@ export function Header({
               className="h-5 bg-slate-500 dark:bg-slate-100"
             />
             <div>
-              {/* <h1 className={`${isMobile ? "text-lg" : "text-xl"} font-bold text-slate-900 dark:text-slate-100`}>
-                {title}
-              </h1> */}
-              <img src="/icon/eiu15.svg" alt="IIC Logo" className="w-60 h-30" />
+              <h1 className="text-2xl uppercase font-bold text-slate-600 dark:text-slate-100">
+                Smart Builidng Management System
+              </h1>
             </div>
           </div>
         )}
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-4 ml-auto">
           <p className="text-base font-semibold text-slate-600 dark:text-slate-100">
             {greeting}
           </p>
+          <button className="text-slate-600 hover:text-slate-900 dark:text-slate-100 dark:hover:text-slate-500 transition-colors">
+            <BellIcon className="w-5 h-5" />
+          </button>
           <NavUser
             user={{
               name: "",

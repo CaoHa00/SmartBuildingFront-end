@@ -21,7 +21,7 @@ export function MainDashboard() {
   return (
     <SidebarProvider>
       <AppSidebar
-        className={`${isMobile ? "p-1 rounded-xl" : "p-2 rounded-3xl"}`}
+        className={`${isMobile ? "p-1 rounded-xl" : "rounded-3xl"}`}
       />
       <SidebarInset className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-blue-950 dark:to-slate-900 flex flex-col h-screen overflow-hidden">
         <Header title={selectedFacility} />

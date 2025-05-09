@@ -130,15 +130,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar 
-      collapsible="icon" 
       className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 border-r-2 border-r-blue-500"
       {...props}
     >
-      <SidebarHeader className="px-4 py-6">
-        <img src="/icon/main-logo.svg" className="w-32 h-auto mx-auto" alt="Main Logo" />
+      <SidebarHeader className="px-4 py-1 flex items-center justify-between">
+        <img src="/icon/eiu15.svg" className="w-50 h-auto mx-auto" alt="Main Logo" />
       </SidebarHeader>
       <Separator/>
-      <SidebarContent className="px-3">
+      <SidebarContent>
         <NavFacility 
           items={organizedSpaces.map(mapSpaceToNavItem)} 
           className="space-y-1"
@@ -148,7 +147,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           className="mt-auto pt-6 font-medium text-gray-600 dark:text-gray-300"
         />
       </SidebarContent>
-      <SidebarRail className="bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900" />
     </Sidebar>
   );
 }
