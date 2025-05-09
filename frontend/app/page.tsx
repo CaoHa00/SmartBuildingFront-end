@@ -20,7 +20,9 @@ export function MainDashboard() {
   const { selectedFacility } = useFacility();
   return (
     <SidebarProvider>
-      <AppSidebar className={`${isMobile ? "rounded-xl" : "rounded-3xl"}`} />
+      <AppSidebar
+        className={`${isMobile ? "p-1 rounded-xl" : "rounded-3xl"}`}
+      />
       <SidebarInset className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-blue-950 dark:to-slate-900 flex flex-col h-screen overflow-hidden">
         <Header title={selectedFacility} />
         <div className="bg-background p-5">
