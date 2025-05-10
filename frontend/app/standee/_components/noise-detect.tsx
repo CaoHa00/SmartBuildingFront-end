@@ -21,11 +21,13 @@ export default function NoiseDetect() {
       };
   return (
     <div className="bg-[#5e83ba] rounded-xl aspect-auto px-5 py-3">
-      <div className="flex justify-center font-bold text-2xl leading-none">
+      <div className="flex justify-center font-bold text-xl leading-none">
         <Ear />
         {text.title}
       </div>
-      <div className="w-full text-center mt-3 h-24 md:h-40">Gauge</div>
+      <div className="w-full text-center my-[43px] md:h-40 italic">
+        Currently under development
+      </div>
       <div className="flex justify-center w-full">
         <div className="w-1/3 flex border-r border-white">
           <div className="w-full">

@@ -2,22 +2,22 @@
 
 // import { Square } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
-import { WeeklyEnergyChart } from "./weekly-energy-chart";
+import { WeeklyCo2EmissionChart } from "./weekly-co2-emission-chart";
 
-export default function EnergyUser() {
+export default function CO2Usage() {
   const { isEnglish } = useLanguage();
 
   const text = isEnglish
     ? {
-        title: "Energy Usage",
+        title: "CO₂ Emission",
         dropdown: "Last week",
-        consumesLegend: "Consumes",
+        consumesLegend: "Emits",
         efficiencyLegend: "Efficiency",
       }
     : {
-        title: "Năng lượng tiêu thụ",
+        title: "Lượng khí thải CO₂",
         dropdown: "Tuần trước",
-        consumesLegend: "Tiêu thụ",
+        consumesLegend: "Tỏa ra",
         efficiencyLegend: "Hiệu năng",
       };
   return (
@@ -51,7 +51,7 @@ export default function EnergyUser() {
         </div>
       </div>
       <div className="h-[157px] bg-muted/60 mt-3 rounded-xl">
-        <WeeklyEnergyChart />
+        <WeeklyCo2EmissionChart />
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  WeatherResponse,
   AdminWeatherData,
   WeatherNews,
   StandeeWeatherData,
