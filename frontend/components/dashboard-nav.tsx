@@ -65,6 +65,14 @@ export default function DashboardNavigation() {
   }, [activeBlock, activeFloor, activeRoom, getSpaceById]);
 
   const renderBreadcrumbs = () => {
+    if (loading) {
+      return (
+        <div className="text-muted-foreground text-base">
+          Loading breadcrumbs...
+        </div>
+      );
+    }
+
     return (
       <Breadcrumb>
         <BreadcrumbList>

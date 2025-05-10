@@ -25,14 +25,12 @@ export default function ElevatorCard() {
         </div>
       </h2>
       <div className="mb-4 text-muted-foreground text-sm">BLOCK 8</div>
-      <div>
-        <Elevator
-          id={elevator.id}
-          status={elevator.status}
-          phaseConsumption={elevator.phaseConsumption}
-          totalConsumption={elevator.totalConsumption}
-        />
-      </div>
+      <Elevator
+        id={elevator.id}
+        status={elevator.status}
+        phaseConsumption={elevator.phaseConsumption}
+        totalConsumption={elevator.totalConsumption}
+      />
     </div>
   );
 }

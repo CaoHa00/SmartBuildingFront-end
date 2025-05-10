@@ -92,7 +92,7 @@ export default function ActiveDeviceControl() {
   }
 
   return (
-    <div className="rounded-xl w-full h-full bg-blue-800  shadow-xl p-4">
+    <div className="rounded-xl w-full h-full bg-card border-2 shadow-xl p-4">
       <div className="ml-3 mb-4">
         <h2 className="flex font-bold tracking-wide text-xl text-neutral-100 leading-none">
           Active Devices
@@ -105,7 +105,7 @@ export default function ActiveDeviceControl() {
         {activeDevices.map((device) => (
           <div
             key={device.id}
-            className="bg-white/10 backdrop-blur-sm dark:bg-blue-950 p-4 rounded-xl shadow-lg transition-all duration-200 hover:bg-white/20 dark:hover:bg-blue-900/70"
+            className="bg-white/10 backdrop-blur-sm dark:bg-primary p-4 rounded-xl shadow-lg transition-all duration-200 hover:bg-white/20 dark:hover:bg-blue-800"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -117,8 +117,16 @@ export default function ActiveDeviceControl() {
                     {device.name}
                   </h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <div className={`w-2 h-2 rounded-full ${device.status === 'online' ? 'bg-green-400' : 'bg-red-400'}`} />
-                    <span className="text-sm text-neutral-100">{device.status}</span>
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        device.status === "online"
+                          ? "bg-green-400 shadow-[0_0_10px_#2DF5B2] animate-pulse"
+                          : "bg-grey-400"
+                      }`}
+                    />
+                    <span className="text-sm text-neutral-100">
+                      {device.status}
+                    </span>
                   </div>
                 </div>
               </div>

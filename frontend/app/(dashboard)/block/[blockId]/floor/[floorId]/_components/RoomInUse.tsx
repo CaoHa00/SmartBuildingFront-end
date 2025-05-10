@@ -19,7 +19,7 @@ import {
 
 const chartData = [
   { type: "inUse", rooms: 3, fill: "var(--color-inUse)" },
-  { type: "vacant", rooms: 9, fill: "var(--color-vacant)" },
+  { type: "vacant", rooms: 6, fill: "var(--color-vacant)" },
 ];
 
 const chartConfig = {

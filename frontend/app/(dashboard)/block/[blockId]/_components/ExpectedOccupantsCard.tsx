@@ -25,7 +25,7 @@ export default function ExpectedOccupantsCard() {
         <CardContent className="text-center">
           <div className="m-auto">
             <span className="text-[70px] text-[#00FFFF] font-semibold">
-              5000
+              387
             </span>
             <div className="text-3xl">OCCUPANTS</div>
           </div>

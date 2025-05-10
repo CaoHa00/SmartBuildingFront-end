@@ -15,7 +15,7 @@ export default function OverviewCo2EmissionCard() {
   };
 
   const co2Emission = CalculateCarbonFootprint(
-    totalReading ? totalReading.cumulativeEnergy : 0
+    totalReading.maxReading ? totalReading.maxReading.cumulativeEnergy : 0
   );
 
   return (

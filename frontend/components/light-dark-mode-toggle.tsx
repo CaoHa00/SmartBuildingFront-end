@@ -19,7 +19,7 @@ export function LightDarkModeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "dark" : "dark")}
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
       aria-label="Toggle theme"
     >
