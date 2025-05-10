@@ -9,7 +9,7 @@ export default function CarbonEmission() {
 
   return (
     <div className="grid grid-flow-col md:row-span-2 grid-rows-3">
-      <CarbonEmissionChart electricalReading={reading?.electricalReading} />
+      <CarbonEmissionChart electricalReading={reading.maxReading?.cumulativeEnergy} />
       <CarbonEmissionAnalytics />
     </div>
   );
