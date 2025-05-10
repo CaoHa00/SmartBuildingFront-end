@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/chart";
 
 const chartData = [
-  { type: "big", rooms: 6, fill: "var(--color-big)" },
-  { type: "small", rooms: 6, fill: "var(--color-small)" },
+  { type: "30-seats", rooms: 4, fill: "var(--color-small)" },
+  { type: "60-seats", rooms: 5, fill: "var(--color-big)" },
 ];
 
 const chartConfig = {

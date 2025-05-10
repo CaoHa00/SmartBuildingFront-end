@@ -13,7 +13,7 @@ import {
   AlignVerticalJustifyEnd,
 } from "lucide-react";
 
-import { NavFacility } from "./nav-facility";;
+import { NavFacility } from "./nav-facility";
 // import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
@@ -26,7 +26,6 @@ import { NavHelper } from "./nav-helper";
 import { Space } from "@/types/space";
 import { useSpaces } from "@/hooks/use-spaces";
 import { Separator } from "@/components/ui/separator";
-
 
 // This is sample data.
 const data = {
@@ -92,7 +91,7 @@ interface NavItem {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { spaces,  fetchSpaces } = useSpaces();
+  const { spaces, fetchSpaces } = useSpaces();
   const [organizedSpaces, setOrganizedSpaces] = useState<Space[]>([]);
 
   useEffect(() => {
@@ -129,17 +128,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   });
 
   return (
-    <Sidebar 
-      className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 border-r-2 border-r-blue-500"
+    <Sidebar
+      // className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 border-r-2 border-r-blue-500"
       {...props}
     >
       <SidebarHeader className="px-4 py-1 flex items-center justify-between">
-        <img src="/icon/eiu15.svg" className="w-50 h-auto mx-auto" alt="Main Logo" />
+        <img
+          src="/icon/eiu15.svg"
+          className="w-50 h-auto mx-auto"
+          alt="Main Logo"
+        />
       </SidebarHeader>
-      <Separator/>
-      <SidebarContent>
-        <NavFacility 
-          items={organizedSpaces.map(mapSpaceToNavItem)} 
+      <Separator />
+      <SidebarContent className="relative z-10">
+        <NavFacility
+          items={organizedSpaces.map(mapSpaceToNavItem)}
           className="space-y-1"
         />
         <NavHelper
@@ -147,6 +150,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           className="mt-auto pt-6 font-medium text-gray-600 dark:text-gray-300"
         />
       </SidebarContent>
+      <div className="absolute bottom-0 left-0 w-full h-2/3 bg-[url(/icon/SidebarPattern.svg)] bg-no-repeat bg-bottom pointer-events-none z-0" />
     </Sidebar>
   );
 }

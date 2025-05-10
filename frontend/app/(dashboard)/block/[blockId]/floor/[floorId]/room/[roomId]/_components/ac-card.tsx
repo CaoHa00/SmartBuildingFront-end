@@ -18,7 +18,7 @@ const AcCard = () => {
   );
   const [temperature, setTemperature] = React.useState(25);
 
-//   const temperature = getValueByName("ac-temperature") ?? "--";
+  //   const temperature = getValueByName("ac-temperature") ?? "--";
   const powerStatus = getValueByName("ac-power") === 1;
   const mode = String(getValueByName("ac-mode") ?? "unknown");
   const fanSpeed = getValueByName("ac-fan-speed") ?? "--";
@@ -37,7 +37,7 @@ const AcCard = () => {
   };
 
   return (
-    <div className="rounded-xl bg-blue-800 dark:bg-blue-900 w-full  h-full shadow-xl p-4">
+    <div className="rounded-xl bg-card border-2 w-full  h-full shadow-xl p-4">
       <div className="ml-3">
         <h2 className="flex font-bold tracking-wide text-xl text-neutral-100 dark:text-neutral-100 leading-none">
           AIR CONDITIONERS
@@ -64,7 +64,7 @@ const AcCard = () => {
             <button className="p-2 rounded-full text-white">
               <Wind />
             </button>
-            <button className="p-3 rounded-full bg-blue-600 text-white ">
+            <button className="p-3 rounded-full bg-blue-600 text-white">
               <Snowflake size={30} />
             </button>
             <button className="p-2 rounded-full text-white">

@@ -40,7 +40,11 @@ export default function OverviewElectricalCard() {
         <CardContent className="text-center">
           <div className="">
             <span className="text-[70px] text-[#00FFFF] font-semibold">
-              {Math.round(totalReading ? totalReading.cumulativeEnergy : 0)}
+              {Math.round(
+                totalReading.maxReading
+                  ? totalReading.maxReading.cumulativeEnergy
+                  : 0
+              )}
             </span>
             <div className="text-3xl">kWh</div>
           </div>

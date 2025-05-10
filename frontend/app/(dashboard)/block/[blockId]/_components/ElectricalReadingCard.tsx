@@ -16,19 +16,11 @@ import {
   ChartTooltip,
 } from "@/components/ui/chart";
 import { TooltipProps } from "recharts";
-
-const chartData = [
-  { time: "00:00", consumption: 11 },
-  { time: "04:00", consumption: 9 },
-  { time: "08:00", consumption: 280 },
-  { time: "12:00", consumption: 320 },
-  { time: "16:00", consumption: 200 },
-  { time: "20:00", consumption: 35 },
-];
+import { format, parseISO } from "date-fns";
 
 const chartConfig = {
-  consumption: {
-    label: "Consumption",
+  cumulativeEnergy: {
+    label: "Cumulative Energy",
     color: "#22c55e",
   },
 } satisfies ChartConfig;
@@ -36,6 +28,9 @@ const chartConfig = {
 export default function ElectricalReadingCard() {
   const currentReading = useCurrentElectricalReading();
   const totalReading = useTotalElectricalReading();
+
+  const realData = totalReading.dailyReadings;
+  console.log(realData);
 
   const ChartTooltipContent = ({
     active,
@@ -48,9 +43,11 @@ export default function ElectricalReadingCard() {
     return (
       <div className="rounded-md border bg-background p-2 shadow-sm">
         <p className="text-sm font-medium text-foreground">
-          Reading: {data.consumption} kW
+          Cumulative: {data.cumulativeEnergy?.toFixed(2)} kWh
         </p>
-        <p className="text-sm text-muted-foreground">Time: {data.time}</p>
+        <p className="text-sm text-muted-foreground">
+          Time: {format(parseISO(data.timestamp), "HH:mm")}
+        </p>
       </div>
     );
   };
@@ -82,32 +79,30 @@ export default function ElectricalReadingCard() {
           <CardDescription>BLOCK 8</CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <div className="m-auto flex justify-between">
+          <div className="m-auto flex justify-around">
             <div className="pr-3">
               <div>Today's Total</div>
-              <span className="text-[70px] text-[#00FFFF] font-semibold leading-none">
-                {Math.round(totalReading ? totalReading.cumulativeEnergy : 0)}
+              <span className="text-5xl text-[#00FFFF] font-semibold leading-none">
+                {Math.round(totalReading?.maxReading?.cumulativeEnergy ?? 0)}
               </span>
               <div className="text-3xl">kWh</div>
             </div>
-            <div className="border-l-2 border-white pl-3">
+            <div className="pl-3">
               <div>Current</div>
-              <span className="text-[70px] text-[#00FFFF] font-semibold leading-none">
-                {Math.round(
-                  currentReading ? currentReading.electricalReading : 0
-                )}
+              <span className="text-5xl text-[#00FFFF] font-semibold leading-none">
+                {Math.round(currentReading?.electricalReading ?? 0)}
               </span>
               <div className="text-3xl">kW</div>
             </div>
           </div>
           <div className="m-auto mt-5 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 p-4 rounded-xl border border-slate-200/50 dark:border-primary hover:shadow-lg transition-all">
-            <div className="w-full h-[250px]">
+            {realData && realData.length > 0 ? (
               <ChartContainer
                 config={chartConfig}
-                className="aspect-auto h-full"
+                className="aspect-auto w-full h-[265px]"
               >
                 <AreaChart
-                  data={chartData}
+                  data={realData}
                   margin={{ left: 10, right: 10, top: 10, bottom: 0 }}
                 >
                   <defs>
@@ -120,12 +115,12 @@ export default function ElectricalReadingCard() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="var(--color-consumption)"
+                        stopColor="var(--color-cumulativeEnergy)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        stopColor="var(--color-consumption)"
+                        stopColor="var(--color-cumulativeEnergy)"
                         stopOpacity={0.1}
                       />
                     </linearGradient>
@@ -136,11 +131,12 @@ export default function ElectricalReadingCard() {
                     opacity={0.1}
                   />
                   <XAxis
-                    dataKey="time"
+                    dataKey="timestamp"
+                    tickFormatter={(value) => format(parseISO(value), "HH:mm")}
+                    tick={{ fill: "#fff" }}
                     tickLine={false}
                     axisLine={false}
-                    tickMargin={8}
-                    tick={{ fill: "#fff" }}
+                    tickMargin={1}
                     padding={{ left: 10 }}
                   />
                   <ChartTooltip
@@ -149,13 +145,17 @@ export default function ElectricalReadingCard() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="consumption"
-                    stroke="var(--color-consumption)"
+                    dataKey="cumulativeEnergy"
+                    stroke="var(--color-cumulativeEnergy)"
                     fill="url(#gradientConsumption)"
                   />
                 </AreaChart>
               </ChartContainer>
-            </div>
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                Loading chart...
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

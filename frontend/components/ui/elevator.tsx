@@ -93,7 +93,7 @@ export const Elevator = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 p-4 rounded-xl border border-slate-200/50 dark:border-primary hover:shadow-lg transition-all">
+    <div className="h-[435px] bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 p-4 rounded-xl border border-slate-200/50 dark:border-primary hover:shadow-lg transition-all">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
@@ -176,8 +176,11 @@ export const Elevator = ({
         />
       </div> */}
 
-      <div className="mt-5">
-        <ChartContainer config={chartConfig}>
+      <div className="h-[290px] relative mt-5">
+        <ChartContainer
+          config={chartConfig}
+          className="bottom-0 absolute mx-auto w-full h-full"
+        >
           <BarChart
             accessibilityLayer
             data={chartData}

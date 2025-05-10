@@ -9,7 +9,10 @@ interface ElectricalValue {
 }
 
 export default function useTotalElectricalReading() {
-  const [reading, setReading] = useState<ElectricalValue | null>(null);
+  const [maxReading, setMaxReading] = useState<ElectricalValue | null>(null);
+  const [dailyReadings, setDailyReadings] = useState<
+    ElectricalValue[] | undefined
+  >([]);
 
   const fetchTotalElectricalReading = async () => {
     try {
@@ -24,10 +27,11 @@ export default function useTotalElectricalReading() {
         );
 
         if (todayData.length > 0) {
+          setDailyReadings(todayData);
           const maxItem = todayData.reduce((max, item) =>
             item.cumulativeEnergy > max.cumulativeEnergy ? item : max
           );
-          setReading(maxItem);
+          setMaxReading(maxItem);
         }
       }
     } catch (e) {
@@ -40,7 +44,7 @@ export default function useTotalElectricalReading() {
 
     const poll = async () => {
       await fetchTotalElectricalReading();
-      timeoutId = setTimeout(poll, 10 * 60 * 1000); // 10 minutes
+      timeoutId = setTimeout(poll, 10 * 60 * 1000);
     };
 
     poll();
@@ -48,5 +52,8 @@ export default function useTotalElectricalReading() {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  return reading;
+  return {
+    maxReading,
+    dailyReadings,
+  };
 }

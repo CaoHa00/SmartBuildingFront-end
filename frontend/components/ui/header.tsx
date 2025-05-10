@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { NavUser } from "../nav-user";
 import { useGreeting } from "@/hooks/use-greeting";
 import { BellIcon } from "lucide-react";
-import { LightDarkModeToggle } from "../light-dark-mode-toggle";
 
 interface HeaderProps extends React.HTMLAttributes<HTMLElement> {
   title?: string;

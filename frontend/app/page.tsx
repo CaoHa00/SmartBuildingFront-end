@@ -25,7 +25,7 @@ export function MainDashboard() {
       />
       <SidebarInset className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-blue-950 dark:to-slate-900 flex flex-col h-screen overflow-hidden">
         <Header title={selectedFacility} />
-        <div className="bg-background p-5">
+        <div className="bg-background p-5 pb-7">
           <div className="space-y-4 mb-4">
             <Breadcrumb>
               <BreadcrumbList>

@@ -7,7 +7,7 @@ import {
   Droplet,
   Snowflake,
   Wind,
-  Power
+  Power,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
@@ -40,7 +40,11 @@ export function AirConditionerControl() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Power className={`h-4 w-4 ${isPowered ? 'text-green-400' : 'text-neutral-400'}`} />
+          <Power
+            className={`h-4 w-4 ${
+              isPowered ? "text-green-400" : "text-neutral-400"
+            }`}
+          />
           <Switch
             checked={isPowered}
             onCheckedChange={setIsPowered}
@@ -48,7 +52,11 @@ export function AirConditionerControl() {
           />
         </div>
       </div>
-      <div className={`bg-blue-800 text-white p-4 rounded-xl mt-4 ${!isPowered && 'opacity-50'}`}>
+      <div
+        className={`bg-blue-800 text-white p-4 rounded-xl mt-4 ${
+          !isPowered && "opacity-50"
+        }`}
+      >
         <div className="space-y-6">
           {/* Thermostat Control */}
           <div className="thermostat-container relative w-[200px] h-[200px] mx-auto">
@@ -63,19 +71,54 @@ export function AirConditionerControl() {
 
           {/* Mode Controls */}
           <div className="flex justify-evenly items-center">
-            <button className="text-white" disabled={!isPowered}>
+            <button
+              className={`text-white ${
+                isPowered
+                  ? "hover:bg-white hover:text-blue-600 rounded-[50%] p-1"
+                  : ""
+              }`}
+              disabled={!isPowered}
+            >
               <CircleMinus onClick={decreaseTemp} />
             </button>
-            <button className={`p-2 rounded-full ${isPowered ? 'bg-sky-300' : 'bg-gray-500'} text-white`} disabled={!isPowered}>
+            <button
+              className={`p-2 rounded-full ${
+                isPowered
+                  ? "bg-sky-300 hover:bg-white hover:text-blue-600"
+                  : "bg-gray-500"
+              } text-white`}
+              disabled={!isPowered}
+            >
               <Wind />
             </button>
-            <button className={`p-3 rounded-full ${isPowered ? 'bg-blue-900 dark:bg-green-400' : 'bg-gray-500'} text-white`} disabled={!isPowered}>
+            <button
+              className={`p-3 rounded-full ${
+                isPowered
+                  ? "bg-blue-900 dark:bg-green-400 dark:hover:bg-white hover:bg-white hover:text-blue-600"
+                  : "bg-gray-500"
+              } text-white`}
+              disabled={!isPowered}
+            >
               <Snowflake size={30} />
             </button>
-            <button className={`p-2 rounded-full ${isPowered ? 'bg-sky-300' : 'bg-gray-500'} text-white`} disabled={!isPowered}>
+            <button
+              className={`p-2 rounded-full ${
+                isPowered
+                  ? "bg-sky-300 hover:bg-white hover:text-blue-600"
+                  : "bg-gray-500"
+              } text-white`}
+              disabled={!isPowered}
+            >
               <Droplet />
             </button>
-            <button className="text-white" disabled={!isPowered}>
+            <button
+              className={`text-white ${
+                isPowered
+                  ? "hover:bg-white hover:text-blue-600 rounded-[50%] p-1"
+                  : ""
+              }`}
+              disabled={!isPowered}
+            >
               <CirclePlus onClick={increaseTemp} />
             </button>
           </div>

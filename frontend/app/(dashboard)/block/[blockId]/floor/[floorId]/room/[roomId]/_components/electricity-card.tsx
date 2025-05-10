@@ -38,15 +38,27 @@ export function ElectricityCard() {
   const totalPower = getValueByName("total-energy-consumed");
 
   return (
-    <Card className="w-full h-full bg-blue-800 dark:bg-blue-950 text-neutral-100">
+    <Card className="w-full h-full bg-card text-neutral-100">
       <CardHeader className={`${isMobile ? "px-4 py-3" : "p-4"} pb-2`}>
         <h2
-          className={`flex items-center font-bold gap-2 ${
+          className={`flex items-center font-bold gap-2 justify-between ${
             isMobile ? "text-base" : "text-xl"
           }`}
         >
           Electricity Consumption
-          <Zap />
+          <svg
+            className="w-5 h-5 text-yellow-600 dark:text-yellow-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
         </h2>
       </CardHeader>
       <CardContent className="p-4">
@@ -74,11 +86,11 @@ export function ElectricityCard() {
               <span className="text-sm ml-1">kW</span>
             </p>
           </div>
-          <div className="w-full h-[100px]">
+          <div className="w-full h-[150px]">
             <ChartContainer config={chartConfig} className="aspect-auto h-full">
               <AreaChart
                 data={chartData}
-                margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
+                margin={{ left: 10, right: 10, top: 10, bottom: 0 }}
               >
                 <defs>
                   <linearGradient
@@ -111,6 +123,7 @@ export function ElectricityCard() {
                   axisLine={false}
                   tickMargin={8}
                   tick={{ fill: "#fff" }}
+                  padding={{ left: 10, right: 10 }}
                 />
                 <ChartTooltip
                   cursor={false}

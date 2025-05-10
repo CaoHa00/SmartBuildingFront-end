@@ -18,7 +18,7 @@ export function Footer({
   const variants = {
     default: `flex items-center justify-center px-6 ${
       isMobile ? "h-14" : "h-16"
-    } bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border-t border-slate-200/50 dark:border-slate-700/50 shadow-sm`,
+    } bg-card border-t border-slate-200/50 dark:border-slate-700/50 shadow-sm`,
     standee:
       "absolute bottom-0 left-0 right-0 flex items-center justify-between px-6 h-16 bg-gradient-to-br from-[#080077]/80 to-[#650bf7]/80 border-t border-white/10 backdrop-blur-sm",
   };
